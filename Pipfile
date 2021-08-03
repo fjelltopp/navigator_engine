@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+gevent = "*"
+redis = "*"
+aioredis = "*"
+flask = "*"
+flask-sqlalchemy = "*"
+flask-login = "*"
+flask-socketio = "*"
+"python-socketio[client]" = "*"
+
+[dev-packages]
+flake8 = "*"
+ipdb = "==0.13.9"
+
+[requires]
+python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true
