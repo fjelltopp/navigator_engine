@@ -4,8 +4,8 @@ RUN pip3 install uwsgi pipenv
 
 WORKDIR /var/www/navigator_engine
 
-ADD Pipfile /var/www/navigator_engine/Pipfile
-RUN pipenv install --dev
+ADD Pipfile.lock /var/www/navigator_engine/Pipfile.lock
+RUN pipenv sync --dev
 
 ADD uwsgi-app.ini /var/www/uwsgi/app.ini
 
