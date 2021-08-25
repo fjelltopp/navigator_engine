@@ -1,3 +1,5 @@
+import json
+
 import logging
 from flask import Flask
 
@@ -8,6 +10,7 @@ log = logging.getLogger(__name__)
 @pubsub.subscribe
 def navigate(message):
     print(f"Print message: {message}")
+    pubsub.publish('result', json.dumps({"message": f"Received navigate action: {message}"}))
 
 
 def create_app():
