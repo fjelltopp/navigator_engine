@@ -9,7 +9,7 @@ redis = "*"
 aioredis = "*"
 flask = "*"
 flask-sqlalchemy = "*"
-flask-login = "*"
+flask-restful = "*"
 pydevd-pycharm = "*"
 
 [dev-packages]
