@@ -11,6 +11,9 @@ flask = "*"
 flask-sqlalchemy = "*"
 flask-restful = "*"
 pydevd-pycharm = "*"
+packaging = "*"
+sentry-sdk = {extras = ["flask"], version = "*"}
+ipdb = "*"
 
 [dev-packages]
 flake8 = "*"
