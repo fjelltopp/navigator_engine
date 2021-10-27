@@ -14,6 +14,8 @@ pydevd-pycharm = "*"
 packaging = "*"
 sentry-sdk = {extras = ["flask"], version = "*"}
 ipdb = "*"
+psycopg2 = "*"
+networkx = {extras = ["default"], version = "*"}
 
 [dev-packages]
 flake8 = "*"
