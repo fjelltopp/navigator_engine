@@ -9,7 +9,6 @@ class Graph(db.Model):
     title = db.Column(db.String, nullable=False)
     version = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
-    nodes = db.relationship("Node", back_populates="graph")
     edges = db.relationship("Edge", back_populates="graph")
 
     def to_networkx(self):
@@ -37,12 +36,10 @@ class Action(db.Model):
 
 class Node(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    graph_id = db.Column(db.Integer,  db.ForeignKey('graph.id'), nullable=False)
     conditional_id = db.Column(db.Integer, db.ForeignKey('conditional.id'))
     action_id = db.Column(db.Integer, db.ForeignKey('action.id'))
     action = db.relationship("Action", back_populates="nodes")
     conditional = db.relationship("Conditional", back_populates="nodes")
-    graph = db.relationship("Graph", back_populates="nodes")
 
     def __hash__(self):
         return self.id
