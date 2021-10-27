@@ -1,5 +1,12 @@
+from navigator_engine.app import create_app
 import navigator_engine.model as model
-from flask import current_app
+import logging
+
+
+# We should only need one seperate flask app for testing, so import from here.
+app = create_app('navigator_engine.config.Testing')
+
+logger = logging.getLogger("Tests")
 
 
 def create_demo_data():
@@ -65,33 +72,3 @@ def create_demo_data():
     model.db.session.add(edge6)
     model.db.session.add(edge7)
     model.db.session.commit()
-
-
-def demo_graph_etl():
-    # Load the demo graph from the db
-    graph = model.Graph.query.filter_by(id=1).first()
-
-    # Convert data into a networkx Graph
-    graph.to_networkx()
-
-    # Find the decision graph root node
-    root = [n for n, d in graph.network.in_degree() if d == 0]
-    root = root[0]  # (there should only be one root)
-    original_title = root.conditional.title
-    current_app.logger.info(f"Root node {root} with title {original_title}")
-
-    # Update the root node's title
-    new_title = "Is geographic data loaded?"
-    root.conditional.title = new_title
-
-    # Write all changes made to the graph back to the db
-    model.db.session.add(graph)
-    model.db.session.commit()
-
-    # Reload the graph fromt he db and check that the title of the root node is updated
-    graph_reloaded = model.Graph.query.filter_by(id=1).first()
-    graph_reloaded.to_networkx()
-    root = [n for n, d in graph_reloaded.network.in_degree() if d == 0]
-    root = root[0]
-    current_app.logger.info(f"Reloaded root node {root} with title {root.conditional.title}")
-    assert new_title == root.conditional.title
