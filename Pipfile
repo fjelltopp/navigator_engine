@@ -16,6 +16,7 @@ sentry-sdk = {extras = ["flask"], version = "*"}
 ipdb = "*"
 networkx = {extras = ["default"], version = "*"}
 psycopg2-binary = "*"
+pytest = "*"
 
 [dev-packages]
 flake8 = "*"

@@ -12,6 +12,7 @@ class Config(object):
 
 class Testing(Config):
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/test_navigator_engine'
 
 
 class Production(Config):
