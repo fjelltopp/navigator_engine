@@ -4,6 +4,7 @@ from flask import Flask
 from sentry_sdk.integrations.flask import FlaskIntegration
 from navigator_engine.model import db
 from navigator_engine.api import api
+from navigator_engine.data_demo import create_demo_data, demo_graph_etl
 
 app = Flask(__name__)
 
@@ -21,6 +22,10 @@ if app.config.get("SENTRY_DSN"):
 
 db.init_app(app)
 api.init_app(app)
+
+with app.app_context():
+    create_demo_data()
+    demo_graph_etl()
 
 
 @app.route('/')
