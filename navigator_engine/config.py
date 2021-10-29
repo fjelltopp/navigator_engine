@@ -1,4 +1,5 @@
 import logging
+import os
 
 
 class Config(object):
@@ -13,6 +14,12 @@ class Config(object):
 class Testing(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/test_navigator_engine'
+
+
+class Development(Config):
+    DEBUG = True
+
+    SQLALCHEMY_DATABASE_URI = 'sqlite+pysqlite://'
 
 
 class Production(Config):
