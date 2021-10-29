@@ -93,23 +93,6 @@ def create_demo_data():
                 type=False)
         model.db.session.add(edge_false)
         model.db.session.commit()
-    foo = 1
-
-    # edge1 = model.Edge(graph_id=graph.id, from_id=node1.id, to_id=node2.id, type=True)
-    # edge2 = model.Edge(graph_id=graph.id, from_id=node1.id, to_id=node5.id, type=False)
-    # edge3 = model.Edge(graph_id=graph.id, from_id=node2.id, to_id=node3.id, type=True)
-    # edge4 = model.Edge(graph_id=graph.id, from_id=node2.id, to_id=node6.id, type=False)
-    # edge5 = model.Edge(graph_id=graph.id, from_id=node3.id, to_id=node4.id, type=True)
-    # edge6 = model.Edge(graph_id=graph.id, from_id=node3.id, to_id=node7.id, type=False)
-    # edge7 = model.Edge(graph_id=graph.id, from_id=node4.id, to_id=node8.id, type=False)
-    # model.db.session.add(edge1)
-    # model.db.session.add(edge2)
-    # model.db.session.add(edge3)
-    # model.db.session.add(edge4)
-    # model.db.session.add(edge5)
-    # model.db.session.add(edge6)
-    # model.db.session.add(edge7)
-    # model.db.session.commit()
 
 
 def demo_graph_etl():
