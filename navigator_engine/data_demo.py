@@ -1,4 +1,6 @@
 import navigator_engine.model as model
+import csv
+import logging
 from flask import current_app
 
 
@@ -7,64 +9,107 @@ def create_demo_data():
     model.db.drop_all()
     model.db.create_all()
 
+    data = csv.DictReader(open(current_app.config.get('GRAPH_CSV'), newline=''))
+
+    # Read graph data into memory
+    data_dict = {}
+    for row in data:
+        keys = list(row.keys())
+        data_dict[row[keys[0]]] = {}
+        for col in keys[1:]:
+            data_dict[row[keys[0]]][col] = row[col]
+
+    # TODO: validate the imported graph CSV
+
     # Load a simple BDG
-    graph = model.Graph(title="Upload ADR Data", version="0.1", description="Demo graph to guide people through ADR data upload")
+    graph = model.Graph(
+        title="Upload ADR Data",
+        version="0.1",
+        description="Demo graph to guide people through ADR data upload")
     model.db.session.add(graph)
     model.db.session.commit()
 
-    conditional1 = model.Conditional(title="Check if GeoJSON uploaded", function="check_resource_exists('inputs-geographic')")
-    conditional2 = model.Conditional(title="Check if GeoJSON valid", function="check_resource_valid('inputs-geographic')")
-    conditional3 = model.Conditional(title="Check if Survey data uploaded", function="check_resource_exists('inputs-survey')")
-    conditional4 = model.Conditional(title="Check if Survey data valid", function="check_resource_valid('inputs-survey')")
-    model.db.session.add(conditional1)
-    model.db.session.add(conditional2)
-    model.db.session.add(conditional3)
-    model.db.session.add(conditional4)
-    model.db.session.commit()
+    # Loop through the data dictionary to create nodes conditionals and actions
+    for sheet_id in data_dict:
+        row = data_dict[sheet_id]
+        conditional = model.Conditional(title=row['Conditional'], function=row['ConditionalFunction'])
+        model.db.session.add(conditional)
+        model.db.session.commit()
 
-    action1 = model.Action(title="Upload your geographic data", html="Upload geographic data html", skippable=False, action_url="url")
-    action2 = model.Action(title="Validate your geographic data", html="Validate geographic data html", skippable=False, action_url="url")
-    action3 = model.Action(title="Upload your survey data", html="Upload survey data html", skippable=False, action_url="url")
-    action4 = model.Action(title="Validate your survey data", html="Validate survey data html", skippable=False, action_url="url")
-    model.db.session.add(action1)
-    model.db.session.add(action2)
-    model.db.session.add(action3)
-    model.db.session.add(action4)
-    model.db.session.commit()
+        node_conditional = model.Node(
+            conditional_id=conditional.id
+        )
 
-    node1 = model.Node(conditional_id=conditional1.id)
-    node2 = model.Node(conditional_id=conditional2.id)
-    node3 = model.Node(conditional_id=conditional3.id)
-    node4 = model.Node(conditional_id=conditional4.id)
-    node5 = model.Node(action_id=action1.id)
-    node6 = model.Node(action_id=action2.id)
-    node7 = model.Node(action_id=action3.id)
-    node8 = model.Node(action_id=action4.id)
-    model.db.session.add(node1)
-    model.db.session.add(node2)
-    model.db.session.add(node3)
-    model.db.session.add(node4)
-    model.db.session.add(node5)
-    model.db.session.add(node6)
-    model.db.session.add(node7)
-    model.db.session.add(node8)
-    model.db.session.commit()
+        model.db.session.add(node_conditional)
+        model.db.session.commit()
 
-    edge1 = model.Edge(graph_id=graph.id, from_id=node1.id, to_id=node2.id, type=True)
-    edge2 = model.Edge(graph_id=graph.id, from_id=node1.id, to_id=node5.id, type=False)
-    edge3 = model.Edge(graph_id=graph.id, from_id=node2.id, to_id=node3.id, type=True)
-    edge4 = model.Edge(graph_id=graph.id, from_id=node2.id, to_id=node6.id, type=False)
-    edge5 = model.Edge(graph_id=graph.id, from_id=node3.id, to_id=node4.id, type=True)
-    edge6 = model.Edge(graph_id=graph.id, from_id=node3.id, to_id=node7.id, type=False)
-    edge7 = model.Edge(graph_id=graph.id, from_id=node4.id, to_id=node8.id, type=False)
-    model.db.session.add(edge1)
-    model.db.session.add(edge2)
-    model.db.session.add(edge3)
-    model.db.session.add(edge4)
-    model.db.session.add(edge5)
-    model.db.session.add(edge6)
-    model.db.session.add(edge7)
-    model.db.session.commit()
+        data_dict[sheet_id]['DbNodeId'] = node_conditional.id
+
+        if row['ConditionalNo'] == 'action':
+            action = model.Action(
+                title=row['Action'],
+                html=row['ActionHtml'],
+                skippable=_map_excel_boolean(row['ActionSkippable']),
+                action_url=row['ActionUrl'])
+            model.db.session.add(action)
+            model.db.session.commit()
+
+            node_action = model.Node(
+                action_id=action.id
+            )
+            model.db.session.add(node_action)
+            model.db.session.commit()
+
+            data_dict[sheet_id]['DbNodeActionId'] = node_action.id
+            model.db.session.add(node_action)
+            model.db.session.commit()
+
+    # Loop through the data dictionary to create edges
+    for sheet_id in data_dict:
+        row = data_dict[sheet_id]
+
+        if row['ConditionalYes'] == 'end':
+            logging.info('End node reached')
+        else:
+            edge_true = model.Edge(
+                graph_id=graph.id,
+                from_id=row['DbNodeId'],
+                to_id=data_dict[row['ConditionalYes']]['DbNodeId'],
+                type=True)
+            model.db.session.add(edge_true)
+            model.db.session.commit()
+
+        if row['ConditionalNo'] == 'action':
+            edge_false = model.Edge(
+                graph_id=graph.id,
+                from_id=row['DbNodeId'],
+                to_id=row['DbNodeActionId'],
+                type=False)
+        else:
+            edge_false = model.Edge(
+                graph_id=graph.id,
+                from_id=row['DbNodeId'],
+                to_id=data_dict[row['ConditionalNo']]['DbNodeId'],
+                type=False)
+        model.db.session.add(edge_false)
+        model.db.session.commit()
+    foo = 1
+
+    # edge1 = model.Edge(graph_id=graph.id, from_id=node1.id, to_id=node2.id, type=True)
+    # edge2 = model.Edge(graph_id=graph.id, from_id=node1.id, to_id=node5.id, type=False)
+    # edge3 = model.Edge(graph_id=graph.id, from_id=node2.id, to_id=node3.id, type=True)
+    # edge4 = model.Edge(graph_id=graph.id, from_id=node2.id, to_id=node6.id, type=False)
+    # edge5 = model.Edge(graph_id=graph.id, from_id=node3.id, to_id=node4.id, type=True)
+    # edge6 = model.Edge(graph_id=graph.id, from_id=node3.id, to_id=node7.id, type=False)
+    # edge7 = model.Edge(graph_id=graph.id, from_id=node4.id, to_id=node8.id, type=False)
+    # model.db.session.add(edge1)
+    # model.db.session.add(edge2)
+    # model.db.session.add(edge3)
+    # model.db.session.add(edge4)
+    # model.db.session.add(edge5)
+    # model.db.session.add(edge6)
+    # model.db.session.add(edge7)
+    # model.db.session.commit()
 
 
 def demo_graph_etl():
@@ -95,3 +140,14 @@ def demo_graph_etl():
     root = root[0]
     current_app.logger.info(f"Reloaded root node {root} with title {root.conditional.title}")
     assert new_title == root.conditional.title
+
+
+def _map_excel_boolean(boolean):
+    if boolean == 'TRUE':
+        return True
+    elif boolean == 'FALSE':
+        return False
+    else:
+        raise ValueError('Value {} read from Graph CSV is not valid; Only TRUE and FALSE are valid values.'
+                         .format(boolean))
+
