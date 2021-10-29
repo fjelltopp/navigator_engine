@@ -4,23 +4,23 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-gevent = "*"
 redis = "*"
 aioredis = "*"
 flask = "*"
 flask-sqlalchemy = "*"
 flask-restful = "*"
-pydevd-pycharm = "*"
 packaging = "*"
 sentry-sdk = {extras = ["flask"], version = "*"}
-ipdb = "*"
 networkx = {extras = ["default"], version = "*"}
 psycopg2-binary = "*"
-pytest = "*"
+
 
 [dev-packages]
 flake8 = "*"
 ipdb = "==0.13.9"
+pytest = "*"
+factory-boy = "*"
+pydevd-pycharm = "*"
 
 [requires]
 python_version = "3.9"
