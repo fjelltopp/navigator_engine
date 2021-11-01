@@ -20,7 +20,7 @@ class Development(Config):
     DEBUG = True
 
     SQLALCHEMY_DATABASE_URI = 'sqlite+pysqlite://'
-    INITIAL_GRAPH_CONFIG = 'Test_graph.csv'
+    INITIAL_GRAPH_CONFIG = 'Estimates_Navigator_BDG_Validations.xlsx'
 
 
 class Production(Config):
