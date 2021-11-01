@@ -27,6 +27,10 @@ def create_app(config_object=None):
     db.init_app(app)
     api.init_app(app)
 
+    from navigator_engine.graph_loader import graph_loader
+    with app.app_context():
+        graph_loader()
+
     @app.route('/')
     def index():
         return "Navigator Engine Running"
