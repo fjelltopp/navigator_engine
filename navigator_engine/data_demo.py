@@ -3,33 +3,61 @@ import csv
 import logging
 from flask import current_app
 
+MILESTONE_COLUMNS = {
+    'TITLE': 'Milestone Title',
+    'VERSION': 'Version',
+    'DESCRIPTION': 'Description'
+}
+
+DATA_COLUMNS = {
+    'CONDITIONAL': 'Conditional',
+    'CONDITIONAL_FUNCTION': 'ConditionalFunction',
+    'CONDITIONAL_YES': 'ConditionalYes',
+    'CONDITIONAL_NO': 'ConditionalNo',
+    'ACTION': 'Action',
+    'SKIPPABLE': 'ActionSkippable',
+    'ACTION_HTML': 'ActionHtml',
+    'ACTION_URL': 'ActionUrl'
+}
+
 
 def create_demo_data():
     # Clear and reset the db
     model.db.drop_all()
     model.db.create_all()
 
-    data = csv.DictReader(open(current_app.config.get('GRAPH_CSV'), newline=''))
-
     # Read graph data into memory
-    data_dict = {}
-    for row in data:
-        keys = list(row.keys())
-        data_dict[row[keys[0]]] = {}
-        for col in keys[1:]:
-            data_dict[row[keys[0]]][col] = row[col]
+    with open(current_app.config.get('GRAPH_CSV'), newline='') as csvfile:
+        data_file = csv.reader(csvfile, delimiter=';')
+        row_no = 1
+        milestone_dict = {}
+        data_dict = {}
+
+        for row in data_file:
+            if row_no == 1:
+                milestone_headers = row
+            elif row_no == 2:
+                for i in range(0, len(row)):
+                    milestone_dict[milestone_headers[i]] = row[i]
+            elif row_no == 4:
+                data_headers = row
+            elif row_no > 4:
+                data_dict[row[0]] = {"row": row_no}
+                for i in range(0, len(row)):
+                    data_dict[row[0]][data_headers[i]] = row[i]
+            row_no = row_no + 1
 
     # TODO: validate the imported graph CSV
 
     # Load a simple BDG
     graph = model.Graph(
-        title="Upload ADR Data",
-        version="0.1",
-        description="Demo graph to guide people through ADR data upload")
+        title=milestone_dict['Milestone Title'],
+        version=milestone_dict['Version'],
+        description=milestone_dict['Description'])
     model.db.session.add(graph)
     model.db.session.commit()
 
-    # Loop through the data dictionary to create nodes conditionals and actions
+    # Loop through the data dictionary to create nodes, conditionals and actions
     for sheet_id in data_dict:
         row = data_dict[sheet_id]
         conditional = model.Conditional(title=row['Conditional'], function=row['ConditionalFunction'])
