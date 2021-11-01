@@ -72,3 +72,4 @@ def create_demo_data():
     model.db.session.add(edge6)
     model.db.session.add(edge7)
     model.db.session.commit()
+    
