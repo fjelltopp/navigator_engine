@@ -27,7 +27,7 @@ def create_demo_data():
     model.db.create_all()
 
     # Read graph data into memory
-    with open(current_app.config.get('GRAPH_CSV'), newline='') as csvfile:
+    with open(current_app.config.get('INITIAL_GRAPH_CONFIG'), newline='') as csvfile:
         data_file = csv.reader(csvfile, delimiter=';')
         row_no = 1
         milestone_dict = {}
@@ -159,5 +159,6 @@ def _map_excel_boolean(boolean):
     elif boolean == 'FALSE':
         return False
     else:
-        raise ValueError('Value {} read from Graph CSV is not valid; Only TRUE and FALSE are valid values.'
+        raise ValueError('Value {} read from Initial Graph Config is not valid; Only TRUE and FALSE are valid values.'
                          .format(boolean))
+    

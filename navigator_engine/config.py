@@ -20,7 +20,7 @@ class Development(Config):
     DEBUG = True
 
     SQLALCHEMY_DATABASE_URI = 'sqlite+pysqlite://'
-    GRAPH_CSV = 'Test_graph.csv'
+    INITIAL_GRAPH_CONFIG = 'Test_graph.csv'
 
 
 class Production(Config):
