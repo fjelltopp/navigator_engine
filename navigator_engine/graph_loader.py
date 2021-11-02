@@ -1,10 +1,9 @@
 import navigator_engine.model as model
-from navigator_engine.app import create_app
-import csv
 import logging
 from flask import current_app
 import os
 import pandas as pd
+import re
 
 MILESTONE_COLUMNS = {
     'TITLE': 'Milestone Title',
@@ -13,12 +12,13 @@ MILESTONE_COLUMNS = {
 }
 
 DATA_COLUMNS = {
-    'CONDITIONAL': 'Conditional',
+    'CONDITIONAL': 'Task Test (if test passes, proceed to next test)',
     'CONDITIONAL_FUNCTION': 'ConditionalFunction',
     'CONDITIONAL_YES': 'ConditionalYes',
     'CONDITIONAL_NO': 'ConditionalNo',
-    'ACTION': 'Action',
-    'SKIPPABLE': 'ActionSkippable',
+    'ACTION': 'If test fails, present this to user:',
+    'SKIPPABLE': 'Mandatory to complete estimates?',
+    'SKIP_ON_FAIL': 'If test fails, skip to the following row:',
     'ACTION_HTML': 'ActionHtml',
     'ACTION_URL': 'ActionUrl'
 }
@@ -38,6 +38,23 @@ def graph_loader():
         import_data(graph_header, graph_data)
 
     elif file_extension == '.xlsx':
+        xl = pd.ExcelFile(current_app.config.get('INITIAL_GRAPH_CONFIG'))
+        p = re.compile('[\d]{2,2}-')
+
+        for sheet_name in xl.sheet_names:
+
+            if p.match(sheet_name):
+                graph_header = pd.read_excel(current_app.config.get('INITIAL_GRAPH_CONFIG'),
+                                             sheet_name=sheet_name,
+                                             header=0
+                                             ).loc[0][0:4]
+                graph_data = pd.read_excel(current_app.config.get('INITIAL_GRAPH_CONFIG'),
+                                           sheet_name=sheet_name,
+                                           header=3,
+                                           index_col=0
+                                           )
+                import_data(graph_header, graph_data)
+
         graph_header = pd.read_csv(current_app.config.get('INITIAL_GRAPH_CONFIG'), header=0).loc[0][0:4]
         graph_data = pd.read_csv(current_app.config.get('INITIAL_GRAPH_CONFIG'), header=3, index_col=0)
         import_data(graph_header, graph_data)
@@ -48,9 +65,8 @@ def graph_loader():
 
 def import_data(graph_header, graph_data):
     # Read graph data into memory
-    data_dict = {}
 
-    # TODO: validate the imported graph CSV
+    # TODO: validate the imported graph
 
     # Load a simple BDG
     graph = model.Graph(
@@ -67,8 +83,7 @@ def import_data(graph_header, graph_data):
 
     for idx in graph_data.index:
         conditional = model.Conditional(
-            title=graph_data.loc[idx, 'Conditional'],
-            function=graph_data.loc[idx, 'ConditionalFunction']
+            title=graph_data.loc[idx, 'Conditional']
         )
         model.db.session.add(conditional)
         model.db.session.commit()
@@ -82,12 +97,10 @@ def import_data(graph_header, graph_data):
 
         graph_data.at[idx, 'DbNodeId'] = node_conditional.id
 
-        if graph_data.at[idx, 'ConditionalNo'] == 'action':
+        if len(graph.at[idx, 'SkipOnFail']) > 0:
             action = model.Action(
                 title=graph_data.at[idx, 'Action'],
-                html=graph_data.at[idx, 'ActionHtml'],
-                skippable=_map_excel_boolean(graph_data.at[idx, 'ActionSkippable']),
-                action_url=graph_data.at[idx, 'ActionUrl']
+                skippable=_map_excel_boolean(graph_data.at[idx, 'ActionSkippable'])
             )
             model.db.session.add(action)
             model.db.session.commit()
