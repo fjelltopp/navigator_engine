@@ -4,6 +4,7 @@ from flask import Flask
 from sentry_sdk.integrations.flask import FlaskIntegration
 from navigator_engine.model import db
 from navigator_engine.api import api
+from navigator_engine.graph_loader import graph_loader
 
 
 def create_app(config_object=None):
@@ -27,7 +28,6 @@ def create_app(config_object=None):
     db.init_app(app)
     api.init_app(app)
 
-    from navigator_engine.graph_loader import graph_loader
     with app.app_context():
         graph_loader()
 
