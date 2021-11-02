@@ -70,9 +70,9 @@ def import_data(graph_header, graph_data):
 
     # Load a simple BDG
     graph = model.Graph(
-        title=graph_header['Milestone Title'],
-        version=graph_header['Version'],
-        description=graph_header['Description']
+        title=graph_header[MILESTONE_COLUMNS['TITLE']],
+        version=graph_header[MILESTONE_COLUMNS['VERSION']],
+        description=graph_header[MILESTONE_COLUMNS['DESCRIPTION']]
     )
     model.db.session.add(graph)
     model.db.session.commit()
@@ -83,7 +83,7 @@ def import_data(graph_header, graph_data):
 
     for idx in graph_data.index:
         conditional = model.Conditional(
-            title=graph_data.loc[idx, 'Conditional']
+            title=graph_data.loc[idx, DATA_COLUMNS['CONDITIONAL']]
         )
         model.db.session.add(conditional)
         model.db.session.commit()
@@ -97,10 +97,10 @@ def import_data(graph_header, graph_data):
 
         graph_data.at[idx, 'DbNodeId'] = node_conditional.id
 
-        if len(graph.at[idx, 'SkipOnFail']) > 0:
+        if len(graph.at[idx, DATA_COLUMNS['SKIP_ON_FAIL']]) > 0:
             action = model.Action(
-                title=graph_data.at[idx, 'Action'],
-                skippable=_map_excel_boolean(graph_data.at[idx, 'ActionSkippable'])
+                title=graph_data.at[idx, DATA_COLUMNS['ACTION']],
+                skippable=_map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['SKIPPABLE']])
             )
             model.db.session.add(action)
             model.db.session.commit()
@@ -118,19 +118,19 @@ def import_data(graph_header, graph_data):
     # Loop through the data dictionary to create edges
     for idx in graph_data.index:
 
-        if graph_data.at[idx, 'ConditionalYes'] == 'end':
+        if graph_data.at[idx, DATA_COLUMNS['CONDITIONAL_YES']] == 'end':
             logging.info('End node reached')
         else:
             edge_true = model.Edge(
                 graph_id=graph.id,
                 from_id=graph_data.at[idx, 'DbNodeId'],
-                to_id=graph_data.at[int(graph_data.at[idx, 'ConditionalYes']), 'DbNodeId'],
+                to_id=graph_data.at[int(graph_data.at[idx, DATA_COLUMNS['CONDITIONAL_YES']]), 'DbNodeId'],
                 type=True
             )
             model.db.session.add(edge_true)
             model.db.session.commit()
 
-        if graph_data.at[idx, 'ConditionalNo'] == 'action':
+        if graph_data.at[idx, DATA_COLUMNS['CONDITIONAL_NO']] == 'action':
             edge_false = model.Edge(
                 graph_id=graph.id,
                 from_id=graph_data.at[idx, 'DbNodeId'],
@@ -141,7 +141,7 @@ def import_data(graph_header, graph_data):
             edge_false = model.Edge(
                 graph_id=graph.id,
                 from_id=graph_data.at[idx, 'DbNodeId'],
-                to_id=graph_data.at[int(graph_data.at[idx, 'ConditionalNo']), 'DbNodeId'],
+                to_id=graph_data.at[int(graph_data.at[idx, DATA_COLUMNS['CONDITIONAL_NO']]), 'DbNodeId'],
                 type=False
             )
         model.db.session.add(edge_false)
