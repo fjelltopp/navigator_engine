@@ -2,6 +2,7 @@ import navigator_engine.model as model
 import logging
 from flask import current_app
 import os
+import numpy as np
 import pandas as pd
 import re
 
@@ -13,14 +14,9 @@ MILESTONE_COLUMNS = {
 
 DATA_COLUMNS = {
     'CONDITIONAL': 'Task Test (if test passes, proceed to next test)',
-    'CONDITIONAL_FUNCTION': 'ConditionalFunction',
-    'CONDITIONAL_YES': 'ConditionalYes',
-    'CONDITIONAL_NO': 'ConditionalNo',
     'ACTION': 'If test fails, present this to user:',
     'SKIPPABLE': 'Mandatory to complete estimates?',
-    'SKIP_ON_FAIL': 'If test fails, skip to the following row:',
-    'ACTION_HTML': 'ActionHtml',
-    'ACTION_URL': 'ActionUrl'
+    'SKIP_TO': 'If test fails, skip to this row:'
 }
 
 
@@ -64,7 +60,6 @@ def graph_loader():
 
 
 def import_data(graph_header, graph_data):
-    # Read graph data into memory
 
     # TODO: validate the imported graph
 
@@ -77,7 +72,7 @@ def import_data(graph_header, graph_data):
     model.db.session.add(graph)
     model.db.session.commit()
 
-    # Loop through the data dictionary to create nodes, conditionals and actions
+    # Loop through the graph dataframe to create nodes, conditionals and actions
     graph_data.insert(0, 'DbNodeId', None)
     graph_data.insert(1, 'DbActionNodeId', None)
 
@@ -97,7 +92,8 @@ def import_data(graph_header, graph_data):
 
         graph_data.at[idx, 'DbNodeId'] = node_conditional.id
 
-        if len(graph.at[idx, DATA_COLUMNS['SKIP_ON_FAIL']]) > 0:
+        # If Conditional is False, add an action node if no skip destination is given
+        if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
             action = model.Action(
                 title=graph_data.at[idx, DATA_COLUMNS['ACTION']],
                 skippable=_map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['SKIPPABLE']])
@@ -115,33 +111,35 @@ def import_data(graph_header, graph_data):
             model.db.session.add(node_action)
             model.db.session.commit()
 
-    # Loop through the data dictionary to create edges
+    # Loop through the graph dataframe to create edges
     for idx in graph_data.index:
 
-        if graph_data.at[idx, DATA_COLUMNS['CONDITIONAL_YES']] == 'end':
+        if graph_data.iloc[-1, :].equals(graph_data.loc[idx, :]):
             logging.info('End node reached')
         else:
             edge_true = model.Edge(
                 graph_id=graph.id,
                 from_id=graph_data.at[idx, 'DbNodeId'],
-                to_id=graph_data.at[int(graph_data.at[idx, DATA_COLUMNS['CONDITIONAL_YES']]), 'DbNodeId'],
+                to_id=graph_data.iloc[graph_data.index.get_loc(graph_data.loc[idx].name) + 1].loc['DbNodeId'],
                 type=True
             )
             model.db.session.add(edge_true)
             model.db.session.commit()
 
-        if graph_data.at[idx, DATA_COLUMNS['CONDITIONAL_NO']] == 'action':
+        # If Conditional is False, add an edge to the relevant action if no skip destination is given
+        if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
             edge_false = model.Edge(
                 graph_id=graph.id,
                 from_id=graph_data.at[idx, 'DbNodeId'],
                 to_id=graph_data.at[idx, 'DbNodeActionId'],
                 type=False
             )
+        # if skip destination is given, add an edge to its node
         else:
             edge_false = model.Edge(
                 graph_id=graph.id,
                 from_id=graph_data.at[idx, 'DbNodeId'],
-                to_id=graph_data.at[int(graph_data.at[idx, DATA_COLUMNS['CONDITIONAL_NO']]), 'DbNodeId'],
+                to_id=graph_data.at[graph_data.at[idx, DATA_COLUMNS['SKIP_TO']], 'DbNodeId'],
                 type=False
             )
         model.db.session.add(edge_false)
@@ -152,7 +150,7 @@ def import_data(graph_header, graph_data):
 def _map_excel_boolean(boolean):
     if boolean in ['TRUE', 1, "1", "T", "t", "true", "True"]:
         return True
-    elif boolean in ['FALSE', 0, "0", "F", "f", "false", "False"]:
+    elif boolean in ['FALSE', 0, "0", "F", "f", "false", "False"] or np.isnan(boolean):
         return False
     else:
         raise ValueError('Value {} read from Initial Graph Config is not valid; Only TRUE and FALSE are valid values.'
