@@ -51,10 +51,6 @@ def graph_loader():
                                            )
                 import_data(graph_header, graph_data)
 
-        graph_header = pd.read_csv(current_app.config.get('INITIAL_GRAPH_CONFIG'), header=0).loc[0][0:4]
-        graph_data = pd.read_csv(current_app.config.get('INITIAL_GRAPH_CONFIG'), header=3, index_col=0)
-        import_data(graph_header, graph_data)
-
     else:
         raise ValueError('File extension of Initial Graph Config must be XLSX or CSV')
 
