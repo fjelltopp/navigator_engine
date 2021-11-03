@@ -203,5 +203,17 @@ def test_process_milestone_complete(mocker):
 
 
 def test_decide(mocker):
-    # TODO
-    pass
+    root_node = factories.NodeFactory(id=1)
+    engine = mocker.Mock(spec=DecisionEngine)
+    engine.data = {}
+    engine.skip = []
+    engine.root_node = root_node
+    engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
+    engine.skipped = [1, 2, 3]
+    engine.process_node.return_value = 'processed_action'
+    result = DecisionEngine.decide(engine, data={'test': 'data'}, skip=[4, 5])
+    engine.process_node.assert_called_once_with(root_node)
+    assert result == 'processed_action'
+    assert engine.data == {'test': 'data'}
+    assert engine.skip == [4, 5]
+    assert engine.skipped == []
