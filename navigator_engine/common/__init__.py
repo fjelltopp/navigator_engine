@@ -1,8 +1,10 @@
-import networkx
-from navigator_engine.model import Graph
+CONDITIONAL_FUNCTIONS = {}
+DATA_LOADERS = {}
 
 
-def load_graph(graph_id: str):
-    graph = Graph.query.filter_by(id=graph_id).first().to_networkx()
-    root = [n for n, d in graph.in_degree() if d==0]
-    return graph
+def register_conditional(f):
+    CONDITIONAL_FUNCTIONS[f.__name__] = f
+
+
+def register_loader(f):
+    DATA_LOADERS[f.__name__] = f
