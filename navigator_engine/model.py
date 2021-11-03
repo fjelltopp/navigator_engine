@@ -31,15 +31,26 @@ class Action(db.Model):
     html = db.Column(db.String)
     skippable = db.Column(db.Boolean, default=False)
     action_url = db.Column(db.String)
+    complete = db.Column(db.Boolean, default=False)
     nodes = db.relationship("Node", back_populates="action")
+
+
+class Milestone(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String)
+    graph_id = db.Column(db.Integer, db.ForeignKey('graph.id'))
+    data_loader = db.Column(db.String)
+    nodes = db.relationship("Node", back_populates="milestone")
 
 
 class Node(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     conditional_id = db.Column(db.Integer, db.ForeignKey('conditional.id'))
     action_id = db.Column(db.Integer, db.ForeignKey('action.id'))
+    milestone_id = db.Column(db.Integer, db.ForeignKey('milestone.id'))
     action = db.relationship("Action", back_populates="nodes")
     conditional = db.relationship("Conditional", back_populates="nodes")
+    milestone = db.relationship("Milestone", back_populates="nodes")
 
     def __hash__(self):
         return self.id
@@ -57,3 +68,7 @@ class Edge(db.Model):
 
     def tuple(self):
         return (self.from_node, self.to_node, {'type': self.type, 'object': self})
+
+
+def load_graph(graph_id: int) -> Graph:
+    return Graph.query.filter_by(id=graph_id).first()
