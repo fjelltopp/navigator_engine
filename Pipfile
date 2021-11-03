@@ -14,13 +14,13 @@ networkx = {extras = ["default"], version = "*"}
 psycopg2-binary = "*"
 openpyxl = "*"
 
-
 [dev-packages]
 flake8 = "*"
 ipdb = "==0.13.9"
 pytest = "*"
 factory-boy = "*"
 pydevd-pycharm = "*"
+pytest-mock = "*"
 
 [requires]
 python_version = "3.9"
