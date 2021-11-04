@@ -1,10 +1,11 @@
 from navigator_engine.common import DecisionError
+import navigator_engine.model as model
 import networkx
 
 
 class ProgressTracker():
 
-    def __init__(self, network, route = []):
+    def __init__(self, network: networkx.DiGraph, route: list[str] = []) -> None:
         self.network = network
         self.previous_route = route.copy()
         self.complete_route = route.copy()
@@ -12,32 +13,32 @@ class ProgressTracker():
         self.milestones = self.get_milestones()
         self.complete_node = self.get_complete_node()
 
-    def reset(self):
+    def reset(self) -> None:
         self.complete_route = self.previous_route
         self.milestone_route = []
 
-    def add_node(self, node):
+    def add_node(self, node: model.Node) -> None:
         self.complete_route.append(node)
         self.milestone_route.append(node)
 
-    def pop_node(self):
+    def pop_node(self) -> model.Node:
         node = self.complete_route[-1]
         self.complete_route = self.complete_route[:-1]
         self.milestone_route = self.milestone_route[:-1]
         return node
 
-    def get_complete_node(self):
+    def get_complete_node(self) -> model.Node:
         for node in self.network.nodes():
             if getattr(node, 'action') and node.action.complete:
                 return node
         raise DecisionError("Graph {graph.id} ({graph.title}) has no complete node")
 
-    def get_milestones(self):
+    def get_milestones(self) -> None:
         for node in self.network.nodes():
             if getattr(node, 'milestone_id'):
                 self.milestones.append(node.milestone)
 
-    def progress(self):
+    def progress(self) -> int:
         if not self.milestone_route or not getattr(self.milestone_route[-1], "action_id"):
             raise DecisionError("Can only calculate progress for action nodes.")
         current_node = self.milestone_route[-2]
@@ -53,7 +54,7 @@ class ProgressTracker():
         percentage_progress = int(round(progress*100))
         return percentage_progress
 
-    def milestones_to_complete(self):
+    def milestones_to_complete(self) -> tuple[list[model.Node], bool]:
         if not self.milestone_route or not getattr(self.milestone_route[-1], "action_id"):
             raise DecisionError("Can only calculate milestones to complete for action nodes.")
         current_node = self.milestone_route[-2]

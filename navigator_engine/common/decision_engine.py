@@ -2,11 +2,13 @@ import ast
 import navigator_engine.model as model
 from navigator_engine.common import CONDITIONAL_FUNCTIONS, DATA_LOADERS, DecisionError
 from navigator_engine.common.progress_tracker import ProgressTracker
+from typing import Callable
 
 
 class DecisionEngine():
 
-    def __init__(self, graph, data, skip=[], route=[]):
+    def __init__(self, graph: model.Graph, data: object,
+                 skip: list[str] = [], route: list[str] = []) -> None:
         self.graph = graph
         self.network = self.graph.to_networkx()
         self.data = data
@@ -16,7 +18,7 @@ class DecisionEngine():
         self.skipped = []
         self.progress = ProgressTracker(self.network, route=route)
 
-    def decide(self, data=None, skip=None):
+    def decide(self, data: object = None, skip: list[str] = None) -> dict:
         if data:
             self.data = data
         if skip:
@@ -25,7 +27,7 @@ class DecisionEngine():
         self.skipped = []
         return self.process_node(self.root_node)
 
-    def get_root(self):
+    def get_root(self) -> model.Node:
         for node, in_degree in self.network.in_degree():
             if in_degree == 0:
                 return node
@@ -79,14 +81,15 @@ class DecisionEngine():
                 return new_node
         raise DecisionError(f"No outgoing '{edge_type}' edge for node {node.id}")
 
-    def run_pluggable_logic(self, function_string: str, functions=CONDITIONAL_FUNCTIONS):
+    def run_pluggable_logic(self, function_string: str,
+                            functions: dict[str, Callable] = CONDITIONAL_FUNCTIONS):
         function_name = function_string.split("(")[0]
         function = functions[function_name]
         args = function_string.split(function_name)[1]
         args = ast.literal_eval(args)
         return function(*args, self.data)
 
-    def skip_action(self, node: model.Node) -> model.Action:
+    def skip_action(self, node: model.Node) -> dict:
         action = node.action
         if not action.skippable:
             raise DecisionError(f"Action cannot be skipped: {action.id} ({action.title})")
