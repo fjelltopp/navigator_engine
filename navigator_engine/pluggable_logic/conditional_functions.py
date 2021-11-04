@@ -7,5 +7,10 @@ def return_true(data):
 
 
 @register_conditional
+def dict_value(key, data):
+    return bool(data[key])
+
+
+@register_conditional
 def check_dict_value(key, value, data):
     return data[key] == value

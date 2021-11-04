@@ -41,9 +41,10 @@ class ProgressTracker():
     def progress(self) -> int:
         if not self.milestone_route or not getattr(self.milestone_route[-1], "action_id"):
             raise DecisionError("Can only calculate progress for action nodes.")
+        if self.milestone_route[-1].action.complete:
+            return 100
         current_node = self.milestone_route[-2]
         distance_travelled = len(self.milestone_route[:-1])
-
         all_possible_path_lengths = map(len, networkx.all_simple_paths(
             self.network,
             source=current_node,

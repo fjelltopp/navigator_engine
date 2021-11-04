@@ -14,7 +14,6 @@ class DecisionEngine():
         self.data = data
         self.skip = skip
         self.root_node = self.get_root()
-        self.complete_node = self.get_complete()
         self.skipped = []
         self.progress = ProgressTracker(self.network, route=route)
 
@@ -84,10 +83,14 @@ class DecisionEngine():
     def run_pluggable_logic(self, function_string: str,
                             functions: dict[str, Callable] = CONDITIONAL_FUNCTIONS):
         function_name = function_string.split("(")[0]
-        function = functions[function_name]
-        args = function_string.split(function_name)[1]
-        args = ast.literal_eval(args)
-        return function(*args, self.data)
+        try:
+            function = functions[function_name]
+        except KeyError:
+            raise DecisionError(f"No pluggable logic for function {function_name}")
+        function_args = function_string.split(function_name)[1]
+        function_args = function_args[:-1] + ",)"
+        function_args = ast.literal_eval(function_args)
+        return function(*function_args, self.data)
 
     def skip_action(self, node: model.Node) -> dict:
         action = node.action

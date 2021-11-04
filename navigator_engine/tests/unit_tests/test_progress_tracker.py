@@ -76,7 +76,8 @@ def test_calculate_progress_raises_error(mock_tracker, simple_network):
     ([1, 9, 12, 13], 33),
     ([1, 9, 12, 2, 3, 6], 62),
     ([1, 9, 12, 2, 3, 11, 4, 7], 88),
-    ([1, 9, 12, 2, 10, 14, 15], 67)
+    ([1, 9, 12, 2, 10, 14, 15], 67),
+    ([1, 9, 12, 2, 10, 14, 16, 18, 8], 100)
 ])
 def test_calculate_progress(mock_tracker, simple_network, route, expected_result):
     mock_tracker.network = simple_network['network']
