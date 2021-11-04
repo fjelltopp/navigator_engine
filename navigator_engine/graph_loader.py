@@ -93,7 +93,8 @@ def import_data(graph_header, graph_data):
         if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
             action = model.Action(
                 title=graph_data.at[idx, DATA_COLUMNS['ACTION']],
-                skippable=_map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['SKIPPABLE']])
+                skippable=_map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['SKIPPABLE']]),
+                complete=False
             )
             model.db.session.add(action)
             model.db.session.commit()
@@ -113,11 +114,11 @@ def import_data(graph_header, graph_data):
         title='{} complete!'.format(graph_header[MILESTONE_COLUMNS['TITLE']]),
         html='Well done.  You have completed the milestone <milestone_title>.  Time to move on to the next one...'
             .format(graph_header[MILESTONE_COLUMNS['TITLE']]),
-        skippable=False
+        skippable=False,
+        complete=True
     )
     model.db.session.add(complete_action)
     model.db.session.commit()
-
 
     # Loop through the graph dataframe to create edges
     for idx in graph_data.index:
@@ -143,6 +144,15 @@ def import_data(graph_header, graph_data):
                 to_id=graph_data.at[idx, 'DbNodeActionId'],
                 type=False
             )
+        # if skip destination is "complete", create an edge to the complete action
+        elif graph_data.loc[idx, DATA_COLUMNS['SKIP_TO']] == 'complete':
+            edge_false = model.Edge(
+                graph_id=graph.id,
+                from_id=graph_data.at[idx, 'DbNodeId'],
+                to_id=complete_action.id,
+                type=False
+            )
+
         # if skip destination is given, add an edge to its node
         else:
             edge_false = model.Edge(
