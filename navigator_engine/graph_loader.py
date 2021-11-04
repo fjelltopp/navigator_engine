@@ -13,10 +13,10 @@ MILESTONE_COLUMNS = {
 }
 
 DATA_COLUMNS = {
-    'CONDITIONAL': 'Task Test (if test passes, proceed to next test)',
-    'ACTION': 'If test fails, present this to user:',
-    'SKIPPABLE': 'Mandatory to complete estimates?',
-    'SKIP_TO': 'If test fails, skip to this row:'
+    'CONDITIONAL': 'Task Test',
+    'ACTION': 'Action Title (if test fails)',
+    'SKIPPABLE': 'Mandatory to proceed?',
+    'SKIP_TO': 'Proceed to test (if test fails)'
 }
 
 
@@ -68,10 +68,11 @@ def import_data(graph_header, graph_data):
     model.db.session.add(graph)
     model.db.session.commit()
 
-    # Loop through the graph dataframe to create nodes, conditionals and actions
+    # Add new columns for references to database primary keys
     graph_data.insert(0, 'DbNodeId', None)
     graph_data.insert(1, 'DbActionNodeId', None)
 
+    # Loop through the graph dataframe to create nodes, conditionals and actions
     for idx in graph_data.index:
         conditional = model.Conditional(
             title=graph_data.loc[idx, DATA_COLUMNS['CONDITIONAL']]
@@ -107,11 +108,23 @@ def import_data(graph_header, graph_data):
             model.db.session.add(node_action)
             model.db.session.commit()
 
+    # Add a completion action
+    complete_action = model.Action(
+        title='{} complete!'.format(graph_header[MILESTONE_COLUMNS['TITLE']]),
+        html='Well done.  You have completed the milestone <milestone_title>.  Time to move on to the next one...'
+            .format(graph_header[MILESTONE_COLUMNS['TITLE']]),
+        skippable=False
+    )
+    model.db.session.add(complete_action)
+    model.db.session.commit()
+
+
     # Loop through the graph dataframe to create edges
     for idx in graph_data.index:
 
         if graph_data.iloc[-1, :].equals(graph_data.loc[idx, :]):
             logging.info('End node reached')
+
         else:
             edge_true = model.Edge(
                 graph_id=graph.id,
@@ -140,7 +153,6 @@ def import_data(graph_header, graph_data):
             )
         model.db.session.add(edge_false)
         model.db.session.commit()
-    foo = 1
 
 
 def _map_excel_boolean(boolean):
