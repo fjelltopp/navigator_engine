@@ -13,7 +13,7 @@ MILESTONE_COLUMNS = {
 }
 
 DATA_COLUMNS = {
-    'CONDITIONAL': 'Task Test',
+    'TITLE': 'Task Test',
     'ACTION': 'Action Title (if test fails)',
     'SKIPPABLE': 'Mandatory to proceed?',
     'SKIP_TO': 'Proceed to test (if test fails)'
@@ -74,20 +74,39 @@ def import_data(graph_header, graph_data):
 
     # Loop through the graph dataframe to create nodes, conditionals and actions
     for idx in graph_data.index:
-        conditional = model.Conditional(
-            title=graph_data.loc[idx, DATA_COLUMNS['CONDITIONAL']]
-        )
-        model.db.session.add(conditional)
-        model.db.session.commit()
+        # Create a Milestone or a Conditional depending on which one the row represents
+        p = re.compile('[\d]{2,2}-')
+        if p.match(graph_data.loc[idx, DATA_COLUMNS['TITLE']]):
+            milestone = model.Milestone(
+                title=graph_data.loc[idx, DATA_COLUMNS['TITLE']],
+                graph_id=graph.id
+            )
+            model.db.session.add(milestone)
+            model.db.session.commit()
 
-        node_conditional = model.Node(
-            conditional_id=conditional.id
-        )
+            node_milestone = model.Node(
+                milestone_id=milestone.id
+            )
 
-        model.db.session.add(node_conditional)
-        model.db.session.commit()
+            model.db.session.add(node_milestone)
+            model.db.session.commit()
 
-        graph_data.at[idx, 'DbNodeId'] = node_conditional.id
+            graph_data.at[idx, 'DbNodeId'] = node_milestone.id
+        else:
+            conditional = model.Conditional(
+                title=graph_data.loc[idx, DATA_COLUMNS['TITLE']]
+            )
+            model.db.session.add(conditional)
+            model.db.session.commit()
+    
+            node_conditional = model.Node(
+                conditional_id=conditional.id
+            )
+    
+            model.db.session.add(node_conditional)
+            model.db.session.commit()
+    
+            graph_data.at[idx, 'DbNodeId'] = node_conditional.id
 
         # If Conditional is False, add an action node if no skip destination is given
         if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
