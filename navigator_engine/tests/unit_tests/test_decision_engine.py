@@ -99,9 +99,9 @@ def test_get_root(mocker):
 
 def test_skip_action(mocker):
     nodes = [
-        factories.NodeFactory(conditional=factories.ConditionalFactory(id=1), conditional_id=1),
-        factories.NodeFactory(action=factories.ActionFactory(id=1, skippable=True), action_id=1),
-        factories.NodeFactory(action=factories.ActionFactory(id=2, skippable=False), action_id=2)
+        factories.NodeFactory(id=56, conditional=factories.ConditionalFactory(id=1), conditional_id=1),
+        factories.NodeFactory(id=57, action=factories.ActionFactory(id=1, skippable=True), action_id=1),
+        factories.NodeFactory(id=58, action=factories.ActionFactory(id=2, skippable=False), action_id=2)
     ]
     network = networkx.DiGraph()
     network.add_edges_from([
@@ -111,14 +111,15 @@ def test_skip_action(mocker):
     engine = mocker.Mock(spec=DecisionEngine)
     engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
     engine.network = network
-    engine.progress.complete_route = engine.progress.milestone_route = [nodes[0], nodes[1]]
+    engine.progress.route = [nodes[0], nodes[1]]
+    engine.progress.entire_route = [nodes[0], nodes[1]]
     engine.skipped = []
     engine.process_node.return_value = 'processed_action'
 
     result = DecisionEngine.skip_action(engine, nodes[1])
 
     assert result == 'processed_action'
-    assert engine.skipped == [nodes[1]]
+    assert engine.skipped == [nodes[1].id]
     engine.progress.pop_node.assert_called_once()
     engine.process_node.assert_called_once_with(nodes[2])
 
@@ -138,6 +139,7 @@ def test_process_milestone_incomplete(mocker):
     milestone_graph = factories.GraphFactory()
     node1 = factories.NodeFactory(milestone=milestone, milestone_id=1)
     node2 = factories.NodeFactory(action=factories.ActionFactory(id=1, complete=False), action_id=1)
+
     engine = mocker.Mock(spec=DecisionEngine)
     engine.run_pluggable_logic.return_value = True
     engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
@@ -145,23 +147,24 @@ def test_process_milestone_incomplete(mocker):
     engine.progress.milestone_route = []
     engine.skip = []
     engine.process_action.return_value = "processed_action"
-    mocker.patch(
-        'navigator_engine.model.load_graph',
-        return_value=milestone_graph
+    mocker.patch('navigator_engine.model.load_graph', return_value=milestone_graph)
+
+    milestone_engine = mocker.Mock(spec=DecisionEngine)
+    milestone_engine.progress = mocker.patch(
+        'navigator_engine.common.progress_tracker.ProgressTracker',
+        auto_spec=True
     )
+    milestone_engine.progress.route = [1, 2, 3]
+    milestone_engine.decide.return_value = {'node': node2}
     mocker.patch(
-        'navigator_engine.common.decision_engine.DecisionEngine.__init__',
-        return_value=None
+        'navigator_engine.common.decision_engine.engine_factory',
+        return_value=milestone_engine
     )
-    milestone_progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
-    milestone_progress.milestone_route = [1, 2, 3]
-    mocker.patch(
-        'navigator_engine.common.decision_engine.DecisionEngine.decide',
-        return_value={'progress': milestone_progress, 'action': node2}
-    )
+
     result = DecisionEngine.process_milestone(engine, node1)
+    engine.progress.add_milestone.assert_called_once_with(node1.milestone, milestone_engine.progress)
     engine.run_pluggable_logic.assert_called_once_with("return_empty()", common.DATA_LOADERS)
-    assert result == "processed_action"
+    assert result == {'node': node2}
 
 
 def test_process_milestone_complete(mocker):
@@ -180,23 +183,23 @@ def test_process_milestone_complete(mocker):
     engine.run_pluggable_logic.return_value = {}
     engine.get_next_node.return_value = node3
     engine.process_node.return_value = "processed_action"
+    mocker.patch('navigator_engine.model.load_graph')
 
-    mocker.patch(
-        'navigator_engine.model.load_graph',
-        return_value=milestone
+    milestone_engine = mocker.Mock(spec=DecisionEngine)
+    milestone_engine.progress = mocker.patch(
+        'navigator_engine.common.progress_tracker.ProgressTracker',
+        auto_spec=True
     )
+    milestone_engine.progress.route = [1, 2, 3]
+    milestone_engine.decide.return_value = {'node': node2}
     mocker.patch(
-        'navigator_engine.common.decision_engine.DecisionEngine.__init__',
-        return_value=None
-    )
-    milestone_progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
-    milestone_progress.milestone_route = [1, 2, 3]
-    mocker.patch(
-        'navigator_engine.common.decision_engine.DecisionEngine.decide',
-        return_value={'progress': milestone_progress, 'action': node2}
+        'navigator_engine.common.decision_engine.engine_factory',
+        return_value=milestone_engine
     )
     result = DecisionEngine.process_milestone(engine, node1)
+
     assert result == "processed_action"
+    engine.progress.add_milestone.assert_called_once_with(node1.milestone, milestone_engine.progress, complete=True)
     engine.run_pluggable_logic.assert_called_once_with("return_empty()", common.DATA_LOADERS)
     engine.get_next_node.assert_called_once_with(node1, True)
     engine.process_node.assert_called_once_with(node3)
@@ -217,3 +220,31 @@ def test_decide(mocker):
     assert engine.data == {'test': 'data'}
     assert engine.skip == [4, 5]
     assert engine.skipped == []
+
+
+def test_process_action_unskipped(mocker):
+    action = factories.ActionFactory(
+        id=1,
+        complete=True,
+        title='Test Action',
+        html='Test HTML',
+        skippable=True
+    )
+    node = factories.NodeFactory(id=1, action_id=1, action=action)
+    engine = mocker.Mock(spec=DecisionEngine)
+    engine.skip = []
+    result = DecisionEngine.process_action(engine, node)
+    assert result == {
+        "id": node.id,
+        "skipped": False,
+        "content": node.action.to_dict(),
+        "node": node
+    }
+
+
+def test_process_action_skipped(mocker):
+    node = factories.NodeFactory(id=1)
+    engine = mocker.Mock(spec=DecisionEngine)
+    engine.skip = [1]
+    DecisionEngine.process_action(engine, node)
+    engine.skip_action.assert_called_once_with(node)

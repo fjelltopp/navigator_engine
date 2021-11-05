@@ -36,8 +36,8 @@ def with_app_context():
 def mock_tracker():
     tracker = mock.Mock(spec=ProgressTracker)
     tracker.network = mock.Mock(spec=DiGraph)
-    tracker.milestone_route = []
-    tracker.complete_route = []
+    tracker.route = []
+    tracker.entire_route = []
     tracker.previous_route = []
     tracker.milestone = {}
     tracker.complete_node = factories.NodeFactory()

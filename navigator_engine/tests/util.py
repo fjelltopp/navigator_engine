@@ -15,6 +15,7 @@ def create_demo_data():
     model.db.create_all()
 
     # Load a simple BDG
+    # Code written before I learned the more concise way of creating graph data used for the 2nd graph
     graph = model.Graph(title="Upload ADR Data", version="0.1", description="Demo graph to guide people through ADR data upload")
     model.db.session.add(graph)
     model.db.session.commit()
@@ -78,4 +79,21 @@ def create_demo_data():
     model.db.session.add(edge7)
     model.db.session.add(edge8)
     model.db.session.commit()
-    return graph
+
+    graph_with_milestone = model.Graph(title="Demo Graph", version="0.1", description="Demo")
+    nodes = [
+        model.Node(conditional=model.Conditional(title="Conditional 1", function="dict_value(1)")),
+        model.Node(milestone=model.Milestone(title="ADR Data", data_loader="dict_value('data')", graph_id=1)),
+        model.Node(conditional=model.Conditional(title="Conditional 2", function="dict_value(2)")),
+        model.Node(action=model.Action(title="Action 1", html="Action 1 HTML")),
+        model.Node(action=model.Action(title="Action 2", html="Action 2 HTML")),
+        model.Node(action=model.Action(title="Complete", html="Action Complete", complete=True)),
+    ]
+    graph_with_milestone.edges = [
+        model.Edge(from_node=nodes[0], to_node=nodes[3], type=False),
+        model.Edge(from_node=nodes[0], to_node=nodes[1], type=True),
+        model.Edge(from_node=nodes[1], to_node=nodes[2], type=True),
+        model.Edge(from_node=nodes[2], to_node=nodes[4], type=False),
+        model.Edge(from_node=nodes[2], to_node=nodes[5], type=True)
+    ]
+    model.db.session.add(graph_with_milestone)

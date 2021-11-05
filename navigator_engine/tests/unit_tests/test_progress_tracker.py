@@ -8,8 +8,8 @@ import pytest
 def test_add_node(mock_tracker):
     node = factories.NodeFactory(id=2)
     ProgressTracker.add_node(mock_tracker, node)
-    assert mock_tracker.complete_route == [node]
-    assert mock_tracker.milestone_route == [node]
+    assert mock_tracker.entire_route == [node]
+    assert mock_tracker.route == [node]
 
 
 def test_pop_node(mock_tracker):
@@ -18,12 +18,12 @@ def test_pop_node(mock_tracker):
         factories.NodeFactory(id=3),
         factories.NodeFactory(id=4)
     ]
-    mock_tracker.complete_route = nodes.copy()
-    mock_tracker.milestone_route = [nodes[-1]]
+    mock_tracker.entire_route = nodes.copy()
+    mock_tracker.route = [nodes[-1]]
     result = ProgressTracker.pop_node(mock_tracker)
     assert result == nodes[-1]
-    assert mock_tracker.complete_route == nodes[:-1]
-    assert mock_tracker.milestone_route == []
+    assert mock_tracker.entire_route == nodes[:-1]
+    assert mock_tracker.route == []
 
 
 def test_reset(mock_tracker):
@@ -32,12 +32,12 @@ def test_reset(mock_tracker):
         factories.NodeFactory(id=3),
         factories.NodeFactory(id=4)
     ]
-    mock_tracker.complete_route = nodes.copy()
+    mock_tracker.entire_route = nodes.copy()
     mock_tracker.previous_route = nodes[0:2].copy()
-    mock_tracker.milestone_route = [nodes[2]]
+    mock_tracker.route = [nodes[2]]
     ProgressTracker.reset(mock_tracker)
-    assert mock_tracker.complete_route == nodes[0:2]
-    assert mock_tracker.milestone_route == []
+    assert mock_tracker.entire_route == nodes[0:2]
+    assert mock_tracker.route == []
 
 
 def test_get_complete_node(mock_tracker):
@@ -64,27 +64,21 @@ def test_get_complete_node_raises_error(mock_tracker):
         ProgressTracker.get_complete_node(mock_tracker)
 
 
-def test_calculate_progress_raises_error(mock_tracker, simple_network):
-    mock_tracker.network = simple_network['network']
-    mock_tracker.milestone_route = [simple_network['nodes'][1]]
-    with pytest.raises(DecisionError, match="Can only calculate progress for action nodes"):
-        ProgressTracker.progress(mock_tracker)
-
-
 @pytest.mark.parametrize("route,expected_result", [
-    ([1, 5], 11),
-    ([1, 9, 12, 13], 33),
-    ([1, 9, 12, 2, 3, 6], 62),
-    ([1, 9, 12, 2, 3, 11, 4, 7], 88),
-    ([1, 9, 12, 2, 10, 14, 15], 67),
+    ([1, 5], 0),
+    ([1, 9, 12, 13], 25),
+    ([1, 9, 12, 2, 3, 6], 57),
+    ([1, 9, 12, 2, 3, 11, 4, 7], 86),
+    ([1, 9, 12, 2, 10, 14, 15], 62),
+    ([1, 9, 12, 2, 10, 14, 16, 18, 19], 88),
     ([1, 9, 12, 2, 10, 14, 16, 18, 8], 100)
 ])
-def test_calculate_progress(mock_tracker, simple_network, route, expected_result):
+def test_percentage_progress(mock_tracker, simple_network, route, expected_result):
     mock_tracker.network = simple_network['network']
-    mock_tracker.complete_route = [simple_network['nodes'][i] for i in route]
-    mock_tracker.milestone_route = [simple_network['nodes'][i] for i in route]
+    mock_tracker.entire_route = [simple_network['nodes'][i] for i in route]
+    mock_tracker.route = [simple_network['nodes'][i] for i in route]
     mock_tracker.complete_node = simple_network['nodes'][8]
-    result = ProgressTracker.progress(mock_tracker)
+    result = ProgressTracker.percentage_progress(mock_tracker)
     assert result == expected_result
 
 
@@ -94,8 +88,8 @@ def test_calculate_progress(mock_tracker, simple_network, route, expected_result
 ])
 def test_milestones_to_complete(mock_tracker, simple_network, route, expected_result):
     mock_tracker.network = simple_network['network']
-    mock_tracker.complete_route = [simple_network['nodes'][i] for i in route]
-    mock_tracker.milestone_route = [simple_network['nodes'][i] for i in route]
+    mock_tracker.entire_route = [simple_network['nodes'][i] for i in route]
+    mock_tracker.route = [simple_network['nodes'][i] for i in route]
     mock_tracker.complete_node = simple_network['nodes'][8]
     result = ProgressTracker.milestones_to_complete(mock_tracker)
     expected_milestones = [simple_network['nodes'][i] for i in expected_result[0]]

@@ -18,7 +18,7 @@ def test_graph_processing(data, expected_node_id):
     graph = model.load_graph(1)
     engine = DecisionEngine(graph, data)
     result = engine.decide()
-    assert result['node_id'] == expected_node_id
+    assert result['id'] == expected_node_id
 
 
 @pytest.mark.parametrize("data, skip_steps, expected_node_id", [
@@ -31,7 +31,8 @@ def test_with_skip_steps(data, skip_steps, expected_node_id):
     graph = model.load_graph(1)
     engine = DecisionEngine(graph, data, skip=skip_steps)
     result = engine.decide()
-    assert result['node_id'] == expected_node_id
+    assert result['id'] == expected_node_id
+    assert engine.skipped == skip_steps
 
 
 @pytest.mark.parametrize("data, skip_steps", [
@@ -45,3 +46,89 @@ def test_skipping_unskippable_step_raises_error(data, skip_steps):
     engine = DecisionEngine(graph, data, skip=skip_steps)
     with pytest.raises(DecisionError):
         engine.decide()
+
+
+@pytest.mark.parametrize("data, expected_node_id", [
+    ({1: True, 2: True, 'data': {1: True, 2: True, 3: False, 4: True}}, 7),
+    ({1: True, 2: True, 'data': {1: False, 2: True, 3: True, 4: True}}, 5),
+    ({1: True, 2: True, 'data': {1: True, 2: True, 3: True, 4: True}}, 15)
+])
+@pytest.mark.usefixtures('with_app_context')
+def test_graph_processing_with_milestones(data, expected_node_id):
+    test_util.create_demo_data()
+    graph = model.load_graph(2)
+    engine = DecisionEngine(graph, data)
+    result = engine.decide()
+    assert result['id'] == expected_node_id
+
+
+@pytest.mark.usefixtures('with_app_context')
+def test_progress_during_milestone():
+    test_util.create_demo_data()
+    graph = model.load_graph(2)
+    data = {
+        1: True,
+        2: True,
+        'data': {1: True, 2: True, 3: False, 4: True}
+    }
+    engine = DecisionEngine(graph, data)
+    engine.decide()
+    progress = engine.progress.progress()
+    assert progress == {
+        'progress': 33,
+        'milestone_list_is_complete': True,
+        'milestones': [{
+            'id': 1,
+            'title': 'ADR Data',
+            'progress': 50,
+            'completed': False
+        }]
+    }
+
+
+@pytest.mark.usefixtures('with_app_context')
+def test_progress_prior_milestone():
+    test_util.create_demo_data()
+    graph = model.load_graph(2)
+    data = {
+        1: False,
+        2: True,
+        'data': {1: True, 2: True, 3: False, 4: True}
+    }
+    engine = DecisionEngine(graph, data)
+    engine.decide()
+    progress = engine.progress.progress()
+    assert progress == {
+        'progress': 0,
+        'milestone_list_is_complete': True,
+        'milestones': [{
+            'id': 1,
+            'title': 'ADR Data',
+            'progress': 0,
+            'completed': False
+        }]
+    }
+
+
+@pytest.mark.usefixtures('with_app_context')
+def test_progress_after_milestone():
+    test_util.create_demo_data()
+    graph = model.load_graph(2)
+    data = {
+        1: True,
+        2: False,
+        'data': {1: True, 2: True, 3: True, 4: True}
+    }
+    engine = DecisionEngine(graph, data)
+    engine.decide()
+    progress = engine.progress.progress()
+    assert progress == {
+        'progress': 67,
+        'milestone_list_is_complete': True,
+        'milestones': [{
+            'id': 1,
+            'title': 'ADR Data',
+            'progress': 100,
+            'completed': True
+        }]
+    }

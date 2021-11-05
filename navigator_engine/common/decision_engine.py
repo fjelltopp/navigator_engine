@@ -24,7 +24,8 @@ class DecisionEngine():
             self.skip = skip
         self.progress.reset()
         self.skipped = []
-        return self.process_node(self.root_node)
+        self.decision = self.process_node(self.root_node)
+        return self.decision
 
     def get_root(self) -> model.Node:
         for node, in_degree in self.network.in_degree():
@@ -50,29 +51,28 @@ class DecisionEngine():
         if node.id in self.skip:
             return self.skip_action(node)
         return {
-            'node_id': node.id,
-            'skipped': self.skipped,
-            'action': node.action,
-            'progress': self.progress,
+            "id": node.id,
+            "skipped": False,
+            "content": node.action.to_dict(),
+            "node": node
         }
 
     def process_milestone(self, node: model.Node) -> model.Node:
         nested_graph = model.load_graph(node.milestone.graph_id)
         nested_graph_data = self.run_pluggable_logic(node.milestone.data_loader, DATA_LOADERS)
-        milestone_engine = DecisionEngine(
+        milestone_engine = engine_factory(
             nested_graph,
             nested_graph_data,
             skip=self.skip
         )
         milestone_result = milestone_engine.decide()
-        self.progress.complete_route += milestone_result['progress'].milestone_route
-        if milestone_result['action'].action.complete:
+        if milestone_result['node'].action.complete:
+            self.progress.add_milestone(node.milestone, milestone_engine.progress, complete=True)
             next_node = self.get_next_node(node, True)
             return self.process_node(next_node)
         else:
-            # TODO: Bubble the right characteristics up the nested graphs
-            self.current_milestone = node.milestone
-            return self.process_action(milestone_result['action'])
+            self.progress.add_milestone(node.milestone, milestone_engine.progress)
+            return milestone_result
 
     def get_next_node(self, node: model.Node, edge_type: bool) -> model.Node:
         for node, new_node, type in self.network.out_edges(node, data="type"):
@@ -96,10 +96,20 @@ class DecisionEngine():
         action = node.action
         if not action.skippable:
             raise DecisionError(f"Action cannot be skipped: {action.id} ({action.title})")
-        previous_node = self.progress.complete_route[-2]
+        previous_node = self.progress.entire_route[-2]
         for previous_node, new_node in self.network.out_edges(previous_node):
             if node != new_node:
-                self.skipped.append(node)
+                self.skipped.append(node.id)
                 self.progress.pop_node()
                 return self.process_node(new_node)
         raise DecisionError(f"Only one outgoing edge for node: {previous_node.id}")
+
+
+def engine_factory(graph, data, skip=[]) -> DecisionEngine:
+    # Needed because mocking recursive object creation in tests is difficult!
+    # There may be a better way?
+    return DecisionEngine(
+        graph,
+        data,
+        skip=skip
+    )
