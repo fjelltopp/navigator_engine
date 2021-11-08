@@ -1,15 +1,16 @@
 import logging
-from decouple import config
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
     DEBUG = False
     TESTING = False
     PRODUCTION = False
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/engine'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+                              'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LOGGING_LEVEL = logging.INFO
-    LOAD_GRAPH = config('NAVIGATOR_ENGINE_LOAD_GRAPH', default=False, cast=bool)
 
 
 class Testing(Config):
@@ -25,4 +26,5 @@ class Development(Config):
 
 class Production(Config):
     PRODUCTION = True
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/engine'
     LOGGING_LEVEL = logging.WARNING
