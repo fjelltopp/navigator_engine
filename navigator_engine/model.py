@@ -20,7 +20,6 @@ class Graph(db.Model):
 
 class Conditional(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    ref = db.Column(db.String)
     title = db.Column(db.String)
     function = db.Column(db.String)
     nodes = db.relationship("Node", back_populates="conditional")
