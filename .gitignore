@@ -67,7 +67,7 @@ instance/
 .webassets-cache
 
 # sqlite
-navigator_engine/app.db
+*.db
 
 # Scrapy stuff:
 .scrapy

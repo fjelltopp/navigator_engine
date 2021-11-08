@@ -1,26 +1,25 @@
 import logging
 import os
-basedir = os.path.abspath(os.path.dirname(__file__))
+base_directory = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
     DEBUG = False
     TESTING = False
     PRODUCTION = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/engine'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LOGGING_LEVEL = logging.INFO
 
 
 class Testing(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/test_navigator_engine'
+    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/testing.db'
 
 
 class Development(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite+pysqlite://'
+    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/app.db'
 
 
 class Production(Config):

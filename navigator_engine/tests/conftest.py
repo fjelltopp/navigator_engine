@@ -8,7 +8,7 @@ import navigator_engine.tests.factories as factories
 
 
 @pytest.fixture
-def client():
+def client(scope="module"):
     """
     Passes as a test_client to the test (as arg "client"), used to fetch
     end points from the flask app.  e.g. client.get("/")
@@ -20,7 +20,7 @@ def client():
         yield client
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def with_app_context():
     """
     Runs the test within the flask app context.  This should probably be used if
