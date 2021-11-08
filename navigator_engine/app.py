@@ -5,7 +5,6 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 
 from navigator_engine.api import api_blueprint
 from navigator_engine.model import db
-from navigator_engine.api import api
 import importlib
 from navigator_engine.graph_loader import graph_loader
 
