@@ -21,7 +21,7 @@ class DecisionEngine():
         if skip:
             self.skip = skip
         self.progress.reset()
-        self.decision = self.process_node(self.root_node)
+        self.decision = self.process_node(self.progress.root_node)
         return self.decision
 
     def process_node(self, node: model.Node) -> model.Action:
