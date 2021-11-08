@@ -15,14 +15,13 @@ def decide():
                 "url": "<url from estimates dataset json datadict>",
                 "authorization_header": "<optional value to be supplied as the Authorization header tag>"
             },
-            "skip_actions": ["<action_id>", "<action_id>"]
+            "skipActions": ["<action_id>", "<action_id>"]
         }
     ```
     """
-
     return jsonify({
         "actions": ["<action_id>", "<action_id>", "<action_id>", "<action_id>"],
-        "skipped": ["<action_id>", "<action_id>"],
+        "skippedActions": ["<action_id>", "<action_id>"],
         "progress": {
             "overallProgress": 35,
             "milestoneListFullyResolved": False,
@@ -49,9 +48,9 @@ def decide():
             "id": "xxx",
             "content": {
                 "title": "Node Title",
-                "display_html": "<p>Lorem Ipsum</p>",
+                "displayHTML": "<p>Lorem Ipsum</p>",
                 "skippable": True,
-                "action_url": "http://fjelltopp.org"
+                "actionURL": "http://fjelltopp.org"
             }
         }
     })
@@ -66,8 +65,8 @@ def action(action_id):
         "id": "xxx",
         "content": {
             "title": "Node Title",
-            "display_html": "<p>Lorem Ipsum</p>",
+            "displayHTML": "<p>Lorem Ipsum</p>",
             "skippable": True,
-            "action_url": "http://fjelltopp.org"
+            "actionURL": "http://fjelltopp.org"
         }
     })
