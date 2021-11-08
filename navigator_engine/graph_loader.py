@@ -20,31 +20,31 @@ DATA_COLUMNS = {
 }
 
 
-def graph_loader():
+def graph_loader(graph_config_file):
     # Clear and reset the db
     model.db.drop_all()
     model.db.create_all()
 
-    split_file_name = os.path.splitext(current_app.config.get('INITIAL_GRAPH_CONFIG'))
+    split_file_name = os.path.splitext(graph_config_file)
     file_extension = split_file_name[1]
 
     if file_extension == '.csv':
-        graph_header = pd.read_csv(current_app.config.get('INITIAL_GRAPH_CONFIG'), header=0).loc[0][0:4]
-        graph_data = pd.read_csv(current_app.config.get('INITIAL_GRAPH_CONFIG'), header=3, index_col=0)
+        graph_header = pd.read_csv(graph_config_file, header=0).loc[0][0:4]
+        graph_data = pd.read_csv(graph_config_file, header=3, index_col=0)
         import_data(graph_header, graph_data)
 
     elif file_extension == '.xlsx':
-        xl = pd.ExcelFile(current_app.config.get('INITIAL_GRAPH_CONFIG'))
+        xl = pd.ExcelFile(graph_config_file)
         p = re.compile('[\d]{2,2}-')
 
         for sheet_name in xl.sheet_names:
 
             if p.match(sheet_name):
-                graph_header = pd.read_excel(current_app.config.get('INITIAL_GRAPH_CONFIG'),
+                graph_header = pd.read_excel(graph_config_file,
                                              sheet_name=sheet_name,
                                              header=0
                                              ).loc[0][0:4]
-                graph_data = pd.read_excel(current_app.config.get('INITIAL_GRAPH_CONFIG'),
+                graph_data = pd.read_excel(graph_config_file,
                                            sheet_name=sheet_name,
                                            header=3,
                                            index_col=0
