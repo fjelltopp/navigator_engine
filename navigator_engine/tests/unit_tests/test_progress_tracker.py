@@ -5,11 +5,44 @@ import networkx
 import pytest
 
 
+@pytest.mark.parametrize("completed", [True, False])
+def test_add_milestone(mock_tracker, mocker, completed):
+    route = [factories.NodeFactory(id=1), factories.NodeFactory(id=2)]
+    mock_tracker.route = route.copy()
+    mock_tracker.entire_route = route.copy()
+    mock_tracker.action_breadcrumbs = [1, 2, 3]
+
+    milestone_route = [factories.NodeFactory(id=3), factories.NodeFactory(id=4)]
+    milestone = factories.MilestoneFactory()
+    milestone_tracker = mocker.Mock(spec=ProgressTracker)
+    milestone_tracker.route = milestone_route.copy()
+    milestone_tracker.entire_route = milestone_route.copy()
+    milestone_tracker.action_breadcrumbs = [4, 5, 6]
+
+    ProgressTracker.add_milestone(mock_tracker, milestone, milestone_tracker, complete=completed)
+
+    assert mock_tracker.entire_route == route + milestone_route
+    assert mock_tracker.action_breadcrumbs == [1, 2, 3, 4, 5, 6]
+    assert mock_tracker.milestones == [{
+        'id': 1,
+        'title': 'Test Milestone',
+        'progress': 100 if completed else milestone_tracker,
+        'completed': completed
+    }]
+
+
 def test_add_node(mock_tracker):
+    previous_node = factories.NodeFactory(id=1)
     node = factories.NodeFactory(id=2)
+
+    mock_tracker.route = [previous_node]
+    mock_tracker.entire_route = [previous_node]
+
     ProgressTracker.add_node(mock_tracker, node)
-    assert mock_tracker.entire_route == [node]
-    assert mock_tracker.route == [node]
+
+    mock_tracker.drop_action_breadcrumb.assert_called_once()
+    assert mock_tracker.entire_route == [previous_node, node]
+    assert mock_tracker.route == [previous_node, node]
 
 
 def test_pop_node(mock_tracker):
@@ -109,3 +142,19 @@ def test_milestones_to_complete(mock_tracker, simple_network, route, expected_re
     result = ProgressTracker.milestones_to_complete(mock_tracker)
     expected_milestones = [simple_network['nodes'][i] for i in expected_result[0]]
     assert result == (expected_milestones, expected_result[1])
+
+
+def test_drop_action_breadcrumb(mock_tracker, simple_network):
+    nodes = [
+        factories.NodeFactory(conditional=factories.ConditionalFactory(id=1), conditional_id=1),
+        factories.NodeFactory(conditional=factories.ConditionalFactory(id=2), conditional_id=2),
+        factories.NodeFactory(action=factories.ActionFactory(id=2), action_id=2)
+    ]
+    mock_tracker.network = networkx.DiGraph()
+    mock_tracker.network.add_edges_from([
+        (nodes[0], nodes[1], {'type': True}),
+        (nodes[0], nodes[2], {'type': False})
+    ])
+    mock_tracker.route = [nodes[0], nodes[1]]
+    ProgressTracker.drop_action_breadcrumb(mock_tracker)
+    assert mock_tracker.action_breadcrumbs == [2]

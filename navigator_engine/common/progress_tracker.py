@@ -13,6 +13,7 @@ class ProgressTracker():
         self.route = []
         self.milestones = []
         self.skipped = []
+        self.action_breadcrumbs = []
         self.complete_node = self.get_complete_node()
         self.root_node = self.get_root_node()
 
@@ -43,6 +44,7 @@ class ProgressTracker():
     def add_milestone(self, milestone: model.Milestone,
                       milestone_progress, complete: bool = False) -> None:
         self.entire_route += milestone_progress.entire_route
+        self.action_breadcrumbs += milestone_progress.action_breadcrumbs
         self.milestones.append({
             'id': milestone.id,
             'title': milestone.title,
@@ -53,6 +55,16 @@ class ProgressTracker():
     def add_node(self, node: model.Node) -> None:
         self.entire_route.append(node)
         self.route.append(node)
+        self.drop_action_breadcrumb()
+
+    def drop_action_breadcrumb(self):
+        if len(self.route) < 2:
+            return
+        parent_node = self.route[-2]
+        current_node = self.route[-1]
+        for parent_node, child_node in self.network.out_edges(parent_node):
+            if child_node != current_node and getattr(child_node, 'action_id'):
+                self.action_breadcrumbs.append(child_node.action_id)
 
     def pop_node(self) -> model.Node:
         node = self.entire_route[-1]
