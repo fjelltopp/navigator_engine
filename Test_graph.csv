@@ -1,0 +1,10 @@
+﻿Milestone Title,Version,Description,Entry Criteria,,,,,
+Upload Data to ADR,0.1,Demo graph to guide people through ADR data upload," Data input files are available
+ User has an ADR account associated with a country organization in ADR
+ User has at least editor role assigned within the country organization",,,,,
+,,,,,,,,
+row,Conditional,ConditionalFunction,ConditionalYes,ConditionalNo,Action,ActionHtml,ActionSkippable,ActionUrl
+1,Check if GeoJSON uploaded,check_resource_exists('inputs-geographic'),2,action,Upload your geographic data,Upload geographic data html,FALSE,url
+2,Check if GeoJSON valid,check_resource_valid('inputs-geographic'),3,action,Validate your geographic data,Validate geographic data html,FALSE,url
+3,Check if Survey data uploaded,check_resource_exists('inputs-survey'),4,action,Upload your survey data,Upload survey data html,FALSE,url
+4,Check if Survey data valid,check_resource_valid('inputs-survey'),end,action,Validate your survey data,Validate survey data html,FALSE,url
