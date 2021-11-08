@@ -40,6 +40,21 @@ def test_reset(mock_tracker):
     assert mock_tracker.route == []
 
 
+def test_get_root_node(mock_tracker):
+    nodes = [
+        factories.NodeFactory(conditional=factories.ConditionalFactory(id=1), conditional_id=1),
+        factories.NodeFactory(action=factories.ActionFactory(id=1), action_id=1),
+        factories.NodeFactory(action=factories.ActionFactory(id=2), action_id=2)
+    ]
+    mock_tracker.network = networkx.DiGraph()
+    mock_tracker.network.add_edges_from([
+        (nodes[0], nodes[1], {'type': True}),
+        (nodes[0], nodes[2], {'type': False})
+    ])
+    result = ProgressTracker.get_root_node(mock_tracker)
+    assert result == nodes[0]
+
+
 def test_get_complete_node(mock_tracker):
     nodes = [
         factories.NodeFactory(id=2, action_id=1, action=factories.ActionFactory(id=1)),

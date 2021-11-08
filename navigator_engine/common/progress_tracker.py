@@ -9,12 +9,14 @@ class ProgressTracker():
     def __init__(self, network: networkx.DiGraph, route: list[str] = []) -> None:
         self.network = network
         self.previous_route = route.copy()
-        self.route = []
         self.entire_route = route.copy()
+        self.route = []
         self.milestones = []
+        self.skipped = []
         self.complete_node = self.get_complete_node()
+        self.root_node = self.get_root_node()
 
-    def progress(self) -> None:
+    def report_progress(self) -> dict:
         milestones = copy.deepcopy(self.milestones)
         if milestones and not milestones[-1]['completed']:
             # Calculate percentage progress for current milestone
@@ -36,10 +38,7 @@ class ProgressTracker():
     def reset(self) -> None:
         self.entire_route = self.previous_route
         self.route = []
-
-    def add_node(self, node: model.Node) -> None:
-        self.entire_route.append(node)
-        self.route.append(node)
+        self.skipped = []
 
     def add_milestone(self, milestone: model.Milestone,
                       milestone_progress, complete: bool = False) -> None:
@@ -51,6 +50,10 @@ class ProgressTracker():
             'completed': complete
         })
 
+    def add_node(self, node: model.Node) -> None:
+        self.entire_route.append(node)
+        self.route.append(node)
+
     def pop_node(self) -> model.Node:
         node = self.entire_route[-1]
         self.entire_route = self.entire_route[:-1]
@@ -61,7 +64,13 @@ class ProgressTracker():
         for node in self.network.nodes():
             if getattr(node, 'action') and node.action.complete:
                 return node
-        raise DecisionError("Graph {graph.id} ({graph.title}) has no complete node")
+        raise DecisionError("Network has no complete node")
+
+    def get_root_node(self) -> model.Node:
+        for node, in_degree in self.network.in_degree():
+            if in_degree == 0:
+                return node
+        raise DecisionError("Network has no root node")
 
     def get_milestones(self) -> None:
         for node in self.network.nodes():

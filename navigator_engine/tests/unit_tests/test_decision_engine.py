@@ -80,23 +80,6 @@ def test_process_conditional(mocker):
     engine.process_node.assert_called_once_with(next_node)
 
 
-def test_get_root(mocker):
-    nodes = [
-        factories.NodeFactory(conditional=factories.ConditionalFactory(id=1), conditional_id=1),
-        factories.NodeFactory(action=factories.ActionFactory(id=1), action_id=1),
-        factories.NodeFactory(action=factories.ActionFactory(id=2), action_id=2)
-    ]
-    network = networkx.DiGraph()
-    network.add_edges_from([
-        (nodes[0], nodes[1], {'type': True}),
-        (nodes[0], nodes[2], {'type': False})
-    ])
-    engine = mocker.Mock(spec=DecisionEngine)
-    engine.network = network
-    result = DecisionEngine.get_root(engine)
-    assert result == nodes[0]
-
-
 def test_skip_action(mocker):
     nodes = [
         factories.NodeFactory(id=56, conditional=factories.ConditionalFactory(id=1), conditional_id=1),
@@ -113,13 +96,13 @@ def test_skip_action(mocker):
     engine.network = network
     engine.progress.route = [nodes[0], nodes[1]]
     engine.progress.entire_route = [nodes[0], nodes[1]]
-    engine.skipped = []
+    engine.progress.skipped = []
     engine.process_node.return_value = 'processed_action'
 
     result = DecisionEngine.skip_action(engine, nodes[1])
 
     assert result == 'processed_action'
-    assert engine.skipped == [nodes[1].id]
+    assert engine.progress.skipped == [nodes[1].id]
     engine.progress.pop_node.assert_called_once()
     engine.process_node.assert_called_once_with(nodes[2])
 
@@ -212,14 +195,14 @@ def test_decide(mocker):
     engine.skip = []
     engine.root_node = root_node
     engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
-    engine.skipped = [1, 2, 3]
+    engine.progress.skipped = [1, 2, 3]
     engine.process_node.return_value = 'processed_action'
     result = DecisionEngine.decide(engine, data={'test': 'data'}, skip=[4, 5])
     engine.process_node.assert_called_once_with(root_node)
+    engine.progress.reset.assert_called_once()
     assert result == 'processed_action'
     assert engine.data == {'test': 'data'}
     assert engine.skip == [4, 5]
-    assert engine.skipped == []
 
 
 def test_process_action_unskipped(mocker):
