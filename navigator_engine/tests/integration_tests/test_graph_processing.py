@@ -32,7 +32,7 @@ def test_with_skip_steps(data, skip_steps, expected_node_id):
     engine = DecisionEngine(graph, data, skip=skip_steps)
     result = engine.decide()
     assert result['id'] == expected_node_id
-    assert engine.skipped == skip_steps
+    assert engine.progress.skipped == skip_steps
 
 
 @pytest.mark.parametrize("data, skip_steps", [
@@ -73,7 +73,7 @@ def test_progress_during_milestone():
     }
     engine = DecisionEngine(graph, data)
     engine.decide()
-    progress = engine.progress.progress()
+    progress = engine.progress.report_progress()
     assert progress == {
         'progress': 33,
         'milestone_list_is_complete': True,
@@ -97,7 +97,7 @@ def test_progress_prior_milestone():
     }
     engine = DecisionEngine(graph, data)
     engine.decide()
-    progress = engine.progress.progress()
+    progress = engine.progress.report_progress()
     assert progress == {
         'progress': 0,
         'milestone_list_is_complete': True,
@@ -121,7 +121,7 @@ def test_progress_after_milestone():
     }
     engine = DecisionEngine(graph, data)
     engine.decide()
-    progress = engine.progress.progress()
+    progress = engine.progress.report_progress()
     assert progress == {
         'progress': 67,
         'milestone_list_is_complete': True,

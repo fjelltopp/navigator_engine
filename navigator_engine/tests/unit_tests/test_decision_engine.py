@@ -193,8 +193,9 @@ def test_decide(mocker):
     engine = mocker.Mock(spec=DecisionEngine)
     engine.data = {}
     engine.skip = []
-    engine.root_node = root_node
+
     engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
+    engine.progress.root_node = root_node
     engine.progress.skipped = [1, 2, 3]
     engine.process_node.return_value = 'processed_action'
     result = DecisionEngine.decide(engine, data={'test': 'data'}, skip=[4, 5])

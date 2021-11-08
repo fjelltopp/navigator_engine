@@ -146,9 +146,9 @@ def test_milestones_to_complete(mock_tracker, simple_network, route, expected_re
 
 def test_drop_action_breadcrumb(mock_tracker, simple_network):
     nodes = [
-        factories.NodeFactory(conditional=factories.ConditionalFactory(id=1), conditional_id=1),
-        factories.NodeFactory(conditional=factories.ConditionalFactory(id=2), conditional_id=2),
-        factories.NodeFactory(action=factories.ActionFactory(id=2), action_id=2)
+        factories.NodeFactory(id=1, conditional=factories.ConditionalFactory(id=1), conditional_id=1),
+        factories.NodeFactory(id=2, conditional=factories.ConditionalFactory(id=2), conditional_id=2),
+        factories.NodeFactory(id=3, action=factories.ActionFactory(id=2), action_id=2)
     ]
     mock_tracker.network = networkx.DiGraph()
     mock_tracker.network.add_edges_from([
@@ -157,4 +157,4 @@ def test_drop_action_breadcrumb(mock_tracker, simple_network):
     ])
     mock_tracker.route = [nodes[0], nodes[1]]
     ProgressTracker.drop_action_breadcrumb(mock_tracker)
-    assert mock_tracker.action_breadcrumbs == [2]
+    assert mock_tracker.action_breadcrumbs == [3]
