@@ -35,6 +35,16 @@ class Action(db.Model):
     complete = db.Column(db.Boolean, default=False)
     nodes = db.relationship("Node", back_populates="action")
 
+    def to_dict(self):
+        return {
+            "action_id": self.id,
+            "title": self.title,
+            "display_html": self.html,
+            "skippable": self.skippable,
+            "action_url": self.action_url,
+            "complete": self.complete
+        }
+
 
 class Milestone(db.Model):
     id = db.Column(db.Integer, primary_key=True)

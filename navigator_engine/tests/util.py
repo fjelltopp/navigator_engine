@@ -15,61 +15,47 @@ def create_demo_data():
     model.db.create_all()
 
     # Load a simple BDG
+    # Code written before I learned the more concise way of creating graph data used for the 2nd graph
     graph = model.Graph(title="Upload ADR Data", version="0.1", description="Demo graph to guide people through ADR data upload")
+    nodes = [
+        model.Node(conditional=model.Conditional(title="Check if GeoJSON uploaded", function="dict_value(1)")),  # id=1
+        model.Node(conditional=model.Conditional(title="Check if GeoJSON valid", function="dict_value(2)")),  # id=2
+        model.Node(conditional=model.Conditional(title="Check if Survey data uploaded", function="dict_value(3)")),  # id=4
+        model.Node(conditional=model.Conditional(title="Check if Survey data valid", function="dict_value(4)")),  # id=6
+        model.Node(action=model.Action(title="Upload your geographic data", html="Upload geographic data html", skippable=False, action_url="url")),  # id=3
+        model.Node(action=model.Action(title="Validate your geographic data", html="Validate geographic data html", skippable=True, action_url="url")),  # id= id=5
+        model.Node(action=model.Action(title="Upload your survey data", html="Upload survey data html", skippable=True, action_url="url")),  # id=7
+        model.Node(action=model.Action(title="Validate your survey data", html="Validate survey data html", skippable=True, action_url="url")), # id=9
+        model.Node(action=model.Action(title="Milestone complete", html="Congratulations! You've completed the milestone", skippable=False, action_url="url", complete=True))  # id=8
+    ]
+    graph.edges = [
+        model.Edge(graph_id=graph.id, from_node=nodes[0], to_node=nodes[1], type=True),
+        model.Edge(graph_id=graph.id, from_node=nodes[0], to_node=nodes[4], type=False),
+        model.Edge(graph_id=graph.id, from_node=nodes[1], to_node=nodes[2], type=True),
+        model.Edge(graph_id=graph.id, from_node=nodes[1], to_node=nodes[5], type=False),
+        model.Edge(graph_id=graph.id, from_node=nodes[2], to_node=nodes[3], type=True),
+        model.Edge(graph_id=graph.id, from_node=nodes[2], to_node=nodes[6], type=False),
+        model.Edge(graph_id=graph.id, from_node=nodes[3], to_node=nodes[8], type=True),
+        model.Edge(graph_id=graph.id, from_node=nodes[3], to_node=nodes[7], type=False)
+    ]
     model.db.session.add(graph)
     model.db.session.commit()
 
-    conditional1 = model.Conditional(title="Check if GeoJSON uploaded", function="check_resource_exists('inputs-geographic')")
-    conditional2 = model.Conditional(title="Check if GeoJSON valid", function="check_resource_valid('inputs-geographic')")
-    conditional3 = model.Conditional(title="Check if Survey data uploaded", function="check_resource_exists('inputs-survey')")
-    conditional4 = model.Conditional(title="Check if Survey data valid", function="check_resource_valid('inputs-survey')")
-    model.db.session.add(conditional1)
-    model.db.session.add(conditional2)
-    model.db.session.add(conditional3)
-    model.db.session.add(conditional4)
+    graph_with_milestone = model.Graph(title="Demo Graph", version="0.1", description="Demo")
+    nodes = [
+        model.Node(conditional=model.Conditional(title="Conditional 1", function="dict_value(1)")),  # id=10
+        model.Node(milestone=model.Milestone(title="ADR Data", data_loader="dict_value('data')", graph_id=1)),  # id=12
+        model.Node(conditional=model.Conditional(title="Conditional 2", function="dict_value(2)")),  # id=13
+        model.Node(action=model.Action(title="Action 1", html="Action 1 HTML")),  # id=11
+        model.Node(action=model.Action(title="Action 2", html="Action 2 HTML")),  # id=14
+        model.Node(action=model.Action(title="Complete", html="Action Complete", complete=True)),  # id=15
+    ]
+    graph_with_milestone.edges = [
+        model.Edge(from_node=nodes[0], to_node=nodes[3], type=False),
+        model.Edge(from_node=nodes[0], to_node=nodes[1], type=True),
+        model.Edge(from_node=nodes[1], to_node=nodes[2], type=True),
+        model.Edge(from_node=nodes[2], to_node=nodes[4], type=False),
+        model.Edge(from_node=nodes[2], to_node=nodes[5], type=True)
+    ]
+    model.db.session.add(graph_with_milestone)
     model.db.session.commit()
-
-    action1 = model.Action(title="Upload your geographic data", html="Upload geographic data html", skippable=False, action_url="url")
-    action2 = model.Action(title="Validate your geographic data", html="Validate geographic data html", skippable=False, action_url="url")
-    action3 = model.Action(title="Upload your survey data", html="Upload survey data html", skippable=False, action_url="url")
-    action4 = model.Action(title="Validate your survey data", html="Validate survey data html", skippable=False, action_url="url")
-    model.db.session.add(action1)
-    model.db.session.add(action2)
-    model.db.session.add(action3)
-    model.db.session.add(action4)
-    model.db.session.commit()
-
-    node1 = model.Node(conditional_id=conditional1.id)
-    node2 = model.Node(conditional_id=conditional2.id)
-    node3 = model.Node(conditional_id=conditional3.id)
-    node4 = model.Node(conditional_id=conditional4.id)
-    node5 = model.Node(action_id=action1.id)
-    node6 = model.Node(action_id=action2.id)
-    node7 = model.Node(action_id=action3.id)
-    node8 = model.Node(action_id=action4.id)
-    model.db.session.add(node1)
-    model.db.session.add(node2)
-    model.db.session.add(node3)
-    model.db.session.add(node4)
-    model.db.session.add(node5)
-    model.db.session.add(node6)
-    model.db.session.add(node7)
-    model.db.session.add(node8)
-    model.db.session.commit()
-
-    edge1 = model.Edge(graph_id=graph.id, from_id=node1.id, to_id=node2.id, type=True)
-    edge2 = model.Edge(graph_id=graph.id, from_id=node1.id, to_id=node5.id, type=False)
-    edge3 = model.Edge(graph_id=graph.id, from_id=node2.id, to_id=node3.id, type=True)
-    edge4 = model.Edge(graph_id=graph.id, from_id=node2.id, to_id=node6.id, type=False)
-    edge5 = model.Edge(graph_id=graph.id, from_id=node3.id, to_id=node4.id, type=True)
-    edge6 = model.Edge(graph_id=graph.id, from_id=node3.id, to_id=node7.id, type=False)
-    edge7 = model.Edge(graph_id=graph.id, from_id=node4.id, to_id=node8.id, type=False)
-    model.db.session.add(edge1)
-    model.db.session.add(edge2)
-    model.db.session.add(edge3)
-    model.db.session.add(edge4)
-    model.db.session.add(edge5)
-    model.db.session.add(edge6)
-    model.db.session.add(edge7)
-    model.db.session.commit()
-    
