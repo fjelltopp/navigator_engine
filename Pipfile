@@ -8,7 +8,6 @@ redis = "*"
 aioredis = "*"
 flask = "*"
 flask-sqlalchemy = "*"
-flask-restful = "*"
 packaging = "*"
 sentry-sdk = {extras = ["flask"], version = "*"}
 networkx = {extras = ["default"], version = "*"}

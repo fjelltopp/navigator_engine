@@ -5,7 +5,6 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 
 from navigator_engine.api import api_blueprint
 from navigator_engine.model import db
-from navigator_engine.api import api
 from navigator_engine.graph_loader import graph_loader
 
 
@@ -29,7 +28,6 @@ def create_app(config_object=None):
         )
 
     db.init_app(app)
-    api.init_app(app)
     app.register_blueprint(api_blueprint)
 
     with app.app_context():
