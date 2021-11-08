@@ -11,6 +11,8 @@ def decision_engine_create():
 @api_blueprint.route('/decision-engine/<engine_id>/progress')
 def decision_engine_progress(engine_id):
     return jsonify({
+        "overallProgress": 35,
+        "milestoneListFullyResolved": False,
         "milestones":
             [
                 {
@@ -23,12 +25,12 @@ def decision_engine_progress(engine_id):
                 "title": "Shiny 90 Data Prep",
                 "completed": False,
                 "progress": 50
-            }, {
-                "id": "zzz",
-                "title": "Update Spectrum",
-                "completed": False,
-                "progress": 0
-            }
+                }, {
+                    "id": "zzz",
+                    "title": "Update Spectrum",
+                    "completed": False,
+                    "progress": 0
+                }
             ]
     })
 
@@ -43,11 +45,11 @@ def decision_engine_action_path(engine_id):
 
 @api_blueprint.route('/decision-engine/<engine_id>/decide')
 def decision_engine_decide(engine_id):
-    _skipped_actions = request.args.get('skipped-actions', default='')
-    if len(_skipped_actions) == 0:
-        skipped_actions = []
+    _skip_actions = request.args.get('skip-actions', default='')
+    if len(_skip_actions) == 0:
+        skip_actions = []
     else:
-        skipped_actions = _skipped_actions.split(',')
+        skip_actions = _skip_actions.split(',')
 
     return jsonify({
         "id": "xxx",
