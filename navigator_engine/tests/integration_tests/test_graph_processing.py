@@ -62,6 +62,20 @@ def test_graph_processing_with_milestones(data, expected_node_id):
     assert result['id'] == expected_node_id
 
 
+@pytest.mark.parametrize("data, expected_breadcrumbs", [
+    ({1: True, 2: True, 'data': {1: True, 2: True, 3: False, 4: True}}, [11, 3, 5]),
+    ({1: True, 2: True, 'data': {1: False, 2: True, 3: True, 4: True}}, [11]),
+    ({1: True, 2: True, 'data': {1: True, 2: True, 3: True, 4: True}}, [11, 3, 5, 7, 9, 14])
+])
+@pytest.mark.usefixtures('with_app_context')
+def test_action_breadcrumbs(data, expected_breadcrumbs):
+    test_util.create_demo_data()
+    graph = model.load_graph(2)
+    engine = DecisionEngine(graph, data)
+    engine.decide()
+    assert engine.progress.action_breadcrumbs == expected_breadcrumbs
+
+
 @pytest.mark.usefixtures('with_app_context')
 def test_progress_during_milestone():
     test_util.create_demo_data()
