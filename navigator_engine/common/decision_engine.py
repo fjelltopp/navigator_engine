@@ -31,7 +31,7 @@ class DecisionEngine():
         for node, in_degree in self.network.in_degree():
             if in_degree == 0:
                 return node
-        raise DecisionError("Graph {graph.id} ({graph.title}) has no root node")
+        raise DecisionError(f"Graph {self.graph.id} ({self.graph.title}) has no root node")
 
     def process_node(self, node: model.Node) -> model.Action:
         self.progress.add_node(node)
