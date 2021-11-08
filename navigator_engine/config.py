@@ -14,12 +14,12 @@ class Config(object):
 
 class Testing(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/testing.db'
+    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/../testing.db'
 
 
 class Development(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/app.db'
+    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/../app.db'
 
 
 class Production(Config):
