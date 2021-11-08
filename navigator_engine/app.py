@@ -34,8 +34,9 @@ def create_app(config_object=None):
 
     importlib.import_module('navigator_engine.pluggable_logic')  # register pluggable_logic
 
-    with app.app_context():
-        graph_loader()
+    if app.config.get('LOAD_GRAPH'):
+        with app.app_context():
+            graph_loader()
 
     @app.route('/')
     def index():

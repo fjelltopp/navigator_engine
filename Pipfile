@@ -13,6 +13,7 @@ sentry-sdk = {extras = ["flask"], version = "*"}
 networkx = {extras = ["default"], version = "*"}
 psycopg2-binary = "*"
 openpyxl = "*"
+decouple = "*"
 
 [dev-packages]
 flake8 = "*"
