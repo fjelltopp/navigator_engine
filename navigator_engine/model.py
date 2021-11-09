@@ -36,11 +36,10 @@ class Action(db.Model):
 
     def to_dict(self):
         return {
-            "action_id": self.id,
             "title": self.title,
-            "display_html": self.html,
+            "displayHTML": self.html,
             "skippable": self.skippable,
-            "action_url": self.action_url,
+            "actionURL": self.action_url,
             "complete": self.complete
         }
 
@@ -82,3 +81,7 @@ class Edge(db.Model):
 
 def load_graph(graph_id: int) -> Graph:
     return Graph.query.filter_by(id=graph_id).first()
+
+
+def load_node(node_id: int) -> Node:
+    return Node.query.filter_by(id=node_id).first()

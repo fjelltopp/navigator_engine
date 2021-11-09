@@ -39,6 +39,7 @@ def mock_tracker():
     tracker.route = []
     tracker.entire_route = []
     tracker.previous_route = []
+    tracker.skipped_= []
     tracker.milestones = []
     tracker.complete_node = factories.NodeFactory()
     tracker.action_breadcrumbs = []

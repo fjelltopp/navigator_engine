@@ -1,4 +1,8 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request, abort
+from navigator_engine.common.decision_engine import DecisionEngine
+from navigator_engine.model import load_graph, load_node
+from navigator_engine.common import choose_graph, choose_data_loader
+import json
 
 api_blueprint = Blueprint('main', __name__, url_prefix='/api/')
 
@@ -19,54 +23,44 @@ def decide():
         }
     ```
     """
+    input_data = json.loads(request.data)
+
+    if not input_data.get('data'):
+        abort(400, "No data specified in request")
+    if not input_data['data'].get('url'):
+        abort(400, "No url to data specified in request")
+
+    graph = load_graph(choose_graph(input_data['data']['url']))
+    data_loader = choose_data_loader(input_data['data']['url'])
+    data = data_loader('url', 'authorization_header', input_data['data'])
+    skip_actions = input_data.get('skipActions', [])
+
+    engine = DecisionEngine(graph, data, skip=skip_actions)
+    engine.decide()
+    del engine.decision['node']
+
     return jsonify({
-        "actions": ["<action_id>", "<action_id>", "<action_id>", "<action_id>"],
-        "skippedActions": ["<action_id>", "<action_id>"],
-        "progress": {
-            "overallProgress": 35,
-            "milestoneListFullyResolved": False,
-            "milestones": [
-                {
-                    "id": "xxx",
-                    "title": "Naomi Data Prep",
-                    "completed": True,
-                    "progress": 100
-                }, {
-                    "id": "yyy",
-                    "title": "Shiny 90 Data Prep",
-                    "completed": False,
-                    "progress": 50
-                }, {
-                    "id": "zzz",
-                    "title": "Update Spectrum",
-                    "completed": False,
-                    "progress": 0
-                }
-            ]
-        },
-        "decision": {
-            "id": "xxx",
-            "content": {
-                "title": "Node Title",
-                "displayHTML": "<p>Lorem Ipsum</p>",
-                "skippable": True,
-                "actionURL": "http://fjelltopp.org"
-            }
-        }
+        "decision": engine.decision,
+        "actions": engine.progress.action_breadcrumbs,
+        "skippedActions": engine.progress.skipped,
+        "progress": engine.progress.report,
     })
 
 
-@api_blueprint.route('/action/<action_id>')
-def action(action_id):
+@api_blueprint.route('/action/<node_id>')
+def action(node_id):
     """
     Return the contents of a particular action.
     """
+    node = load_node(node_id)
+    if not node:
+        abort(400, f"Invalid node ID: {node_id}")
+
+    action = node.action
+    if not action:
+        abort(400, f"Node {node_id} is not an action")
+
     return jsonify({
-        "id": "xxx",
-        "content": {
-            "title": "Node Title",
-            "displayHTML": "<p>Lorem Ipsum</p>",
-            "skippable": True,
-            "actionURL": "http://fjelltopp.org"
-        }
+        "id": node_id,
+        "content": action.to_dict()
     })

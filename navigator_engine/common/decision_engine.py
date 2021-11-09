@@ -3,6 +3,7 @@ import navigator_engine.model as model
 from navigator_engine.common import CONDITIONAL_FUNCTIONS, DATA_LOADERS, DecisionError
 from navigator_engine.common.progress_tracker import ProgressTracker
 from typing import Callable
+from flask import current_app
 
 
 class DecisionEngine():
@@ -14,6 +15,7 @@ class DecisionEngine():
         self.data = data
         self.skip = skip
         self.progress = ProgressTracker(self.network, route=route)
+        self.decision = {}
 
     def decide(self, data: object = None, skip: list[str] = None) -> dict:
         if data:
@@ -22,6 +24,7 @@ class DecisionEngine():
             self.skip = skip
         self.progress.reset()
         self.decision = self.process_node(self.progress.root_node)
+        self.progress.report_progress()
         return self.decision
 
     def process_node(self, node: model.Node) -> model.Action:
@@ -43,7 +46,6 @@ class DecisionEngine():
             return self.skip_action(node)
         return {
             "id": node.id,
-            "skipped": False,
             "content": node.action.to_dict(),
             "node": node
         }
@@ -58,11 +60,11 @@ class DecisionEngine():
         )
         milestone_result = milestone_engine.decide()
         if milestone_result['node'].action.complete:
-            self.progress.add_milestone(node.milestone, milestone_engine.progress, complete=True)
+            self.progress.add_milestone(node, milestone_engine.progress, complete=True)
             next_node = self.get_next_node(node, True)
             return self.process_node(next_node)
         else:
-            self.progress.add_milestone(node.milestone, milestone_engine.progress)
+            self.progress.add_milestone(node, milestone_engine.progress)
             return milestone_result
 
     def get_next_node(self, node: model.Node, edge_type: bool) -> model.Node:
@@ -81,7 +83,13 @@ class DecisionEngine():
         function_args = function_string.split(function_name)[1]
         function_args = function_args[:-1] + ",)"
         function_args = ast.literal_eval(function_args)
-        return function(*function_args, self.data)
+        try:
+            return function(*function_args, self.data)
+        except Exception as e:
+            raise DecisionError(
+                f"Error running pluggable logic {function_string} for "
+                f"node {self.progress.route[-1].id}: {type(e).__name__} {e}"
+            )
 
     def skip_action(self, node: model.Node) -> dict:
         action = node.action
