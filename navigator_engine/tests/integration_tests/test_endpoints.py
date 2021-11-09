@@ -59,3 +59,18 @@ def test_decide(client, mocker):
             'milestones': [{'id': 1, 'title': 'ADR Data', 'progress': 100, 'completed': True}]
         }
     }
+
+
+@pytest.mark.parametrize("node_id, expected_action", [
+    (11, {'skippable': False, 'actionURL': None, 'complete': False,
+          'displayHTML': 'Action 1 HTML', 'title': 'Action 1'}),
+    (5, {'skippable': True, 'displayHTML': 'Validate geographic data html',
+         'complete': False, 'actionURL': 'url', 'title': 'Validate your geographic data'}),
+    (15, {'skippable': False, 'actionURL': None, 'complete': True,
+          'displayHTML': 'Action Complete', 'title': 'Complete'})
+])
+@pytest.mark.usefixtures('with_app_context')
+def test_action(client, mocker, node_id, expected_action):
+    test_util.create_demo_data()
+    response = client.get(f"/api/action/{node_id}")
+    assert response.json == {'id': str(node_id), 'content': expected_action}
