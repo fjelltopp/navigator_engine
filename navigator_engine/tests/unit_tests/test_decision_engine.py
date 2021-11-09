@@ -220,7 +220,6 @@ def test_process_action_unskipped(mocker):
     result = DecisionEngine.process_action(engine, node)
     assert result == {
         "id": node.id,
-        "skipped": False,
         "content": node.action.to_dict(),
         "node": node
     }

@@ -42,7 +42,6 @@ def test_decide(client, mocker):
     assert response.json == {
         'decision': {
             'id': 15,
-            'skipped': False,
             'content': {
                 'title': 'Complete',
                 'displayHTML': 'Action Complete',

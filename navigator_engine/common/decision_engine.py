@@ -46,7 +46,6 @@ class DecisionEngine():
             return self.skip_action(node)
         return {
             "id": node.id,
-            "skipped": False,
             "content": node.action.to_dict(),
             "node": node
         }
