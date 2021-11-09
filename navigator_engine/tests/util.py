@@ -18,10 +18,10 @@ def create_demo_data():
     # Code written before I learned the more concise way of creating graph data used for the 2nd graph
     graph = model.Graph(title="Upload ADR Data", version="0.1", description="Demo graph to guide people through ADR data upload")
     nodes = [
-        model.Node(conditional=model.Conditional(title="Check if GeoJSON uploaded", function="dict_value(1)")),  # id=1
-        model.Node(conditional=model.Conditional(title="Check if GeoJSON valid", function="dict_value(2)")),  # id=2
-        model.Node(conditional=model.Conditional(title="Check if Survey data uploaded", function="dict_value(3)")),  # id=4
-        model.Node(conditional=model.Conditional(title="Check if Survey data valid", function="dict_value(4)")),  # id=6
+        model.Node(conditional=model.Conditional(title="Check if GeoJSON uploaded", function="dict_value('1')")),  # id=1
+        model.Node(conditional=model.Conditional(title="Check if GeoJSON valid", function="dict_value('2')")),  # id=2
+        model.Node(conditional=model.Conditional(title="Check if Survey data uploaded", function="dict_value('3')")),  # id=4
+        model.Node(conditional=model.Conditional(title="Check if Survey data valid", function="dict_value('4')")),  # id=6
         model.Node(action=model.Action(title="Upload your geographic data", html="Upload geographic data html", skippable=False, action_url="url")),  # id=3
         model.Node(action=model.Action(title="Validate your geographic data", html="Validate geographic data html", skippable=True, action_url="url")),  # id= id=5
         model.Node(action=model.Action(title="Upload your survey data", html="Upload survey data html", skippable=True, action_url="url")),  # id=7
@@ -43,9 +43,9 @@ def create_demo_data():
 
     graph_with_milestone = model.Graph(title="Demo Graph", version="0.1", description="Demo")
     nodes = [
-        model.Node(conditional=model.Conditional(title="Conditional 1", function="dict_value(1)")),  # id=10
+        model.Node(conditional=model.Conditional(title="Conditional 1", function="dict_value('1')")),  # id=10
         model.Node(milestone=model.Milestone(title="ADR Data", data_loader="dict_value('data')", graph_id=1)),  # id=12
-        model.Node(conditional=model.Conditional(title="Conditional 2", function="dict_value(2)")),  # id=13
+        model.Node(conditional=model.Conditional(title="Conditional 2", function="dict_value('2')")),  # id=13
         model.Node(action=model.Action(title="Action 1", html="Action 1 HTML")),  # id=11
         model.Node(action=model.Action(title="Action 2", html="Action 2 HTML")),  # id=14
         model.Node(action=model.Action(title="Complete", html="Action Complete", complete=True)),  # id=15
