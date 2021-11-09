@@ -19,7 +19,9 @@ jobs:
 #     needs: lint
     name: Navigator-Engine pytest
     runs-on: ubuntu-latest
-    steps: 
+    env:
+        NAVIGATOR_ENGINE_SETTINGS = navigator_engine.config.Development
+    steps:
       - name: Check out repository code
         uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -34,5 +36,3 @@ jobs:
 
       - name: Run tests
         run: pipenv run pytest
-
-
