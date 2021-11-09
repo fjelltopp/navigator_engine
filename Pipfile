@@ -21,6 +21,7 @@ pytest = "*"
 factory-boy = "*"
 pydevd-pycharm = "*"
 pytest-mock = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.9"

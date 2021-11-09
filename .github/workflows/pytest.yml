@@ -1,0 +1,38 @@
+name: Tests
+on: [pull_request]
+jobs:
+
+#  lint:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions/setup-python@v2
+#        with:
+#          python-version: '3.9'
+#      - name: Install requirements
+#        run: pip install flake8 pycodestyle
+#      - name: Check syntax
+#        run: |
+#          flake8 . --count --max-line-length=127 --show-source --statistics
+
+  test:
+#     needs: lint
+    name: Navigator-Engine pytest
+    runs-on: ubuntu-latest
+    env:
+        NAVIGATOR_ENGINE_SETTINGS: navigator_engine.config.Development
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Prepare venv
+        run: |
+          pip install pipenv
+          pipenv sync --dev
+      - name: Load graph
+        run: pipenv run flask navigator-engine load-graph
+
+      - name: Run tests
+        run: pipenv run pytest
