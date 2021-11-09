@@ -36,11 +36,10 @@ class Action(db.Model):
 
     def to_dict(self):
         return {
-            "action_id": self.id,
             "title": self.title,
-            "display_html": self.html,
+            "displayHTML": self.html,
             "skippable": self.skippable,
-            "action_url": self.action_url,
+            "actionURL": self.action_url,
             "complete": self.complete
         }
 

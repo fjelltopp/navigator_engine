@@ -16,6 +16,7 @@ class ProgressTracker():
         self.action_breadcrumbs = []
         self.complete_node = self.get_complete_node()
         self.root_node = self.get_root_node()
+        self.report = {}
 
     def report_progress(self) -> dict:
         milestones = copy.deepcopy(self.milestones)
@@ -30,11 +31,12 @@ class ProgressTracker():
                 'progress': 0,
                 'completed': False
             })
-        return {
+        self.report = {
             'progress': self.percentage_progress(),
-            'milestone_list_is_complete': milestone_list_is_complete,
+            'milestoneListFullyResolved': milestone_list_is_complete,
             'milestones': milestones
         }
+        return self.report
 
     def reset(self) -> None:
         self.entire_route = self.previous_route
@@ -45,6 +47,7 @@ class ProgressTracker():
                       milestone_progress, complete: bool = False) -> None:
         self.entire_route += milestone_progress.entire_route
         self.action_breadcrumbs += milestone_progress.action_breadcrumbs
+        self.skipped += milestone_progress.skipped
         self.milestones.append({
             'id': milestone.id,
             'title': milestone.title,

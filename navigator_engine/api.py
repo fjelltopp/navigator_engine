@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from navigator_engine.common.decision_engine import DecisionEngine
 from navigator_engine.model import load_graph
-from navigator_engine.common import DATA_LOADERS
+from navigator_engine.common import DATA_LOADERS, choose_graph
 import json
 
 api_blueprint = Blueprint('main', __name__, url_prefix='/api/')
@@ -24,21 +24,20 @@ def decide():
     ```
     """
     input_data = json.loads(request.data)
-
-    graph = load_graph(1)
+    graph = load_graph(choose_graph(input_data['data']['url']))
     data = DATA_LOADERS['json_url']('url', 'authorization_header', input_data['data'])
     skip_actions = input_data.get('skipActions', [])
 
     engine = DecisionEngine(graph, data, skip=skip_actions)
     engine.decide()
+    del engine.decision['node']
 
-    result = {
+    return jsonify({
         "decision": engine.decision,
-        "actions": engine.progress.action_breadcrumbs(),
+        "actions": engine.progress.action_breadcrumbs,
         "skipped": engine.progress.skipped,
-        "progress": engine.progress.report_progress(),
-    }
-    return result
+        "progress": engine.progress.report,
+    })
 
 
 @api_blueprint.route('/action/<action_id>')
