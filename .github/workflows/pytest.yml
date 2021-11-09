@@ -20,7 +20,7 @@ jobs:
     name: Navigator-Engine pytest
     runs-on: ubuntu-latest
     env:
-        NAVIGATOR_ENGINE_SETTINGS = navigator_engine.config.Development
+        NAVIGATOR_ENGINE_SETTINGS: navigator_engine.config.Development
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
