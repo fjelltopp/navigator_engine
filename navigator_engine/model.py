@@ -81,3 +81,7 @@ class Edge(db.Model):
 
 def load_graph(graph_id: int) -> Graph:
     return Graph.query.filter_by(id=graph_id).first()
+
+
+def load_node(node_id: int) -> Node:
+    return Node.query.filter_by(id=node_id).first()
