@@ -41,17 +41,13 @@ def decide():
     })
 
 
-@api_blueprint.route('/action/<action_id>')
-def action(action_id):
+@api_blueprint.route('/action/<node_id>')
+def action(node_id):
     """
     Return the contents of a particular action.
     """
+    action = load_node(node_id).action
     return jsonify({
-        "id": "xxx",
-        "content": {
-            "title": "Node Title",
-            "displayHTML": "<p>Lorem Ipsum</p>",
-            "skippable": True,
-            "actionURL": "http://fjelltopp.org"
-        }
+        "id": node_id,
+        "content": action.to_dict()
     })
