@@ -2,6 +2,7 @@ import json
 import pytest
 import navigator_engine.tests.util as test_util
 from requests import Response
+from werkzeug.exceptions import BadRequest
 """
 Endpoint tests use the client fixture, which requires the db, meaning they should
 be treated as integration tests.
@@ -60,6 +61,20 @@ def test_decide(client, mocker):
     }
 
 
+def test_decide_without_data_raises_bad_request(client, mocker):
+    response = client.post("/api/decide", data=json.dumps({}))
+    assert 400 == response.status_code
+    assert b"No data specified in request" in response.data
+
+
+def test_decide_without_url_raises_bad_request(client, mocker):
+    response = client.post("/api/decide", data=json.dumps({
+        'data': {'authorization_header': 'api-key-here'}
+    }))
+    assert 400 == response.status_code
+    assert b"No url to data specified in request" in response.data
+
+
 @pytest.mark.parametrize("node_id, expected_action", [
     (11, {'skippable': False, 'actionURL': None, 'complete': False,
           'displayHTML': 'Action 1 HTML', 'title': 'Action 1'}),
@@ -73,3 +88,19 @@ def test_action(client, mocker, node_id, expected_action):
     test_util.create_demo_data()
     response = client.get(f"/api/action/{node_id}")
     assert response.json == {'id': str(node_id), 'content': expected_action}
+
+
+@pytest.mark.usefixtures('with_app_context')
+def test_action_for_conditional_raises_bad_request(client, mocker):
+    test_util.create_demo_data()
+    response = client.get("/api/action/6")
+    assert 400 == response.status_code
+    assert b"Node 6 is not an action" in response.data
+
+
+@pytest.mark.usefixtures('with_app_context')
+def test_action_for_nonexistant_node_raises_bad_request(client, mocker):
+    test_util.create_demo_data()
+    response = client.get("/api/action/999")
+    assert 400 == response.status_code
+    assert b"Invalid node ID: 999" in response.data

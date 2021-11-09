@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, abort
 from navigator_engine.common.decision_engine import DecisionEngine
 from navigator_engine.model import load_graph, load_node
 from navigator_engine.common import choose_graph, choose_data_loader
@@ -24,6 +24,12 @@ def decide():
     ```
     """
     input_data = json.loads(request.data)
+
+    if not input_data.get('data'):
+        abort(400, "No data specified in request")
+    if not input_data['data'].get('url'):
+        abort(400, "No url to data specified in request")
+
     graph = load_graph(choose_graph(input_data['data']['url']))
     data_loader = choose_data_loader(input_data['data']['url'])
     data = data_loader('url', 'authorization_header', input_data['data'])
@@ -46,7 +52,14 @@ def action(node_id):
     """
     Return the contents of a particular action.
     """
-    action = load_node(node_id).action
+    node = load_node(node_id)
+    if not node:
+        abort(400, f"Invalid node ID: {node_id}")
+
+    action = node.action
+    if not action:
+        abort(400, f"Node {node_id} is not an action")
+
     return jsonify({
         "id": node_id,
         "content": action.to_dict()
