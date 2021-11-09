@@ -9,12 +9,15 @@ class ProgressTracker():
     def __init__(self, network: networkx.DiGraph, route: list[str] = []) -> None:
         self.network = network
         self.previous_route = route.copy()
-        self.route = []
         self.entire_route = route.copy()
+        self.route = []
         self.milestones = []
+        self.skipped = []
+        self.action_breadcrumbs = []
         self.complete_node = self.get_complete_node()
+        self.root_node = self.get_root_node()
 
-    def progress(self) -> None:
+    def report_progress(self) -> dict:
         milestones = copy.deepcopy(self.milestones)
         if milestones and not milestones[-1]['completed']:
             # Calculate percentage progress for current milestone
@@ -36,20 +39,32 @@ class ProgressTracker():
     def reset(self) -> None:
         self.entire_route = self.previous_route
         self.route = []
-
-    def add_node(self, node: model.Node) -> None:
-        self.entire_route.append(node)
-        self.route.append(node)
+        self.skipped = []
 
     def add_milestone(self, milestone: model.Milestone,
                       milestone_progress, complete: bool = False) -> None:
         self.entire_route += milestone_progress.entire_route
+        self.action_breadcrumbs += milestone_progress.action_breadcrumbs
         self.milestones.append({
             'id': milestone.id,
             'title': milestone.title,
             'progress': 100 if complete else milestone_progress,
             'completed': complete
         })
+
+    def add_node(self, node: model.Node) -> None:
+        self.entire_route.append(node)
+        self.route.append(node)
+        self.drop_action_breadcrumb()
+
+    def drop_action_breadcrumb(self) -> None:
+        if len(self.route) < 2:
+            return
+        parent_node = self.route[-2]
+        current_node = self.route[-1]
+        for parent_node, child_node in self.network.out_edges(parent_node):
+            if child_node != current_node and getattr(child_node, 'action_id'):
+                self.action_breadcrumbs.append(child_node.id)
 
     def pop_node(self) -> model.Node:
         node = self.entire_route[-1]
@@ -61,7 +76,13 @@ class ProgressTracker():
         for node in self.network.nodes():
             if getattr(node, 'action') and node.action.complete:
                 return node
-        raise DecisionError("Graph {graph.id} ({graph.title}) has no complete node")
+        raise DecisionError("Network has no complete node")
+
+    def get_root_node(self) -> model.Node:
+        for node, in_degree in self.network.in_degree():
+            if in_degree == 0:
+                return node
+        raise DecisionError("Network has no root node")
 
     def get_milestones(self) -> None:
         for node in self.network.nodes():

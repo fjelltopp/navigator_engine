@@ -13,8 +13,6 @@ class DecisionEngine():
         self.network = self.graph.to_networkx()
         self.data = data
         self.skip = skip
-        self.root_node = self.get_root()
-        self.skipped = []
         self.progress = ProgressTracker(self.network, route=route)
 
     def decide(self, data: object = None, skip: list[str] = None) -> dict:
@@ -23,15 +21,8 @@ class DecisionEngine():
         if skip:
             self.skip = skip
         self.progress.reset()
-        self.skipped = []
-        self.decision = self.process_node(self.root_node)
+        self.decision = self.process_node(self.progress.root_node)
         return self.decision
-
-    def get_root(self) -> model.Node:
-        for node, in_degree in self.network.in_degree():
-            if in_degree == 0:
-                return node
-        raise DecisionError(f"Graph {self.graph.id} ({self.graph.title}) has no root node")
 
     def process_node(self, node: model.Node) -> model.Action:
         self.progress.add_node(node)
@@ -99,7 +90,7 @@ class DecisionEngine():
         previous_node = self.progress.entire_route[-2]
         for previous_node, new_node in self.network.out_edges(previous_node):
             if node != new_node:
-                self.skipped.append(node.id)
+                self.progress.skipped.append(node.id)
                 self.progress.pop_node()
                 return self.process_node(new_node)
         raise DecisionError(f"Only one outgoing edge for node: {previous_node.id}")

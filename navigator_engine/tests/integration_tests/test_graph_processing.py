@@ -32,7 +32,7 @@ def test_with_skip_steps(data, skip_steps, expected_node_id):
     engine = DecisionEngine(graph, data, skip=skip_steps)
     result = engine.decide()
     assert result['id'] == expected_node_id
-    assert engine.skipped == skip_steps
+    assert engine.progress.skipped == skip_steps
 
 
 @pytest.mark.parametrize("data, skip_steps", [
@@ -62,6 +62,20 @@ def test_graph_processing_with_milestones(data, expected_node_id):
     assert result['id'] == expected_node_id
 
 
+@pytest.mark.parametrize("data, expected_breadcrumbs", [
+    ({1: True, 2: True, 'data': {1: True, 2: True, 3: False, 4: True}}, [11, 3, 5]),
+    ({1: True, 2: True, 'data': {1: False, 2: True, 3: True, 4: True}}, [11]),
+    ({1: True, 2: True, 'data': {1: True, 2: True, 3: True, 4: True}}, [11, 3, 5, 7, 9, 14])
+])
+@pytest.mark.usefixtures('with_app_context')
+def test_action_breadcrumbs(data, expected_breadcrumbs):
+    test_util.create_demo_data()
+    graph = model.load_graph(2)
+    engine = DecisionEngine(graph, data)
+    engine.decide()
+    assert engine.progress.action_breadcrumbs == expected_breadcrumbs
+
+
 @pytest.mark.usefixtures('with_app_context')
 def test_progress_during_milestone():
     test_util.create_demo_data()
@@ -73,7 +87,7 @@ def test_progress_during_milestone():
     }
     engine = DecisionEngine(graph, data)
     engine.decide()
-    progress = engine.progress.progress()
+    progress = engine.progress.report_progress()
     assert progress == {
         'progress': 33,
         'milestone_list_is_complete': True,
@@ -97,7 +111,7 @@ def test_progress_prior_milestone():
     }
     engine = DecisionEngine(graph, data)
     engine.decide()
-    progress = engine.progress.progress()
+    progress = engine.progress.report_progress()
     assert progress == {
         'progress': 0,
         'milestone_list_is_complete': True,
@@ -121,7 +135,7 @@ def test_progress_after_milestone():
     }
     engine = DecisionEngine(graph, data)
     engine.decide()
-    progress = engine.progress.progress()
+    progress = engine.progress.report_progress()
     assert progress == {
         'progress': 67,
         'milestone_list_is_complete': True,
