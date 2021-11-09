@@ -60,11 +60,11 @@ class DecisionEngine():
         )
         milestone_result = milestone_engine.decide()
         if milestone_result['node'].action.complete:
-            self.progress.add_milestone(node.milestone, milestone_engine.progress, complete=True)
+            self.progress.add_milestone(node, milestone_engine.progress, complete=True)
             next_node = self.get_next_node(node, True)
             return self.process_node(next_node)
         else:
-            self.progress.add_milestone(node.milestone, milestone_engine.progress)
+            self.progress.add_milestone(node, milestone_engine.progress)
             return milestone_result
 
     def get_next_node(self, node: model.Node, edge_type: bool) -> model.Node:

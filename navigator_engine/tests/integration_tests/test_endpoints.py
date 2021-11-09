@@ -55,7 +55,7 @@ def test_decide(client, mocker):
         'progress': {
             'progress': 100,
             'milestoneListFullyResolved': True,
-            'milestones': [{'id': 1, 'title': 'ADR Data', 'progress': 100, 'completed': True}]
+            'milestones': [{'id': 12, 'title': 'ADR Data', 'progress': 100, 'completed': True}]
         }
     }
 

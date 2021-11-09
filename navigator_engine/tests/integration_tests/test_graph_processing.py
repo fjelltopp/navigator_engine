@@ -92,7 +92,7 @@ def test_progress_during_milestone():
         'progress': 33,
         'milestoneListFullyResolved': True,
         'milestones': [{
-            'id': 1,
+            'id': 12,
             'title': 'ADR Data',
             'progress': 50,
             'completed': False
@@ -116,7 +116,7 @@ def test_progress_prior_milestone():
         'progress': 0,
         'milestoneListFullyResolved': True,
         'milestones': [{
-            'id': 1,
+            'id': 12,
             'title': 'ADR Data',
             'progress': 0,
             'completed': False
@@ -140,7 +140,7 @@ def test_progress_after_milestone():
         'progress': 67,
         'milestoneListFullyResolved': True,
         'milestones': [{
-            'id': 1,
+            'id': 12,
             'title': 'ADR Data',
             'progress': 100,
             'completed': True

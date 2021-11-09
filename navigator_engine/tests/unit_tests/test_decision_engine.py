@@ -145,7 +145,7 @@ def test_process_milestone_incomplete(mocker):
     )
 
     result = DecisionEngine.process_milestone(engine, node1)
-    engine.progress.add_milestone.assert_called_once_with(node1.milestone, milestone_engine.progress)
+    engine.progress.add_milestone.assert_called_once_with(node1, milestone_engine.progress)
     engine.run_pluggable_logic.assert_called_once_with("return_empty()", common.DATA_LOADERS)
     assert result == {'node': node2}
 
@@ -182,7 +182,7 @@ def test_process_milestone_complete(mocker):
     result = DecisionEngine.process_milestone(engine, node1)
 
     assert result == "processed_action"
-    engine.progress.add_milestone.assert_called_once_with(node1.milestone, milestone_engine.progress, complete=True)
+    engine.progress.add_milestone.assert_called_once_with(node1, milestone_engine.progress, complete=True)
     engine.run_pluggable_logic.assert_called_once_with("return_empty()", common.DATA_LOADERS)
     engine.get_next_node.assert_called_once_with(node1, True)
     engine.process_node.assert_called_once_with(node3)
