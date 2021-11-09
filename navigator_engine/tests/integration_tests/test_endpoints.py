@@ -52,7 +52,7 @@ def test_decide(client, mocker):
             }
         },
         'actions': [11, 3, 5, 7, 9, 14],
-        'skipped': [7],
+        'skippedActions': [7],
         'progress': {
             'progress': 100,
             'milestoneListFullyResolved': True,

@@ -36,7 +36,7 @@ def decide():
     return jsonify({
         "decision": engine.decision,
         "actions": engine.progress.action_breadcrumbs,
-        "skipped": engine.progress.skipped,
+        "skippedActions": engine.progress.skipped,
         "progress": engine.progress.report,
     })
 
