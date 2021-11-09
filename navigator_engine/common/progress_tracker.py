@@ -57,7 +57,7 @@ class ProgressTracker():
         self.route.append(node)
         self.drop_action_breadcrumb()
 
-    def drop_action_breadcrumb(self):
+    def drop_action_breadcrumb(self) -> None:
         if len(self.route) < 2:
             return
         parent_node = self.route[-2]
