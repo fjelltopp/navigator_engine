@@ -1,6 +1,6 @@
 import click
 
-from navigator_engine.graph_loader import graph_loader
+from navigator_engine.common.graph_loader import graph_loader
 
 
 def register(app):

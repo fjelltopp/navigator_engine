@@ -14,10 +14,12 @@ def create_app(config_object=None):
     app = Flask(__name__)
 
     if not config_object:
-        config_object = os.getenv('CONFIG_OBJECT', 'navigator_engine.config.Config')
+        config_object = os.environ.get(
+            'NAVIGATOR_ENGINE_SETTINGS',
+            'navigator_engine.config.Config'
+        )
 
     app.config.from_object(config_object)
-    app.config.from_envvar('NAVIGATOR_ENGINE_SETTINGS', silent=True)
     app.url_map.strict_slashes = False
     app.logger.setLevel(app.config.get('LOGGING_LEVEL'))
 
@@ -32,7 +34,8 @@ def create_app(config_object=None):
     app.register_blueprint(api_blueprint)
     cli.register(app)
 
-    importlib.import_module('navigator_engine.pluggable_logic')  # register pluggable_logic
+    # Importing this code registers all the pluggable_logic for use
+    importlib.import_module('navigator_engine.pluggable_logic')
 
     @app.route('/')
     def index():
