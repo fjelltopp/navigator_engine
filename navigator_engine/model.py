@@ -39,7 +39,6 @@ class Action(db.Model):
             "title": self.title,
             "displayHTML": self.html,
             "skippable": self.skippable,
-            "actionURL": self.action_url,
             "complete": self.complete,
             "helpURLs": []
         }

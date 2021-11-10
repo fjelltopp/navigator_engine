@@ -47,7 +47,6 @@ def test_decide(client, mocker):
                 'title': 'Complete',
                 'displayHTML': 'Action Complete',
                 'skippable': False,
-                'actionURL': None,
                 'complete': True,
                 'helpURLs': []
             }
@@ -77,11 +76,11 @@ def test_decide_without_url_raises_bad_request(client, mocker):
 
 
 @pytest.mark.parametrize("node_id, expected_action", [
-    (11, {'skippable': False, 'actionURL': None, 'complete': False,
-          'displayHTML': 'Action 1 HTML', 'title': 'Action 1', 'helpURLs': []}),
-    (5, {'skippable': True, 'displayHTML': 'Validate geographic data html', 'helpURLs': [],
-         'complete': False, 'actionURL': 'url', 'title': 'Validate your geographic data'}),
-    (15, {'skippable': False, 'actionURL': None, 'complete': True, 'helpURLs': [],
+    (11, {'skippable': False, 'complete': False, 'helpURLs': [],
+          'displayHTML': 'Action 1 HTML', 'title': 'Action 1'}),
+    (5, {'skippable': True, 'displayHTML': 'Validate geographic data html',
+         'complete': False, 'title': 'Validate your geographic data', 'helpURLs': []}),
+    (15, {'skippable': False, 'complete': True, 'helpURLs': [],
           'displayHTML': 'Action Complete', 'title': 'Complete'})
 ])
 @pytest.mark.usefixtures('with_app_context')
