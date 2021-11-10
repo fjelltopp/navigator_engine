@@ -15,6 +15,7 @@ MILESTONE_COLUMNS = {
 DATA_COLUMNS = {
     'TITLE': 'Task Test',
     'ACTION': 'Action Title (if test fails)',
+    'ACTION_CONTENT': 'Action content',
     'SKIPPABLE': 'Mandatory to proceed?',
     'SKIP_TO': 'Proceed to test (if test fails)',
     'FUNCTION': 'Test Code'
@@ -123,6 +124,7 @@ def import_data(sheet_name, graphs):
         if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
             action = model.Action(
                 title=graph_data.at[idx, DATA_COLUMNS['ACTION']],
+                html=graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']],
                 skippable=_map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['SKIPPABLE']]),
                 complete=False
             )
@@ -141,9 +143,9 @@ def import_data(sheet_name, graphs):
 
     # Add a completion action
     complete_action = model.Action(
-        title='{} complete!'.format(graph_header[MILESTONE_COLUMNS['TITLE']]),
-        html='Well done.  You have completed the milestone <milestone_title>.  Time to move on to the next one...'
-            .format(graph_header[MILESTONE_COLUMNS['TITLE']]),
+        title=f"{graph_header[MILESTONE_COLUMNS['TITLE']]} complete!",
+        html=("Well done.  You have completed the milestone "
+              f"{graph_header[MILESTONE_COLUMNS['TITLE']]}. Time to move on to the next one..."),
         skippable=False,
         complete=True
     )
