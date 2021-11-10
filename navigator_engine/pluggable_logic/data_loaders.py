@@ -16,9 +16,9 @@ def dict_value(key, data):
 @register_loader
 def json_url(url_key, authorization_header_key, data):
     url = data[url_key]
-    headers = f"Authorization: {data[authorization_header_key]}"
+    headers = {"Authorization": data[authorization_header_key]}
     response = requests.get(url, headers=headers)
-    loaded_data = json.loads(response.data)
+    loaded_data = response.json()
     loaded_data['navigator_engine_source_url'] = url
     loaded_data['navigator_engine_auth_headers'] = headers
     return loaded_data
