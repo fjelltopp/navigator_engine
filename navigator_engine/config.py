@@ -7,7 +7,7 @@ class Config(object):
     DEBUG = False
     TESTING = False
     PRODUCTION = False
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/engine'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/navigator_engine'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LOGGING_LEVEL = logging.INFO
 
@@ -24,5 +24,5 @@ class Development(Config):
 
 class Production(Config):
     PRODUCTION = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/engine'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/navigator_engine'
     LOGGING_LEVEL = logging.WARNING
