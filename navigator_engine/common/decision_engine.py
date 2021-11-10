@@ -52,7 +52,9 @@ class DecisionEngine():
 
     def process_milestone(self, node: model.Node) -> model.Node:
         nested_graph = model.load_graph(node.milestone.graph_id)
-        nested_graph_data = self.run_pluggable_logic(node.milestone.data_loader, DATA_LOADERS)
+        nested_graph_data = self.data
+        if node.milestone.data_loader:
+            nested_graph_data = self.run_pluggable_logic(node.milestone.data_loader, DATA_LOADERS)
         milestone_engine = engine_factory(
             nested_graph,
             nested_graph_data,
