@@ -16,7 +16,8 @@ DATA_COLUMNS = {
     'TITLE': 'Task Test',
     'ACTION': 'Action Title (if test fails)',
     'SKIPPABLE': 'Mandatory to proceed?',
-    'SKIP_TO': 'Proceed to test (if test fails)'
+    'SKIP_TO': 'Proceed to test (if test fails)',
+    'FUNCTION': 'Test Code'
 }
 
 
@@ -28,45 +29,53 @@ def graph_loader(graph_config_file):
     split_file_name = os.path.splitext(graph_config_file)
     file_extension = split_file_name[1]
 
-    if file_extension == '.csv':
-        graph_header = pd.read_csv(graph_config_file, header=0).loc[0][0:4]
-        graph_data = pd.read_csv(graph_config_file, header=3, index_col=0)
-        import_data(graph_header, graph_data)
+    assert file_extension == '.xlsx', 'File extension of Initial Graph Config must be XLSX'
 
-    elif file_extension == '.xlsx':
-        xl = pd.ExcelFile(graph_config_file)
-        p = re.compile('[\d]{2,2}-')
+    xl = pd.ExcelFile(graph_config_file)
+    regex = re.compile('[\d]{2,2}-')
+    graph_sheets = list(filter(lambda x: regex.match(x), xl.sheet_names))
+    graphs = {}
 
-        for sheet_name in xl.sheet_names:
+    for index, sheet_name in enumerate(graph_sheets):
+        graph_header = pd.read_excel(
+            graph_config_file,
+            sheet_name=sheet_name,
+            header=0
+        ).loc[0][0:4]
 
-            if p.match(sheet_name):
-                graph_header = pd.read_excel(graph_config_file,
-                                             sheet_name=sheet_name,
-                                             header=0
-                                             ).loc[0][0:4]
-                graph_data = pd.read_excel(graph_config_file,
-                                           sheet_name=sheet_name,
-                                           header=3,
-                                           index_col=0
-                                           )
-                import_data(graph_header, graph_data)
+        graph_data = pd.read_excel(
+            graph_config_file,
+            sheet_name=sheet_name,
+            header=3,
+            index_col=0
+        )
 
-    else:
-        raise ValueError('File extension of Initial Graph Config must be XLSX or CSV')
+        # Create graphs on first past through
+        # So that they can be referenced by foreign keys on second pass
+        graph = model.Graph(
+            title=graph_header[MILESTONE_COLUMNS['TITLE']],
+            version=graph_header[MILESTONE_COLUMNS['VERSION']],
+            description=graph_header[MILESTONE_COLUMNS['DESCRIPTION']]
+        )
+        model.db.session.add(graph)
+        model.db.session.commit()
+
+        graphs[sheet_name] = {
+            'graph_id': graph.id,
+            "graph": graph,
+            'title': graph_header[MILESTONE_COLUMNS['TITLE']],
+            'graph_header': graph_header,
+            'graph_data': graph_data
+        }
+
+    for sheet_name in graph_sheets:
+        import_data(sheet_name, graphs)
 
 
-def import_data(graph_header, graph_data):
-
-    # TODO: validate the imported graph
-
-    # Load a simple BDG
-    graph = model.Graph(
-        title=graph_header[MILESTONE_COLUMNS['TITLE']],
-        version=graph_header[MILESTONE_COLUMNS['VERSION']],
-        description=graph_header[MILESTONE_COLUMNS['DESCRIPTION']]
-    )
-    model.db.session.add(graph)
-    model.db.session.commit()
+def import_data(sheet_name, graphs):
+    graph_data = graphs[sheet_name]['graph_data']
+    graph_header = graphs[sheet_name]['graph_header']
+    graph = graphs[sheet_name]['graph']
 
     # Add new columns for references to database primary keys
     graph_data.insert(0, 'DbNodeId', None)
@@ -77,9 +86,10 @@ def import_data(graph_header, graph_data):
         # Create a Milestone or a Conditional depending on which one the row represents
         p = re.compile('[\d]{2,2}-')
         if p.match(graph_data.loc[idx, DATA_COLUMNS['TITLE']]):
+            milestone_sheet_name = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
             milestone = model.Milestone(
-                title=graph_data.loc[idx, DATA_COLUMNS['TITLE']],
-                graph_id=graph.id
+                title=graphs[milestone_sheet_name]['title'],
+                graph_id=graphs[milestone_sheet_name]['graph_id']
             )
             model.db.session.add(milestone)
             model.db.session.commit()
@@ -94,18 +104,19 @@ def import_data(graph_header, graph_data):
             graph_data.at[idx, 'DbNodeId'] = node_milestone.id
         else:
             conditional = model.Conditional(
-                title=graph_data.loc[idx, DATA_COLUMNS['TITLE']]
+                title=graph_data.loc[idx, DATA_COLUMNS['TITLE']],
+                function=graph_data.loc[idx, DATA_COLUMNS['FUNCTION']]
             )
             model.db.session.add(conditional)
             model.db.session.commit()
-    
+
             node_conditional = model.Node(
                 conditional_id=conditional.id
             )
-    
+
             model.db.session.add(node_conditional)
             model.db.session.commit()
-    
+
             graph_data.at[idx, 'DbNodeId'] = node_conditional.id
 
         # If Conditional is False, add an action node if no skip destination is given

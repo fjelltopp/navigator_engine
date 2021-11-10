@@ -7,6 +7,11 @@ def return_true(data):
 
 
 @register_conditional
+def return_false(data):
+    return False
+
+
+@register_conditional
 def dict_value(key, data):
     return bool(data[key])
 
