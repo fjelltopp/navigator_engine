@@ -3,6 +3,7 @@ import pytest
 import json
 
 
+@pytest.mark.vcr()
 @pytest.mark.usefixtures('with_app_context')
 def test_end_to_end(client):
     graph_loader('Estimates_Navigator_BDG_Validations.xlsx')
