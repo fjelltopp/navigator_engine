@@ -129,6 +129,7 @@ def test_process_milestone_incomplete(mocker):
     engine.progress.complete_route = []
     engine.progress.milestone_route = []
     engine.skip = []
+    engine.data = {}
     engine.process_action.return_value = "processed_action"
     mocker.patch('navigator_engine.model.load_graph', return_value=milestone_graph)
 
@@ -151,7 +152,7 @@ def test_process_milestone_incomplete(mocker):
 
 
 def test_process_milestone_complete(mocker):
-    milestone = factories.MilestoneFactory()
+    milestone = factories.MilestoneFactory(data_loader="")
     node1 = factories.NodeFactory(milestone=milestone, milestone_id=1)
     node2 = factories.NodeFactory(action=factories.ActionFactory(id=1, complete=True), action_id=1)
     node3 = factories.NodeFactory(
@@ -163,6 +164,7 @@ def test_process_milestone_complete(mocker):
     engine.progress.complete_route = []
     engine.progress.milestone_route = []
     engine.skip = []
+    engine.data = {'test': 'data'}
     engine.run_pluggable_logic.return_value = {}
     engine.get_next_node.return_value = node3
     engine.process_node.return_value = "processed_action"
@@ -183,7 +185,7 @@ def test_process_milestone_complete(mocker):
 
     assert result == "processed_action"
     engine.progress.add_milestone.assert_called_once_with(node1, milestone_engine.progress, complete=True)
-    engine.run_pluggable_logic.assert_called_once_with("return_empty()", common.DATA_LOADERS)
+    engine.run_pluggable_logic.assert_not_called()
     engine.get_next_node.assert_called_once_with(node1, True)
     engine.process_node.assert_called_once_with(node3)
 

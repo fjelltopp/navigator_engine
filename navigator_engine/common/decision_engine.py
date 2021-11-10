@@ -3,7 +3,6 @@ import navigator_engine.model as model
 from navigator_engine.common import CONDITIONAL_FUNCTIONS, DATA_LOADERS, DecisionError
 from navigator_engine.common.progress_tracker import ProgressTracker
 from typing import Callable
-from flask import current_app
 
 
 class DecisionEngine():
@@ -52,7 +51,9 @@ class DecisionEngine():
 
     def process_milestone(self, node: model.Node) -> model.Node:
         nested_graph = model.load_graph(node.milestone.graph_id)
-        nested_graph_data = self.run_pluggable_logic(node.milestone.data_loader, DATA_LOADERS)
+        nested_graph_data = self.data
+        if node.milestone.data_loader:
+            nested_graph_data = self.run_pluggable_logic(node.milestone.data_loader, DATA_LOADERS)
         milestone_engine = engine_factory(
             nested_graph,
             nested_graph_data,
@@ -81,8 +82,9 @@ class DecisionEngine():
         except KeyError:
             raise DecisionError(f"No pluggable logic for function {function_name}")
         function_args = function_string.split(function_name)[1]
-        function_args = function_args[:-1] + ",)"
         function_args = ast.literal_eval(function_args)
+        if type(function_args) is not tuple:
+            function_args = (function_args,)
         try:
             return function(*function_args, self.data)
         except Exception as e:

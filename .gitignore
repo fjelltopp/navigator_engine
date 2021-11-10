@@ -144,3 +144,6 @@ cython_debug/
 
 # jetbrains
 .idea/
+
+# Open office
+.~lock.*

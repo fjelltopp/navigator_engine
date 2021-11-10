@@ -1,0 +1,128 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - example-api-key
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.26.0
+    method: GET
+    uri: https://dev.adr.fjelltopp.org/api/3/action/package_show?id=antarctica-country-estimates-2022-1-2
+  response:
+    body:
+      string: '{"help": "https://dev.adr.fjelltopp.org/api/3/action/help_show?name=package_show",
+        "success": true, "result": {"geo-location": "Antarctica", "owner_org": "de623d4c-7e86-4dc4-a745-c835022929ca",
+        "maintainer": "Robert Ashton", "relationships_as_object": [], "private": false,
+        "maintainer_email": "", "num_tags": 4, "year": "2022", "id": "2317c329-7f76-42ae-8959-5a3a5c284596",
+        "metadata_created": "2021-11-04T12:37:43.885056", "metadata_modified": "2021-11-04T12:42:41.083526",
+        "author": null, "author_email": null, "type_name": "Country Estimates", "state":
+        "active", "version": null, "license_id": "cc-by-igo", "type": "country-estimates-22",
+        "resources": [{"validate_package": "true", "hash": "", "description": "",
+        "cache_last_updated": null, "package_id": "2317c329-7f76-42ae-8959-5a3a5c284596",
+        "mimetype_inner": null, "url_type": "upload", "validation_status": "success",
+        "datastore_active": true, "id": "a86ee45c-90bf-4704-9036-e4d4df8aef52", "size":
+        1045993, "mimetype": "application/geo+json", "cache_url": null, "name": "Geographic
+        Data", "metadata_modified": "2021-11-04T12:38:26.743550", "created": "2021-11-04T12:38:16.745668",
+        "validation_timestamp": "2021-11-04T12:38:26.537134", "restricted": "{\"allowed_organizations\":
+        \"unaids\", \"allowed_users\": \"\", \"level\": \"public\"}", "format": "GeoJSON",
+        "url": "https://dev.adr.fjelltopp.org/dataset/2317c329-7f76-42ae-8959-5a3a5c284596/resource/a86ee45c-90bf-4704-9036-e4d4df8aef52/download/demo_areas.geojson",
+        "state": "active", "last_modified": "2021-11-04T12:38:16.485385", "resource_type":
+        "inputs-unaids-geographic", "position": 0, "sha256": "fb9a189da2337c0b568998b3ab668ebf9e433e6ec26135cae95c20bf9bd5a953",
+        "lfs_prefix": "imperial-college-london/antarctica-country-estimates-2022-1-2",
+        "schema": "3_geojson_inputs"}, {"hash": "", "description": "", "cache_last_updated":
+        null, "package_id": "2317c329-7f76-42ae-8959-5a3a5c284596", "mimetype_inner":
+        null, "url_type": "upload", "validation_status": "success", "datastore_active":
+        true, "id": "c4324942-4baf-4313-a15f-aa6cd90f07f8", "size": 15323, "mimetype":
+        "text/csv", "cache_url": null, "name": "ANC Data", "metadata_modified": "2021-11-04T12:38:42.249305",
+        "created": "2021-11-04T12:38:37.353913", "validation_timestamp": "2021-11-04T12:38:42.140983",
+        "restricted": "{\"allowed_organizations\": \"unaids\", \"allowed_users\":
+        \"\", \"level\": \"public\"}", "format": "CSV", "url": "https://dev.adr.fjelltopp.org/dataset/2317c329-7f76-42ae-8959-5a3a5c284596/resource/c4324942-4baf-4313-a15f-aa6cd90f07f8/download/demo_anc_testing.csv",
+        "state": "active", "last_modified": "2021-11-04T12:38:37.140049", "resource_type":
+        "inputs-unaids-anc", "position": 1, "sha256": "09c5357c560ea1d25b0da67136d17340b2d44f4f56728a4dd47ede28f7c10c6d",
+        "lfs_prefix": "imperial-college-london/antarctica-country-estimates-2022-1-2",
+        "schema": "3_anc_inputs"}, {"hash": "", "description": "", "cache_last_updated":
+        null, "package_id": "2317c329-7f76-42ae-8959-5a3a5c284596", "mimetype_inner":
+        null, "url_type": "upload", "validation_status": "success", "datastore_active":
+        true, "id": "6d24fea6-f800-494c-b16a-ec239e8d8891", "size": 30039, "mimetype":
+        "text/csv", "cache_url": null, "name": "ART Data", "metadata_modified": "2021-11-04T12:39:00.404379",
+        "created": "2021-11-04T12:38:54.546744", "validation_timestamp": "2021-11-04T12:39:00.260099",
+        "restricted": "{\"allowed_organizations\": \"unaids\", \"allowed_users\":
+        \"\", \"level\": \"public\"}", "format": "CSV", "url": "https://dev.adr.fjelltopp.org/dataset/2317c329-7f76-42ae-8959-5a3a5c284596/resource/6d24fea6-f800-494c-b16a-ec239e8d8891/download/demo_art_number.csv",
+        "state": "active", "last_modified": "2021-11-04T12:38:54.375249", "resource_type":
+        "inputs-unaids-art", "position": 2, "sha256": "8bc366c65000c7b82608db2248b0f5f32f546b242cf523f72657064b9641d6b3",
+        "lfs_prefix": "imperial-college-london/antarctica-country-estimates-2022-1-2",
+        "schema": "3_art_inputs"}, {"hash": "", "description": "", "cache_last_updated":
+        null, "package_id": "2317c329-7f76-42ae-8959-5a3a5c284596", "mimetype_inner":
+        null, "url_type": "upload", "validation_status": "success", "datastore_active":
+        true, "id": "1826a555-3813-4738-91cc-a87bac079d53", "size": 3371963, "mimetype":
+        "text/csv", "cache_url": null, "name": "Survey Data", "metadata_modified":
+        "2021-11-04T12:42:41.094131", "created": "2021-11-04T12:39:14.031449", "validation_timestamp":
+        "2021-11-04T12:42:40.958013", "restricted": "{\"allowed_organizations\": \"unaids\",
+        \"allowed_users\": \"\", \"level\": \"public\"}", "format": "CSV", "url":
+        "https://dev.adr.fjelltopp.org/dataset/2317c329-7f76-42ae-8959-5a3a5c284596/resource/1826a555-3813-4738-91cc-a87bac079d53/download/demo_survey_hiv_indicators.csv",
+        "state": "active", "last_modified": "2021-11-04T12:39:13.840200", "resource_type":
+        "inputs-unaids-survey", "position": 3, "sha256": "4fdfbc4271f06f8a7abbd0727b8795da052ef75b527c65fce0601bb985c969dd",
+        "lfs_prefix": "imperial-college-london/antarctica-country-estimates-2022-1-2",
+        "schema": "3_survey_inputs"}, {"hash": "", "description": "", "cache_last_updated":
+        null, "package_id": "2317c329-7f76-42ae-8959-5a3a5c284596", "mimetype_inner":
+        null, "url_type": "upload", "validation_status": "success", "datastore_active":
+        true, "id": "e35d0b2a-6e81-4238-93a5-295011ad9b6d", "size": 1573222, "mimetype":
+        "text/csv", "cache_url": null, "name": "Population Data", "metadata_modified":
+        "2021-11-04T12:41:46.526062", "created": "2021-11-04T12:39:35.768339", "validation_timestamp":
+        "2021-11-04T12:41:46.343746", "restricted": "{\"allowed_organizations\": \"unaids\",
+        \"allowed_users\": \"\", \"level\": \"public\"}", "format": "CSV", "url":
+        "https://dev.adr.fjelltopp.org/dataset/2317c329-7f76-42ae-8959-5a3a5c284596/resource/e35d0b2a-6e81-4238-93a5-295011ad9b6d/download/demo_population_agesex.csv",
+        "state": "active", "last_modified": "2021-11-04T12:39:35.470171", "resource_type":
+        "inputs-unaids-population", "position": 4, "sha256": "08077125cf7665222828b13156f6a375299181eaf415e1d6b5ade1f27b1ac847",
+        "lfs_prefix": "imperial-college-london/antarctica-country-estimates-2022-1-2",
+        "schema": "3_population_inputs"}, {"hash": "", "description": "", "cache_last_updated":
+        null, "package_id": "2317c329-7f76-42ae-8959-5a3a5c284596", "mimetype_inner":
+        null, "url_type": "upload", "datastore_active": false, "id": "ff0d230e-1a2b-4d23-95a5-e709379fd752",
+        "size": 1028513, "mimetype": "application/pjnz", "cache_url": null, "name":
+        "Spectrum File", "metadata_modified": "2021-11-04T12:41:46.526295", "created":
+        "2021-11-04T12:40:01.191746", "url": "https://dev.adr.fjelltopp.org/dataset/2317c329-7f76-42ae-8959-5a3a5c284596/resource/ff0d230e-1a2b-4d23-95a5-e709379fd752/download/demo_mwi2019.pjnz",
+        "restricted": "{\"allowed_organizations\": \"unaids\", \"allowed_users\":
+        \"\", \"level\": \"public\"}", "format": "PJNZ", "state": "active", "last_modified":
+        "2021-11-04T12:40:00.481731", "resource_type": "inputs-unaids-spectrum-file",
+        "position": 5, "sha256": "5ef32dd0f29a7edec33c41f04b288260a420a8149c7c9913d08c696602da7b47",
+        "lfs_prefix": "imperial-college-london/antarctica-country-estimates-2022-1-2"}],
+        "num_resources": 6, "tags": [{"vocabulary_id": null, "state": "active", "display_name":
+        "ANC", "id": "f7f90df7-dcfd-4b6a-9521-a7e6fe56eb72", "name": "ANC"}, {"vocabulary_id":
+        null, "state": "active", "display_name": "ART", "id": "1eed9ad8-3455-4727-861f-6c4f6230c08c",
+        "name": "ART"}, {"vocabulary_id": null, "state": "active", "display_name":
+        "Country Estimates", "id": "d94fe9ee-38d8-4816-9986-48421ba8386a", "name":
+        "Country Estimates"}, {"vocabulary_id": null, "state": "active", "display_name":
+        "SVY", "id": "1740fcee-c122-4cda-80d5-287e52012bde", "name": "SVY"}], "title":
+        "Antarctica HIV Estimates 2022", "groups": [], "creator_user_id": "c9fc88f0-7ba8-4752-bf88-c49506611dd2",
+        "relationships_as_subject": [], "name": "antarctica-country-estimates-2022-1-2",
+        "isopen": false, "url": null, "notes": "A record of the input data and final
+        HIV estimates.", "license_title": "Creative Commons Attribution for Intergovernmental
+        Organisations", "license_url": "http://creativecommons.org/licenses/by/3.0/igo/legalcode",
+        "organization": {"description": "", "created": "2019-09-10T20:47:12.683277",
+        "title": "Imperial College London", "name": "imperial-college-london", "is_organization":
+        true, "state": "active", "image_url": "2019-10-24-090934.647449IMPML1CS4CP.png",
+        "type": "organization", "id": "de623d4c-7e86-4dc4-a745-c835022929ca", "approval_status":
+        "approved"}}}'
+    headers:
+      Cache-Control:
+      - public, must-revalidate, max-age=0
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '8495'
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Wed, 10 Nov 2021 02:30:19 GMT
+      Server:
+      - nginx/1.19.3
+    status:
+      code: 200
+      message: OK
+version: 1

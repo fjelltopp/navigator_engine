@@ -23,7 +23,7 @@ def test_decide(client, mocker):
         'data': {'1': True, '2': True, '3': False, '4': True}
     }
     mock_response = mocker.Mock(spec=Response)
-    mock_response.data = json.dumps(data)
+    mock_response.json.return_value = data
     mocker.patch(
         'navigator_engine.pluggable_logic.data_loaders.requests.get',
         return_value=mock_response
