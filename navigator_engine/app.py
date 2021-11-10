@@ -1,18 +1,22 @@
 import os
 import sentry_sdk
 from flask import Flask, jsonify
+import flask
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+
 from sentry_sdk.integrations.flask import FlaskIntegration
 from werkzeug.exceptions import HTTPException
 from navigator_engine import cli
 from navigator_engine.api import api_blueprint
 from navigator_engine.model import db
+from navigator_engine import graph_viz
 import importlib
 import json
 
 
 def create_app(config_object=None):
 
-    app = Flask(__name__)
+    server = Flask(__name__)
 
     if not config_object:
         config_object = os.environ.get(
@@ -20,25 +24,27 @@ def create_app(config_object=None):
             'navigator_engine.config.Config'
         )
 
-    app.config.from_object(config_object)
-    app.url_map.strict_slashes = False
-    app.logger.setLevel(app.config.get('LOGGING_LEVEL'))
+    server.config.from_object(config_object)
+    server.url_map.strict_slashes = False
+    server.logger.setLevel(server.config.get('LOGGING_LEVEL'))
 
-    if app.config.get("SENTRY_DSN"):
+    if server.config.get("SENTRY_DSN"):
         sentry_sdk.init(
-            dsn=app.config["SENTRY_DSN"],
+            dsn=server.config["SENTRY_DSN"],
             integrations=[FlaskIntegration()],
             traces_sample_rate=1.0
         )
 
-    db.init_app(app)
-    app.register_blueprint(api_blueprint)
-    cli.register(app)
+    db.init_app(server)
+    server.register_blueprint(api_blueprint)
+    cli.register(server)
+
+    dash_app = graph_viz.get_dash_app(server)
 
     # Importing this code registers all the pluggable_logic for use
     importlib.import_module('navigator_engine.pluggable_logic')
 
-    @app.route('/')
+    @server.route('/')
     def index():
         return jsonify({"status": "Navigator Engine Running"})
 
@@ -53,7 +59,15 @@ def create_app(config_object=None):
         response.content_type = "application/json"
         return response
 
-    return app
+    @server.route('/graph')
+    def render_dashboard():
+        return flask.redirect('/graph')
+
+    app = DispatcherMiddleware(server, {
+        '/graph': dash_app.server
+    })
+
+    return app.app
 
 
 app = create_app()
