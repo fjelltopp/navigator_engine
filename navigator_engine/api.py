@@ -48,7 +48,8 @@ def decide():
         "decision": engine.decision,
         "actions": engine.progress.action_breadcrumbs,
         "skippedActions": engine.progress.skipped,
-        "progress": engine.progress.report,
+        "removeSkipActions": engine.remove_skips,
+        "progress": engine.progress.report
     })
 
 
