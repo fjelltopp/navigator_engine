@@ -32,10 +32,15 @@ def decide():
 
     graph = load_graph(choose_graph(input_data['data']['url']))
     data_loader = choose_data_loader(input_data['data']['url'])
-    data = data_loader('url', 'authorization_header', input_data['data'])
+    source_data = input_data['data']
     skip_actions = input_data.get('skipActions', [])
 
-    engine = DecisionEngine(graph, data, skip=skip_actions)
+    engine = DecisionEngine(
+        graph,
+        source_data,
+        data_loader=data_loader,
+        skip=skip_actions
+    )
     engine.decide()
     del engine.decision['node']
 

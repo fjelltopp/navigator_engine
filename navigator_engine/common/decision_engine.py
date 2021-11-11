@@ -7,14 +7,16 @@ from typing import Callable
 
 class DecisionEngine():
 
-    def __init__(self, graph: model.Graph, data: object,
+    def __init__(self, graph: model.Graph, source_data: object, data_loader: str = None,
                  skip: list[str] = [], route: list[str] = []) -> None:
         self.graph = graph
         self.network = self.graph.to_networkx()
-        self.data = data
+        self.data = source_data
         self.skip = skip
         self.progress = ProgressTracker(self.network, route=route)
         self.decision = {}
+        if data_loader:
+            self.data = self.run_pluggable_logic(data_loader, DATA_LOADERS)
 
     def decide(self, data: object = None, skip: list[str] = None) -> dict:
         if data:
@@ -50,13 +52,10 @@ class DecisionEngine():
         }
 
     def process_milestone(self, node: model.Node) -> model.Node:
-        nested_graph = model.load_graph(node.milestone.graph_id)
-        nested_graph_data = self.data
-        if node.milestone.data_loader:
-            nested_graph_data = self.run_pluggable_logic(node.milestone.data_loader, DATA_LOADERS)
         milestone_engine = engine_factory(
-            nested_graph,
-            nested_graph_data,
+            model.load_graph(node.milestone.graph_id),
+            self.data,
+            data_loader=node.milestone.data_loader,
             skip=self.skip
         )
         milestone_result = milestone_engine.decide()
@@ -86,7 +85,7 @@ class DecisionEngine():
         if type(function_args) is not tuple:
             function_args = (function_args,)
         try:
-            return function(*function_args, self.data)
+            return function(*function_args, self)
         except Exception as e:
             raise DecisionError(
                 f"Error running pluggable logic {function_string} for "
@@ -106,11 +105,11 @@ class DecisionEngine():
         raise DecisionError(f"Only one outgoing edge for node: {previous_node.id}")
 
 
-def engine_factory(graph, data, skip=[]) -> DecisionEngine:
-    # Needed because mocking recursive object creation in tests is difficult!
-    # There may be a better way?
+def engine_factory(graph, data, data_loader=None, skip=[]) -> DecisionEngine:
+    # Used to mock out engine creation in tests
     return DecisionEngine(
         graph,
         data,
-        skip=skip
+        skip=skip,
+        data_loader=data_loader
     )
