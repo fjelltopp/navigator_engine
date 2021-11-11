@@ -16,10 +16,12 @@ def choose_data_loader(file_url):
 
 def register_conditional(f):
     CONDITIONAL_FUNCTIONS[f.__name__] = f
+    return f
 
 
 def register_loader(f):
     DATA_LOADERS[f.__name__] = f
+    return f
 
 
 class DecisionError(Exception):
