@@ -11,8 +11,7 @@ import plotly.express as px
 from dash.dependencies import Input, Output
 
 
-def get_dash_app(server):
-    dash_app = Dash(__name__, server=server, url_base_pathname='/graph/')
+def get_dash_app(flask_app, dash_app):
     #elements = _get_graph(server)
     dash_app.layout = html.Div(children=[
         html.Div([
@@ -40,7 +39,8 @@ def get_dash_app(server):
         Input(component_id='graph-selector', component_property='value'))
     def update_figure(graph_id):
 
-        graph = _get_graph(server, graph_id)
+        with flask_app.app_context():
+            graph = model.load_graph(graph_id=graph_id)
 
         fig = cyto.Cytoscape(
             id='cytoscape',
@@ -57,9 +57,3 @@ def get_dash_app(server):
 
     return dash_app
 
-
-def _get_graph(server, graph_id):
-    with server.app_context():
-        graph = model.load_graph(graph_id=graph_id)
-
-    return graph
