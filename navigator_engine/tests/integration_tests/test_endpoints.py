@@ -53,6 +53,7 @@ def test_decide_complete(client, mocker):
         },
         'actions': [11, 3, 5, 7, 9, 14],
         'skippedActions': [7],
+        'removeSkipActions': [],
         'progress': {
             'progress': 100,
             'milestoneListFullyResolved': True,
@@ -89,6 +90,7 @@ def test_decide_incomplete(client, mocker):
     assert response.json == {
         'actions': [11, 3, 5],
         'skippedActions': [],
+        'removeSkipActions': [],
         'decision': {
             'id': 7,
             'content': {
