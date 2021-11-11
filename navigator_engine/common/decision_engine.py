@@ -15,6 +15,7 @@ class DecisionEngine():
         self.skip = skip
         self.progress = ProgressTracker(self.network, route=route)
         self.decision = {}
+        self.remove_skips = []
         if data_loader:
             self.data = self.run_pluggable_logic(data_loader, DATA_LOADERS)
 
