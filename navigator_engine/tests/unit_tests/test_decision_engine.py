@@ -30,7 +30,7 @@ def test_run_pluggable_logic(mocker):
     engine.data = {'key': 'value'}
     function_string = "test_function('hello', 1)"
     result = DecisionEngine.run_pluggable_logic(engine, function_string)
-    assert result == ('hello', 1, {'key': 'value'})
+    assert result == ('hello', 1, engine)
 
 
 @pytest.mark.parametrize("edge_type,node", [(True, 1), (False, 2)])
@@ -147,7 +147,6 @@ def test_process_milestone_incomplete(mocker):
 
     result = DecisionEngine.process_milestone(engine, node1)
     engine.progress.add_milestone.assert_called_once_with(node1, milestone_engine.progress)
-    engine.run_pluggable_logic.assert_called_once_with("return_empty()", common.DATA_LOADERS)
     assert result == {'node': node2}
 
 
@@ -185,7 +184,6 @@ def test_process_milestone_complete(mocker):
 
     assert result == "processed_action"
     engine.progress.add_milestone.assert_called_once_with(node1, milestone_engine.progress, complete=True)
-    engine.run_pluggable_logic.assert_not_called()
     engine.get_next_node.assert_called_once_with(node1, True)
     engine.process_node.assert_called_once_with(node3)
 

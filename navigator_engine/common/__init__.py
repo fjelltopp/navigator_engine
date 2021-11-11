@@ -11,7 +11,7 @@ def choose_graph(file_url):
 def choose_data_loader(file_url):
     # TODO:  choose a data loader for the given file_url
     # For now only one type of file, so only one type of loader
-    return DATA_LOADERS['json_url']
+    return "json_url('url', 'authorization_header')"
 
 
 def register_conditional(f):
