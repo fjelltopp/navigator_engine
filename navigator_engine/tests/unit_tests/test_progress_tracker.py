@@ -161,3 +161,25 @@ def test_drop_action_breadcrumb(mock_tracker, simple_network):
     mock_tracker.route = [nodes[0], nodes[1]]
     ProgressTracker.drop_action_breadcrumb(mock_tracker)
     assert mock_tracker.action_breadcrumbs == [3]
+
+
+def test_report_progress(mocker, mock_tracker):
+    milestone = factories.NodeFactory(milestone=factories.MilestoneFactory())
+    milestone_tracker = mocker.Mock(spec=ProgressTracker)
+    milestone_tracker.percentage_progress.return_value = 70
+    mock_tracker.milestones = [
+        {'id': 2, 'title': 'Mock', 'completed': False, 'progress': milestone_tracker}
+    ]
+    mock_tracker.percentage_progress.return_value = 50
+    mock_tracker.milestones_to_complete.return_value = [milestone], False
+
+    result = ProgressTracker.report_progress(mock_tracker)
+    assert result == {
+        'progress': 50,
+        'currentMilestoneID': 2,
+        'milestoneListFullyResolved': False,
+        'milestones': [
+            {'id': 2, 'title': 'Mock', 'completed': False, 'progress': 70},
+            {'id': 1, 'title': 'Test Milestone', 'progress': 0, 'completed': False}
+        ]
+    }

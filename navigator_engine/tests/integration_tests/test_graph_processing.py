@@ -91,6 +91,7 @@ def test_progress_during_milestone():
     assert progress == {
         'progress': 33,
         'milestoneListFullyResolved': True,
+        'currentMilestoneID': 12,
         'milestones': [{
             'id': 12,
             'title': 'ADR Data',
@@ -115,6 +116,7 @@ def test_progress_prior_milestone():
     assert progress == {
         'progress': 0,
         'milestoneListFullyResolved': True,
+        'currentMilestoneID': None,
         'milestones': [{
             'id': 12,
             'title': 'ADR Data',
@@ -139,6 +141,7 @@ def test_progress_after_milestone():
     assert progress == {
         'progress': 67,
         'milestoneListFullyResolved': True,
+        'currentMilestoneID': None,
         'milestones': [{
             'id': 12,
             'title': 'ADR Data',

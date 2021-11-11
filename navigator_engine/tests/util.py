@@ -12,6 +12,7 @@ logger = logging.getLogger("Tests")
 def create_demo_data():
     # Clear and reset the db
     model.db.drop_all()
+    model.db.session.close()
     model.db.create_all()
 
     # Load a simple BDG

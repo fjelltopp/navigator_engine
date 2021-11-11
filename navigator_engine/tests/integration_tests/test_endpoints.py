@@ -56,6 +56,7 @@ def test_decide_complete(client, mocker):
         'removeSkipActions': [],
         'progress': {
             'progress': 100,
+            'currentMilestoneID': None,
             'milestoneListFullyResolved': True,
             'milestones': [{'id': 12, 'title': 'ADR Data', 'progress': 100, 'completed': True}]
         }
@@ -105,6 +106,7 @@ def test_decide_incomplete(client, mocker):
             }
         },
         'progress': {
+            'currentMilestoneID': 12,
             'milestoneListFullyResolved': True,
             'progress': 33,
             'milestones': [{'completed': False, 'id': 12, 'progress': 50, 'title': 'ADR Data'}]
