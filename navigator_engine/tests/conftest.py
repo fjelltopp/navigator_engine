@@ -4,6 +4,7 @@ from navigator_engine.model import db
 from networkx import DiGraph
 import unittest.mock as mock
 from navigator_engine.common.progress_tracker import ProgressTracker
+from navigator_engine.common.decision_engine import DecisionEngine
 import navigator_engine.tests.factories as factories
 
 
@@ -34,20 +35,43 @@ def with_app_context():
 
 @pytest.fixture
 def mock_tracker():
+    return get_mock_tracker()
+
+
+@pytest.fixture
+def mock_engine():
+    return get_mock_engine()
+
+
+@pytest.fixture
+def simple_network():
+    return get_simple_network()
+
+
+def get_mock_engine():
+    engine = mock.Mock(spec=DecisionEngine)
+    engine.data = {}
+    engine.network = mock.Mock(spec=DiGraph)
+    engine.remove_skips = []
+    engine.skip = []
+    engine.progress = get_mock_tracker()
+    return engine
+
+
+def get_mock_tracker():
     tracker = mock.Mock(spec=ProgressTracker)
     tracker.network = mock.Mock(spec=DiGraph)
     tracker.route = []
     tracker.entire_route = []
     tracker.previous_route = []
-    tracker.skipped_= []
+    tracker.skipped = []
     tracker.milestones = []
     tracker.complete_node = factories.NodeFactory()
     tracker.action_breadcrumbs = []
     return tracker
 
 
-@pytest.fixture
-def simple_network():
+def get_simple_network():
     """
     Creates a small network of conditionals [c] actions [a] and milestone [m]:
 
