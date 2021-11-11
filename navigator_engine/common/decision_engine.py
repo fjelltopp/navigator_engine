@@ -8,18 +8,19 @@ from typing import Callable
 class DecisionEngine():
 
     def __init__(self, graph: model.Graph, source_data: object, data_loader: str = None,
-                 skip: list[str] = [], route: list[str] = []) -> None:
+                 stop: str = None, skip: list[str] = [], route: list[str] = []) -> None:
         self.graph = graph
         self.network = self.graph.to_networkx()
         self.data = source_data
         self.skip = skip
         self.progress = ProgressTracker(self.network, route=route)
         self.decision = {}
+        self.stop_action = stop
         self.remove_skips = []
         if data_loader:
             self.data = self.run_pluggable_logic(data_loader, DATA_LOADERS)
 
-    def decide(self, data: object = None, skip: list[str] = None) -> dict:
+    def decide(self, data: object = None, skip: list[str] = None, stop=None) -> dict:
         if data:
             self.data = data
         if skip:
@@ -27,6 +28,7 @@ class DecisionEngine():
         self.progress.reset()
         self.decision = self.process_node(self.progress.root_node)
         self.progress.report_progress()
+
         return self.decision
 
     def process_node(self, node: model.Node) -> model.Action:
@@ -69,10 +71,15 @@ class DecisionEngine():
             return milestone_result
 
     def get_next_node(self, node: model.Node, edge_type: bool) -> model.Node:
-        for node, new_node, type in self.network.out_edges(node, data="type"):
+        new_node = None
+        for node, child_node, type in self.network.out_edges(node, data="type"):
             if type == edge_type:
-                return new_node
-        raise DecisionError(f"No outgoing '{edge_type}' edge for node {node.id}")
+                new_node = child_node
+            if child_node.id == self.stop_action:
+                return child_node
+        if not new_node:
+            raise DecisionError(f"No outgoing '{edge_type}' edge for node {node.id}")
+        return new_node
 
     def run_pluggable_logic(self, function_string: str,
                             functions: dict[str, Callable] = CONDITIONAL_FUNCTIONS):
