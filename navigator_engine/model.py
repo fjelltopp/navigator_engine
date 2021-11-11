@@ -33,6 +33,7 @@ class Action(db.Model):
     action_url = db.Column(db.String)
     complete = db.Column(db.Boolean, default=False)
     nodes = db.relationship("Node", back_populates="action")
+    resources = db.relationship("Resource", back_populates="action")
 
     def to_dict(self):
         return {
@@ -40,7 +41,7 @@ class Action(db.Model):
             "displayHTML": self.html,
             "skippable": self.skippable,
             "complete": self.complete,
-            "helpURLs": []
+            "helpURLs": [resource.to_dict() for resource in self.resources]
         }
 
 
@@ -77,6 +78,17 @@ class Edge(db.Model):
 
     def tuple(self):
         return (self.from_node, self.to_node, {'type': self.type, 'object': self})
+
+
+class Resource(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String, nullable=False)
+    url = db.Column(db.String, nullable=False)
+    action_id = db.Column(db.Integer, db.ForeignKey('action.id'), nullable=False)
+    action = db.relationship("Action", back_populates="resources")
+
+    def to_dict(self):
+        return {'label': self.title, 'url': self.url}
 
 
 def load_graph(graph_id: int) -> Graph:
