@@ -19,7 +19,8 @@ def decide():
                 "url": "<url from estimates dataset json datadict>",
                 "authorization_header": "<optional value to be supplied as the Authorization header tag>"
             },
-            "skipActions": ["<action_id>", "<action_id>"]
+            "skipActions": ["<action_id>", "<action_id>"],
+            "stopAction": "<action_id>"
         }
     ```
     """
@@ -34,12 +35,14 @@ def decide():
     data_loader = choose_data_loader(input_data['data']['url'])
     source_data = input_data['data']
     skip_actions = input_data.get('skipActions', [])
+    stop_action = input_data.get('stopAction', [])
 
     engine = DecisionEngine(
         graph,
         source_data,
         data_loader=data_loader,
-        skip=skip_actions
+        skip=skip_actions,
+        stop=stop_action
     )
     engine.decide()
     del engine.decision['node']

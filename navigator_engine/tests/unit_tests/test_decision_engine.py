@@ -47,8 +47,27 @@ def test_get_next_node(mocker, edge_type, node):
     ])
     engine = mocker.Mock(spec=DecisionEngine)
     engine.network = network
+    engine.stop_action = None
     result = DecisionEngine.get_next_node(engine, nodes[0], edge_type)
     assert result == nodes[node]
+
+
+def test_get_next_node_stop(mocker):
+    nodes = [
+        factories.NodeFactory(id=0, conditional=factories.ConditionalFactory(id=1), conditional_id=1),
+        factories.NodeFactory(id=1, action=factories.ActionFactory(id=1), action_id=1),
+        factories.NodeFactory(id=2, action=factories.ActionFactory(id=2), action_id=2)
+    ]
+    network = networkx.DiGraph()
+    network.add_edges_from([
+        (nodes[0], nodes[1], {'type': True}),
+        (nodes[0], nodes[2], {'type': False})
+    ])
+    engine = mocker.Mock(spec=DecisionEngine)
+    engine.network = network
+    engine.stop_action = 1
+    result = DecisionEngine.get_next_node(engine, nodes[0], False)
+    assert result == nodes[1]
 
 
 def test_get_next_node_raises_error(mocker):
