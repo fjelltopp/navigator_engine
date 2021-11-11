@@ -1,10 +1,10 @@
 import navigator_engine.model as model
 import logging
-from flask import current_app
 import os
 import numpy as np
 import pandas as pd
 import re
+import markdown
 
 MILESTONE_COLUMNS = {
     'TITLE': 'Milestone Title',
@@ -48,7 +48,8 @@ def graph_loader(graph_config_file):
             graph_config_file,
             sheet_name=sheet_name,
             header=3,
-            index_col=0
+            index_col=0,
+            dtype=str
         )
 
         # Create graphs on first past through
@@ -123,9 +124,10 @@ def import_data(sheet_name, graphs):
 
             # If Conditional is False, add an action node if no skip destination is given
             if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
+                action_html = _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
                 action = model.Action(
                     title=graph_data.at[idx, DATA_COLUMNS['ACTION']],
-                    html=graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']],
+                    html=action_html,
                     skippable=_map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['SKIPPABLE']]),
                     complete=False
                 )
@@ -145,7 +147,7 @@ def import_data(sheet_name, graphs):
     # Add a completion action
     complete_node = model.Node(action=model.Action(
         title=f"{graph_header[MILESTONE_COLUMNS['TITLE']]} complete!",
-        html=("Well done.  You have completed the milestone "
+        html=_markdown_to_html("Well done.  You have completed the milestone "
               f"{graph_header[MILESTONE_COLUMNS['TITLE']]}. Time to move on to the next one..."),
         skippable=False,
         complete=True
@@ -193,11 +195,25 @@ def import_data(sheet_name, graphs):
             model.db.session.add(edge_false)
             model.db.session.commit()
 
+
 def _map_excel_boolean(boolean):
     if boolean in ['TRUE', 1, "1", "T", "t", "true", "True"]:
         return True
-    elif boolean in ['FALSE', 0, "0", "F", "f", "false", "False"] or np.isnan(boolean):
+    elif boolean in ['FALSE', 0, "0", "F", "f", "false", "False", ''] or np.isnan(boolean):
         return False
     else:
         raise ValueError('Value {} read from Initial Graph Config is not valid; Only TRUE and FALSE are valid values.'
                          .format(boolean))
+
+
+def _markdown_to_html(md_in):
+    if type(md_in) != str:
+        if np.isnan(md_in):
+            return None
+
+    try:
+        html_out = markdown.markdown(md_in)
+    except Exception as e:
+        raise ValueError(f'Not valid Markdown: {md_in}')
+
+    return html_out
