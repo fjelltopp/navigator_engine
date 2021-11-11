@@ -17,6 +17,7 @@ def client(scope="module"):
     with app.test_client() as client:
         with app.app_context():
             db.drop_all()
+            db.session.close()
             db.create_all()
         yield client
 
@@ -29,6 +30,7 @@ def with_app_context():
     """
     with app.app_context():
         db.drop_all()
+        db.session.close()
         db.create_all()
         yield
 
