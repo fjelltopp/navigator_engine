@@ -14,6 +14,7 @@ networkx = {extras = ["default"], version = "*"}
 psycopg2-binary = "*"
 openpyxl = "*"
 requests = "*"
+markdown = "*"
 
 [dev-packages]
 flake8 = "*"
