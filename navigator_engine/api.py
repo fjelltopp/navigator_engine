@@ -19,8 +19,7 @@ def decide():
                 "url": "<url from estimates dataset json datadict>",
                 "authorization_header": "<optional value to be supplied as the Authorization header tag>"
             },
-            "skipActions": ["<action_id>", "<action_id>"],
-            "stopAction": "<action_id>"
+            "skipActions": ["<action_id>", "<action_id>"]
         }
     ```
     """
@@ -30,12 +29,14 @@ def decide():
         abort(400, "No data specified in request")
     if not input_data['data'].get('url'):
         abort(400, "No url to data specified in request")
+    if input_data.get("actionID", None) in input_data.get('skipActions', []):
+        abort(400, "The value of actionID is found in skipActions. Can't get action that is skipped.")
 
     graph = load_graph(choose_graph(input_data['data']['url']))
     data_loader = choose_data_loader(input_data['data']['url'])
     source_data = input_data['data']
     skip_actions = input_data.get('skipActions', [])
-    stop_action = input_data.get('stopAction', [])
+    stop_action = input_data.get('actionID')
 
     engine = DecisionEngine(
         graph,
@@ -47,6 +48,10 @@ def decide():
     engine.decide()
     del engine.decision['node']
 
+    if stop_action and stop_action != engine.decision['id']:
+        abort(400, f"Please specify a valid actionID. The actionID {stop_action}"
+                   f" is not found in the action path {engine.progress.action_breadcrumbs}")
+
     return jsonify({
         "decision": engine.decision,
         "actions": engine.progress.action_breadcrumbs,
@@ -56,20 +61,20 @@ def decide():
     })
 
 
-@api_blueprint.route('/action/<node_id>')
-def action(node_id):
+@api_blueprint.route('/action', methods=['POST'])
+def action():
     """
-    Return the contents of a particular action.
+    Get the details of a specific action in the task breadcrumbs.
+
+    POST Request takes the following json input:
+    ```
+        {
+            "data": {
+                "url": "<url from estimates dataset json datadict>",
+                "authorization_header": "<optional value to be supplied as the Authorization header tag>"
+            },
+            "actionID": "<action_id>"
+        }
+    ```
     """
-    node = load_node(node_id)
-    if not node:
-        abort(400, f"Invalid node ID: {node_id}")
-
-    action = node.action
-    if not action:
-        abort(400, f"Node {node_id} is not an action")
-
-    return jsonify({
-        "id": node_id,
-        "content": action.to_dict()
-    })
+    return decide()

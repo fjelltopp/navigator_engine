@@ -25,6 +25,8 @@ class DecisionEngine():
             self.data = data
         if skip:
             self.skip = skip
+        if stop:
+            self.stop_action = stop
         self.progress.reset()
         self.decision = self.process_node(self.progress.root_node)
         self.progress.report_progress()
@@ -59,7 +61,8 @@ class DecisionEngine():
             model.load_graph(node.milestone.graph_id),
             self.data,
             data_loader=node.milestone.data_loader,
-            skip=self.skip
+            skip=self.skip,
+            stop=self.stop_action
         )
         milestone_result = milestone_engine.decide()
         if milestone_result['node'].action.complete:
@@ -96,8 +99,7 @@ class DecisionEngine():
             return function(*function_args, self)
         except Exception as e:
             raise DecisionError(
-                f"Error running pluggable logic {function_string} for "
-                f"node {self.progress.route[-1].id}: {type(e).__name__} {e}"
+                f"Error running pluggable logic {function_string} for: {type(e).__name__} {e}"
             )
 
     def skip_action(self, node: model.Node) -> dict:
@@ -113,11 +115,12 @@ class DecisionEngine():
         raise DecisionError(f"Only one outgoing edge for node: {previous_node.id}")
 
 
-def engine_factory(graph, data, data_loader=None, skip=[]) -> DecisionEngine:
+def engine_factory(graph, data, data_loader=None, skip=[], stop=None) -> DecisionEngine:
     # Used to mock out engine creation in tests
     return DecisionEngine(
         graph,
         data,
         skip=skip,
-        data_loader=data_loader
+        data_loader=data_loader,
+        stop=stop
     )
