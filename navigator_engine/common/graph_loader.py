@@ -207,8 +207,7 @@ def _map_excel_boolean(boolean):
 
 
 def _markdown_to_html(md_in):
-    if type(md_in) != str:
-        if np.isnan(md_in):
+    if pd.isnull(md_in):
             return None
 
     try:
