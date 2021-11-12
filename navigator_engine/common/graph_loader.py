@@ -240,7 +240,7 @@ def _parse_resources(resource_cell):
     if pd.isnull(resource_cell):
         return resources
 
-    resource_rows = re.split('\n', resource_cell)
+    resource_rows = resource_cell.split('\n')
     for row in resource_rows:
         title = row.split('http')[0].strip()
         url = row.split(title)[1].strip() 
