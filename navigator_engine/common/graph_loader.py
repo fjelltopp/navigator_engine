@@ -23,6 +23,8 @@ DATA_COLUMNS = {
     'FUNCTION': 'Test Code'
 }
 
+logger = logging.getLogger(__name__)
+
 
 def graph_loader(graph_config_file):
     # Clear and reset the db
@@ -249,6 +251,6 @@ def _parse_resources(resource_cell):
             url_parsed = urlparse(url)
             resources.append({'title': title, 'url': url_parsed.geturl()})
         except ValueError as e:
-            logging.warning(f'{url} is not a valid URL, omitting resource')
+            logger.error(f'{url} is not a valid URL, omitting resource')
 
     return resources
