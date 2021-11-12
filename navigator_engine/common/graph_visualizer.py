@@ -11,6 +11,51 @@ import plotly.express as px
 from dash.dependencies import Input, Output
 
 
+graph_stylesheet = [  # Group selectors
+    {
+        'selector': 'node',
+        'style': {
+            'content': 'data(label)'
+        }
+    },
+
+    # Class selectors
+    {
+        'selector': '.red',
+        'style': {
+            'background-color': 'red',
+            'line-color': 'red'
+        }
+    },
+    {
+        'selector': '.blue',
+        'style': {
+            'background-color': 'blue',
+            'line-color': 'blue'
+        }
+    },
+    {
+        'selector': '.green',
+        'style': {
+            'background-color': 'green',
+            'line-color': 'green'
+        }
+    },
+    {
+        'selector': '.triangle',
+        'style': {
+            'shape': 'triangle'
+        }
+    },
+    {
+        'selector': '.square',
+        'style': {
+            'shape': 'square'
+        }
+    }
+]
+
+
 def get_dash_app(flask_app, dash_app):
     dash_app.layout = html.Div(children=[
         html.Div([
@@ -42,7 +87,28 @@ def get_dash_app(flask_app, dash_app):
 
         elements = []
         for n in graph_x.nodes:
-            node_element = {'data': {'id': str(n.id), 'label': f'Node {n.id}'}}
+            node = model.load_node(node_id=n.id)
+            if node.action:
+                node_element = {'data': {'id': str(node.id),
+                                         'label': f'A {node.action.id}'
+                                         },
+                                'classes': 'red triangle'
+                                }
+            elif node.milestone:
+                node_element = {'data': {'id': str(node.id),
+                                         'label': f'M {node.milestone.id}'
+                                         },
+                                'classes': 'blue square'
+                                }
+            elif node.conditional:
+                node_element = {'data': {'id': str(node.id),
+                                         'label': f'C {node.conditional.id}'
+                                         },
+                                'classes': 'green circle'
+                                }
+            else:
+                continue
+
             elements.append(node_element)
 
         for e in graph_x.edges:
@@ -53,6 +119,7 @@ def get_dash_app(flask_app, dash_app):
             id='cytoscape',
             layout={'name': 'cose'},
             style={'width': '100%', 'height': '400px'},
+            stylesheet=graph_stylesheet,
             elements=elements
         )
 
