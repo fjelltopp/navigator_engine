@@ -4,14 +4,12 @@ from flask import Flask, jsonify
 import flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 import dash
-
 from sentry_sdk.integrations.flask import FlaskIntegration
 from werkzeug.exceptions import HTTPException
 from navigator_engine import cli
 from navigator_engine.api import api_blueprint
 from navigator_engine.model import db
-from navigator_engine.common import graph_loader
-from navigator_engine import graph_viz
+from navigator_engine.common import dash_app
 import importlib
 import json
 
@@ -41,9 +39,6 @@ def create_app(config_object=None):
     app.register_blueprint(api_blueprint)
     cli.register(app)
 
-    dash_app = dash.Dash(__name__, server=app, url_base_pathname='/graph/')
-    dash_app = graph_viz.get_dash_app(flask_app=app, dash_app=dash_app)
-
     # Importing this code registers all the pluggable_logic for use
     importlib.import_module('navigator_engine.pluggable_logic')
 
@@ -62,11 +57,8 @@ def create_app(config_object=None):
         response.content_type = "application/json"
         return response
 
-    @app.route('/graph')
-    def graph():
-        return flask.redirect('/graph')
-
     return app
 
 
 app = create_app()
+app = dash_app.add_dash_app(app)
