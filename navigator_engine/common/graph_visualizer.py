@@ -91,8 +91,19 @@ def get_dash_app(flask_app, dash_app):
                         {'data': {'id': 'nav', 'label': 'Navigator Engine'}, 'position': {'x': 75, 'y': 75}}
                     ])
             ]
-        )
+        ),
+        html.P(
+            id='tapNodeData-output',
+            children=['Click a node to see more information about it']
+        ),
     ])
+
+    @dash_app.callback(
+        Output('tapNodeData-output', 'children'),
+        Input('cytoscape', 'tapNodeData'))
+    def display_tap_node_data(data):
+        if data:
+            return [f"Node {data['label']}"]
 
     @dash_app.callback(
         Output(component_id='cytoscape-container', component_property='children'),
