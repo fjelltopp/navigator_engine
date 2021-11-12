@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, abort
 from navigator_engine.common.decision_engine import DecisionEngine
-from navigator_engine.model import load_graph, load_node
+from navigator_engine.model import load_graph
 from navigator_engine.common import choose_graph, choose_data_loader
 import json
 
@@ -30,7 +30,10 @@ def decide():
     if not input_data['data'].get('url'):
         abort(400, "No url to data specified in request")
     if input_data.get("actionID", None) in input_data.get('skipActions', []):
-        abort(400, "The value of actionID is found in skipActions. Can't get action that is skipped.")
+        abort(
+            400,
+            "The value of actionID is found in skipActions. Can't get action that is skipped."
+        )
 
     graph = load_graph(choose_graph(input_data['data']['url']))
     data_loader = choose_data_loader(input_data['data']['url'])
@@ -49,8 +52,11 @@ def decide():
     del engine.decision['node']
 
     if stop_action and stop_action != engine.decision['id']:
-        abort(400, f"Please specify a valid actionID. The actionID {stop_action}"
-                   f" is not found in the action path {engine.progress.action_breadcrumbs}")
+        abort(
+            400,
+            f"Please specify a valid actionID. The actionID {stop_action}"
+            f" is not found in the action path {engine.progress.action_breadcrumbs}"
+        )
 
     return jsonify({
         "decision": engine.decision,

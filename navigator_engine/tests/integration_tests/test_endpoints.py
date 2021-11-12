@@ -12,7 +12,7 @@ be treated as integration tests.
 def test_index(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert response.data == b"Navigator Engine Running"
+    assert response.json['status'] == 'Navigator Engine Running'
 
 
 @pytest.mark.usefixtures('with_app_context')
@@ -117,7 +117,7 @@ def test_decide_incomplete(client, mocker):
 def test_decide_without_data_raises_bad_request(client, mocker):
     response = client.post("/api/decide", data=json.dumps({}))
     assert 400 == response.status_code
-    assert b"No data specified in request" in response.data
+    assert "No data specified in request" in response.json['message']
 
 
 def test_decide_without_url_raises_bad_request(client, mocker):
@@ -125,7 +125,7 @@ def test_decide_without_url_raises_bad_request(client, mocker):
         'data': {'authorization_header': 'api-key-here'}
     }))
     assert 400 == response.status_code
-    assert b"No url to data specified in request" in response.data
+    assert "No url to data specified in request" in response.json['message']
 
 
 @pytest.mark.parametrize("node_id, expected_action", [
@@ -164,7 +164,7 @@ def test_action_for_action_not_in_path(client, mocker):
         'actionID': 6
     }))
     assert 400 == response.status_code
-    assert b"Please specify a valid actionID." in response.data
+    assert "Please specify a valid actionID." in response.json['message']
 
 
 def setup_action_endpoint_test(mocker):
