@@ -23,8 +23,11 @@ def test_add_milestone(mock_tracker, mocker, completed):
 
     ProgressTracker.add_milestone(mock_tracker, milestone_node, milestone_tracker, complete=completed)
 
+    if completed:
+        assert mock_tracker.action_breadcrumbs == [1, 2, 3, 4, 5]
+    else:
+        assert mock_tracker.action_breadcrumbs == [1, 2, 3, 4, 5, 6]
     assert mock_tracker.entire_route == route + milestone_route
-    assert mock_tracker.action_breadcrumbs == [1, 2, 3, 4, 5, 6]
     assert mock_tracker.skipped == [2, 3]
     assert mock_tracker.milestones == [{
         'id': 5,

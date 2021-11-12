@@ -30,7 +30,6 @@ class DecisionEngine():
         self.progress.reset()
         self.decision = self.process_node(self.progress.root_node)
         self.progress.report_progress()
-
         return self.decision
 
     def process_node(self, node: model.Node) -> model.Action:
@@ -50,6 +49,7 @@ class DecisionEngine():
     def process_action(self, node: model.Node) -> dict:
         if node.id in self.skip:
             return self.skip_action(node)
+        self.progress.action_breadcrumbs.append(node.id)
         return {
             "id": node.id,
             "content": node.action.to_dict(),
