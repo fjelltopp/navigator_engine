@@ -142,7 +142,6 @@ def import_data(sheet_name, graphs):
                     resource = model.Resource(
                         title=resource_row['title'],
                         url=resource_row['url'],
-                        action_id=action.id,
                         action=action
                     )
                     model.db.session.add(resource)
