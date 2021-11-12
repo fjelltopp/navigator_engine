@@ -1,7 +1,8 @@
 from navigator_engine.app import create_app
 import navigator_engine.model as model
 import logging
-
+from unittest import mock
+from requests import Response
 
 # We should only need one seperate flask app for testing, so import from here.
 app = create_app('navigator_engine.config.Testing')
@@ -22,7 +23,7 @@ def create_demo_data():
         version="0.1",
         description="Demo graph to guide people through ADR data upload"
     )
-    
+
     nodes = [
         model.Node(conditional=model.Conditional(
             title="Check if GeoJSON uploaded",

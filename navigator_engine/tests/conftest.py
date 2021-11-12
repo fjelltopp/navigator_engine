@@ -6,6 +6,7 @@ import unittest.mock as mock
 from navigator_engine.common.progress_tracker import ProgressTracker
 from navigator_engine.common.decision_engine import DecisionEngine
 import navigator_engine.tests.factories as factories
+from requests import Response
 
 
 @pytest.fixture
@@ -57,6 +58,7 @@ def get_mock_engine():
     engine.remove_skips = []
     engine.skip = []
     engine.progress = get_mock_tracker()
+    engine.stop_action = None
     return engine
 
 

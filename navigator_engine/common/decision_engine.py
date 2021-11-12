@@ -8,25 +8,29 @@ from typing import Callable
 class DecisionEngine():
 
     def __init__(self, graph: model.Graph, source_data: object, data_loader: str = None,
-                 skip: list[str] = [], route: list[str] = []) -> None:
+                 stop: str = None, skip: list[str] = [], route: list[str] = []) -> None:
         self.graph = graph
         self.network = self.graph.to_networkx()
         self.data = source_data
         self.skip = skip
         self.progress = ProgressTracker(self.network, route=route)
         self.decision = {}
+        self.stop_action = stop
         self.remove_skips = []
         if data_loader:
             self.data = self.run_pluggable_logic(data_loader, DATA_LOADERS)
 
-    def decide(self, data: object = None, skip: list[str] = None) -> dict:
+    def decide(self, data: object = None, skip: list[str] = None, stop=None) -> dict:
         if data:
             self.data = data
         if skip:
             self.skip = skip
+        if stop:
+            self.stop_action = stop
         self.progress.reset()
         self.decision = self.process_node(self.progress.root_node)
         self.progress.report_progress()
+
         return self.decision
 
     def process_node(self, node: model.Node) -> model.Action:
@@ -57,7 +61,8 @@ class DecisionEngine():
             model.load_graph(node.milestone.graph_id),
             self.data,
             data_loader=node.milestone.data_loader,
-            skip=self.skip
+            skip=self.skip,
+            stop=self.stop_action
         )
         milestone_result = milestone_engine.decide()
         if milestone_result['node'].action.complete:
@@ -69,10 +74,15 @@ class DecisionEngine():
             return milestone_result
 
     def get_next_node(self, node: model.Node, edge_type: bool) -> model.Node:
-        for node, new_node, type in self.network.out_edges(node, data="type"):
+        new_node = None
+        for node, child_node, type in self.network.out_edges(node, data="type"):
             if type == edge_type:
-                return new_node
-        raise DecisionError(f"No outgoing '{edge_type}' edge for node {node.id}")
+                new_node = child_node
+            if child_node.id == self.stop_action:
+                return child_node
+        if not new_node:
+            raise DecisionError(f"No outgoing '{edge_type}' edge for node {node.id}")
+        return new_node
 
     def run_pluggable_logic(self, function_string: str,
                             functions: dict[str, Callable] = CONDITIONAL_FUNCTIONS):
@@ -89,8 +99,7 @@ class DecisionEngine():
             return function(*function_args, self)
         except Exception as e:
             raise DecisionError(
-                f"Error running pluggable logic {function_string} for "
-                f"node {self.progress.route[-1].id}: {type(e).__name__} {e}"
+                f"Error running pluggable logic {function_string} for: {type(e).__name__} {e}"
             )
 
     def skip_action(self, node: model.Node) -> dict:
@@ -106,11 +115,12 @@ class DecisionEngine():
         raise DecisionError(f"Only one outgoing edge for node: {previous_node.id}")
 
 
-def engine_factory(graph, data, data_loader=None, skip=[]) -> DecisionEngine:
+def engine_factory(graph, data, data_loader=None, skip=[], stop=None) -> DecisionEngine:
     # Used to mock out engine creation in tests
     return DecisionEngine(
         graph,
         data,
         skip=skip,
-        data_loader=data_loader
+        data_loader=data_loader,
+        stop=stop
     )

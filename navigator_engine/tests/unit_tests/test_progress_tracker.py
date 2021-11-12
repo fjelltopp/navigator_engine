@@ -164,7 +164,7 @@ def test_drop_action_breadcrumb(mock_tracker, simple_network):
 
 
 def test_report_progress(mocker, mock_tracker):
-    milestone = factories.NodeFactory(milestone=factories.MilestoneFactory())
+    milestone = factories.NodeFactory(id=1, milestone=factories.MilestoneFactory())
     milestone_tracker = mocker.Mock(spec=ProgressTracker)
     milestone_tracker.percentage_progress.return_value = 70
     mock_tracker.milestones = [
