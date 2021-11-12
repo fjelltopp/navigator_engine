@@ -19,7 +19,7 @@ graph_stylesheet = [  # Group selectors
         }
     },
 
-    # Class selectors
+    # Class selectors for nodes
     {
         'selector': '.red',
         'style': {
@@ -52,6 +52,16 @@ graph_stylesheet = [  # Group selectors
         'style': {
             'shape': 'square'
         }
+    },
+
+    # Class selectors for edges
+    {
+        'selector': '.true',
+        'style': {'width': 5}
+    },
+    {
+        'selector': '.false',
+        'style': {'line-style': 'dashed'}
     }
 ]
 
@@ -112,7 +122,16 @@ def get_dash_app(flask_app, dash_app):
             elements.append(node_element)
 
         for e in graph_x.edges:
-            edge_element = {'data': {'source': str(e[0].id), 'target': str(e[1].id)}}
+            edge = model.load_edge(from_id=e[0].id, to_id=e[1].id)
+            if edge.type:
+                edge_element = {'data': {'source': str(e[0].id), 'target': str(e[1].id)},
+                                'classes': 'true'}
+            elif not edge.type:
+                edge_element = {'data': {'source': str(e[0].id), 'target': str(e[1].id)},
+                                'classes': 'false'}
+            else:
+                continue
+
             elements.append(edge_element)
 
         fig = cyto.Cytoscape(
