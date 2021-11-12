@@ -1,12 +1,13 @@
 import os
 import sentry_sdk
-from flask import Flask
+from flask import Flask, jsonify
 from sentry_sdk.integrations.flask import FlaskIntegration
-
+from werkzeug.exceptions import HTTPException
 from navigator_engine import cli
 from navigator_engine.api import api_blueprint
 from navigator_engine.model import db
 import importlib
+import json
 
 
 def create_app(config_object=None):
@@ -39,7 +40,18 @@ def create_app(config_object=None):
 
     @app.route('/')
     def index():
-        return "Navigator Engine Running"
+        return jsonify({"status": "Navigator Engine Running"})
+
+    @app.errorhandler(HTTPException)
+    def error_response(e):
+        response = e.get_response()
+        response.data = json.dumps({
+            'status_code': e.code,
+            'error': e.name,
+            'message': e.description
+        })
+        response.content_type = "application/json"
+        return response
 
     return app
 
