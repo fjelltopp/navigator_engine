@@ -43,6 +43,7 @@ def test_decide_complete(client, mocker):
     assert response.json == {
         'decision': {
             'id': 15,
+            'manualConfirmationRequired': False,
             'content': {
                 'title': 'Complete',
                 'displayHTML': 'Action Complete',
@@ -94,6 +95,7 @@ def test_decide_incomplete(client, mocker):
         'removeSkipActions': [],
         'decision': {
             'id': 7,
+            'manualConfirmationRequired': False,
             'content': {
                 'title': 'Upload your survey data',
                 'complete': False,
@@ -150,7 +152,11 @@ def test_action(client, mocker, node_id, expected_action):
         },
         'actionID': node_id
     }))
-    assert response.json['decision'] == {'id': node_id, 'content': expected_action}
+    assert response.json['decision'] == {
+        'id': node_id,
+        'manualConfirmationRequired': False,
+        'content': expected_action
+    }
 
 
 @pytest.mark.usefixtures('with_app_context')

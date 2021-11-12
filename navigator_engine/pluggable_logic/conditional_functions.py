@@ -30,3 +30,9 @@ def check_not_skipped(actions: list[int], engine: DecisionEngine) -> bool:
     skipped_actions = set(actions) & set(engine.progress.skipped)
     engine.remove_skips += list(skipped_actions)
     return not bool(skipped_actions)
+
+
+@register_conditional
+def check_manual_confirmation(action_id: int, engine: DecisionEngine) -> bool:
+    # Stub
+    return True

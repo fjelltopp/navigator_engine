@@ -218,7 +218,7 @@ def test_decide(mocker):
     assert engine.skip == [4, 5]
 
 
-def test_process_action_unskipped(mocker, mock_engine):
+def test_process_action_unskipped(mock_engine):
     action = factories.ActionFactory(
         id=1,
         complete=True,
@@ -226,12 +226,41 @@ def test_process_action_unskipped(mocker, mock_engine):
         html='Test HTML',
         skippable=True
     )
-    node = factories.NodeFactory(id=1, action_id=1, action=action)
-    result = DecisionEngine.process_action(mock_engine, node)
+    nodes = [
+        factories.NodeFactory(id=1, conditional=factories.ConditionalFactory()),
+        factories.NodeFactory(id=2, action_id=1, action=action)
+    ]
+    mock_engine.progress.entire_route = nodes
+
+    result = DecisionEngine.process_action(mock_engine, nodes[1])
     assert result == {
-        "id": node.id,
-        "content": node.action.to_dict(),
-        "node": node
+        "id": nodes[1].id,
+        "content": nodes[1].action.to_dict(),
+        "node": nodes[1],
+        "manualConfirmationRequired": False
+    }
+
+
+def test_process_action_manual(mock_engine):
+    action = factories.ActionFactory(
+        id=1,
+        complete=True,
+        title='Test Action',
+        html='Test HTML',
+        skippable=True
+    )
+    conditional = factories.ConditionalFactory(function='check_manual_confirmation()')
+    nodes = [
+        factories.NodeFactory(id=1, conditional=conditional),
+        factories.NodeFactory(id=2, action_id=1, action=action)
+    ]
+    mock_engine.progress.entire_route = nodes
+    result = DecisionEngine.process_action(mock_engine, nodes[1])
+    assert result == {
+        "id": nodes[1].id,
+        "content": nodes[1].action.to_dict(),
+        "node": nodes[1],
+        "manualConfirmationRequired": True
     }
 
 
