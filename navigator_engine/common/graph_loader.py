@@ -242,10 +242,8 @@ def _parse_resources(resource_cell):
 
     resource_rows = re.split('\n', resource_cell)
     for row in resource_rows:
-        url_re = re.compile(r'(https?://[^\s]+)')
-        search_results = url_re.search(row)
-        url = search_results.group(0)
-        title = row[0:search_results.span()[0]].strip()
+        title = row.split('http')[0].strip()
+        url = row.split(title)[1].strip() 
 
         try:
             url_parsed = urlparse(url)
