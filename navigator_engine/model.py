@@ -102,3 +102,7 @@ def load_graph(graph_id: int) -> Graph:
 
 def load_node(node_id: int) -> Node:
     return Node.query.filter_by(id=node_id).first()
+
+
+def load_edge(from_id: int, to_id: int) -> Edge:
+    return Edge.query.filter_by(from_id=from_id, to_id=to_id).first()
