@@ -142,22 +142,45 @@ def test_decide_without_url_raises_bad_request(client, mocker):
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_action(client, mocker, node_id, expected_action):
-    test_util.create_demo_data()
-    response = client.get(f"/api/action/{node_id}")
-    assert response.json == {'id': str(node_id), 'content': expected_action}
+    setup_action_endpoint_test(mocker)
+    response = client.post("/api/action", data=json.dumps({
+        'data': {
+            'url': 'https://example.ckan/api/3/action/package_show?id=example',
+            'authorization_header': "example-api-key"
+        },
+        'actionID': node_id
+    }))
+    assert response.json['decision'] == {'id': node_id, 'content': expected_action}
 
 
 @pytest.mark.usefixtures('with_app_context')
-def test_action_for_conditional_raises_bad_request(client, mocker):
-    test_util.create_demo_data()
-    response = client.get("/api/action/6")
+def test_action_for_action_not_in_path(client, mocker):
+    setup_action_endpoint_test(mocker)
+    response = client.post("/api/action", data=json.dumps({
+        'data': {
+            'url': 'https://example.ckan/api/3/action/package_show?id=example',
+            'authorization_header': "example-api-key"
+        },
+        'actionID': 6
+    }))
     assert 400 == response.status_code
-    assert b"Node 6 is not an action" in response.data
+    assert b"Please specify a valid actionID." in response.data
 
 
-@pytest.mark.usefixtures('with_app_context')
-def test_action_for_nonexistant_node_raises_bad_request(client, mocker):
+def setup_action_endpoint_test(mocker):
+    data = {
+        '1': True,
+        '2': True,
+        'data': {'1': True, '2': True, '3': True, '4': True}
+    }
+    mock_response = mocker.Mock(spec=Response)
+    mock_response.json.return_value = data
+    mocker.patch(
+        'navigator_engine.pluggable_logic.data_loaders.requests.get',
+        return_value=mock_response
+    )
+    mocker.patch(
+        'navigator_engine.api.choose_graph',
+        return_value=2
+    )
     test_util.create_demo_data()
-    response = client.get("/api/action/999")
-    assert 400 == response.status_code
-    assert b"Invalid node ID: 999" in response.data

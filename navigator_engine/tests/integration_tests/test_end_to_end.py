@@ -16,7 +16,3 @@ def test_end_to_end(client):
     }))
     assert response.status_code == 200
     assert response.json['decision']['id'] == 30
-    for node_id in response.json['actions']:
-        response = client.get(f"/api/action/{node_id}")
-        assert response.status_code == 200
-        assert response.json['content'].get('title', False)

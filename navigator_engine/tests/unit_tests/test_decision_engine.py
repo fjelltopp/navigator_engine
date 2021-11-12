@@ -136,20 +136,14 @@ def test_skip_action_unskippable(mocker):
         DecisionEngine.skip_action(engine, node)
 
 
-def test_process_milestone_incomplete(mocker):
+def test_process_milestone_incomplete(mocker, mock_engine):
     milestone = factories.MilestoneFactory()
     milestone_graph = factories.GraphFactory()
     node1 = factories.NodeFactory(milestone=milestone, milestone_id=1)
     node2 = factories.NodeFactory(action=factories.ActionFactory(id=1, complete=False), action_id=1)
 
-    engine = mocker.Mock(spec=DecisionEngine)
-    engine.run_pluggable_logic.return_value = True
-    engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
-    engine.progress.complete_route = []
-    engine.progress.milestone_route = []
-    engine.skip = []
-    engine.data = {}
-    engine.process_action.return_value = "processed_action"
+    mock_engine.run_pluggable_logic.return_value = True
+    mock_engine.process_action.return_value = "processed_action"
     mocker.patch('navigator_engine.model.load_graph', return_value=milestone_graph)
 
     milestone_engine = mocker.Mock(spec=DecisionEngine)
@@ -164,12 +158,12 @@ def test_process_milestone_incomplete(mocker):
         return_value=milestone_engine
     )
 
-    result = DecisionEngine.process_milestone(engine, node1)
-    engine.progress.add_milestone.assert_called_once_with(node1, milestone_engine.progress)
+    result = DecisionEngine.process_milestone(mock_engine, node1)
+    mock_engine.progress.add_milestone.assert_called_once_with(node1, milestone_engine.progress)
     assert result == {'node': node2}
 
 
-def test_process_milestone_complete(mocker):
+def test_process_milestone_complete(mocker, mock_engine):
     milestone = factories.MilestoneFactory(data_loader="")
     node1 = factories.NodeFactory(milestone=milestone, milestone_id=1)
     node2 = factories.NodeFactory(action=factories.ActionFactory(id=1, complete=True), action_id=1)
@@ -177,15 +171,10 @@ def test_process_milestone_complete(mocker):
         conditional=factories.ConditionalFactory(id=1),
         conditional_id=1
     )
-    engine = mocker.Mock(spec=DecisionEngine)
-    engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
-    engine.progress.complete_route = []
-    engine.progress.milestone_route = []
-    engine.skip = []
-    engine.data = {'test': 'data'}
-    engine.run_pluggable_logic.return_value = {}
-    engine.get_next_node.return_value = node3
-    engine.process_node.return_value = "processed_action"
+    mock_engine.data = {'test': 'data'}
+    mock_engine.run_pluggable_logic.return_value = {}
+    mock_engine.get_next_node.return_value = node3
+    mock_engine.process_node.return_value = "processed_action"
     mocker.patch('navigator_engine.model.load_graph')
 
     milestone_engine = mocker.Mock(spec=DecisionEngine)
@@ -199,12 +188,16 @@ def test_process_milestone_complete(mocker):
         'navigator_engine.common.decision_engine.engine_factory',
         return_value=milestone_engine
     )
-    result = DecisionEngine.process_milestone(engine, node1)
+    result = DecisionEngine.process_milestone(mock_engine, node1)
 
     assert result == "processed_action"
-    engine.progress.add_milestone.assert_called_once_with(node1, milestone_engine.progress, complete=True)
-    engine.get_next_node.assert_called_once_with(node1, True)
-    engine.process_node.assert_called_once_with(node3)
+    mock_engine.progress.add_milestone.assert_called_once_with(
+        node1,
+        milestone_engine.progress,
+        complete=True
+    )
+    mock_engine.get_next_node.assert_called_once_with(node1, True)
+    mock_engine.process_node.assert_called_once_with(node3)
 
 
 def test_decide(mocker):
