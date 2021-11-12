@@ -1,13 +1,7 @@
 import navigator_engine.model as model
-#from navigator_engine.tests import util
-from dash import Dash
-from sqlalchemy import select
-from sqlalchemy.orm import Session
-import dash_core_components as dcc
+from dash import dcc
 import dash_cytoscape as cyto
 from dash import html
-import networkx as nx
-import plotly.express as px
 from dash.dependencies import Input, Output
 
 
