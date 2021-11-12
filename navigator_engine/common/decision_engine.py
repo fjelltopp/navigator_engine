@@ -50,10 +50,18 @@ class DecisionEngine():
         if node.id in self.skip:
             return self.skip_action(node)
         self.progress.action_breadcrumbs.append(node.id)
+
+        manual_confirmation = False
+        parent_node = self.progress.entire_route[-2]
+        if getattr(parent_node, 'conditional'):
+            function = parent_node.conditional.function
+            manual_confirmation = function.startswith("check_manual_confirmation")
+
         return {
             "id": node.id,
             "content": node.action.to_dict(),
-            "node": node
+            "node": node,
+            "manualConfirmationRequired": manual_confirmation
         }
 
     def process_milestone(self, node: model.Node) -> model.Node:
