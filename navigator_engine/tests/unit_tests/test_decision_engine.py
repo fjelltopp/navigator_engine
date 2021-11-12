@@ -218,7 +218,7 @@ def test_decide(mocker):
     assert engine.skip == [4, 5]
 
 
-def test_process_action_unskipped(mocker):
+def test_process_action_unskipped(mocker, mock_engine):
     action = factories.ActionFactory(
         id=1,
         complete=True,
@@ -227,9 +227,7 @@ def test_process_action_unskipped(mocker):
         skippable=True
     )
     node = factories.NodeFactory(id=1, action_id=1, action=action)
-    engine = mocker.Mock(spec=DecisionEngine)
-    engine.skip = []
-    result = DecisionEngine.process_action(engine, node)
+    result = DecisionEngine.process_action(mock_engine, node)
     assert result == {
         "id": node.id,
         "content": node.action.to_dict(),

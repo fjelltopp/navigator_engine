@@ -63,9 +63,9 @@ def test_graph_processing_with_milestones(data, expected_node_id):
 
 
 @pytest.mark.parametrize("data, expected_breadcrumbs", [
-    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': False, '4': True}}, [11, 3, 5]),
-    ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}}, [11]),
-    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}}, [11, 3, 5, 7, 9, 14])
+    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': False, '4': True}}, [11, 3, 5, 7]),
+    ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}}, [11, 3]),
+    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}}, [11, 3, 5, 7, 9, 14, 15])
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_action_breadcrumbs(data, expected_breadcrumbs):

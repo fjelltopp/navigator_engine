@@ -51,7 +51,7 @@ def test_decide_complete(client, mocker):
                 'helpURLs': []
             }
         },
-        'actions': [11, 3, 5, 7, 9, 14],
+        'actions': [11, 3, 5, 7, 9, 14, 15],
         'skippedActions': [7],
         'removeSkipActions': [],
         'progress': {
@@ -89,7 +89,7 @@ def test_decide_incomplete(client, mocker):
         'skipActions': [5]
     }))
     assert response.json == {
-        'actions': [11, 3, 5],
+        'actions': [11, 3, 5, 7],
         'skippedActions': [],
         'removeSkipActions': [],
         'decision': {
