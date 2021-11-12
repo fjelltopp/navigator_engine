@@ -94,10 +94,10 @@ def get_dash_app(flask_app, dash_app):
 
     @dash_app.callback(
         Output('tapNodeData-output', 'children'),
-        Input('cytoscape', 'tapNodeData'))
+        Input('cytoscape-figure', 'tapNodeData'))
     def display_tap_node_data(data):
         if data:
-            return [f"Node {data['label']}"]
+            return [data['infobox']]
 
     @dash_app.callback(
         Output(component_id='cytoscape-container', component_property='children'),
@@ -113,19 +113,22 @@ def get_dash_app(flask_app, dash_app):
             node = model.load_node(node_id=n.id)
             if node.action:
                 node_element = {'data': {'id': str(node.id),
-                                         'label': f'A {node.action.id}'
+                                         'label': f'A {node.action.id}',
+                                         'infobox': f'Action {node.action.id} | {node.action.title}'
                                          },
                                 'classes': 'red triangle'
                                 }
             elif node.milestone:
                 node_element = {'data': {'id': str(node.id),
-                                         'label': f'M {node.milestone.id}'
+                                         'label': f'M {node.milestone.id}',
+                                         'infobox': f'Milestone {node.milestone.id} | {node.milestone.title}'
                                          },
                                 'classes': 'blue square'
                                 }
             elif node.conditional:
                 node_element = {'data': {'id': str(node.id),
-                                         'label': f'C {node.conditional.id}'
+                                         'label': f'C {node.conditional.id}',
+                                         'infobox': f'Conditional {node.conditional.id} | {node.conditional.title}'
                                          },
                                 'classes': 'green circle'
                                 }
@@ -148,7 +151,7 @@ def get_dash_app(flask_app, dash_app):
             elements.append(edge_element)
 
         fig = cyto.Cytoscape(
-            id='cytoscape',
+            id='cytoscape-figure',
             layout={'name': 'cose'},
             style={'width': '100%', 'height': '400px'},
             stylesheet=graph_stylesheet,
