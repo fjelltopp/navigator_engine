@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import re
 import markdown
+from urllib.parse import urlparse
 
 MILESTONE_COLUMNS = {
     'TITLE': 'Milestone Title',
@@ -16,10 +17,13 @@ DATA_COLUMNS = {
     'TITLE': 'Task Test',
     'ACTION': 'Action Title (if test fails)',
     'ACTION_CONTENT': 'Action content',
+    'ACTION_RESOURCES': 'Resources / Links',
     'SKIPPABLE': 'Mandatory to proceed?',
     'SKIP_TO': 'Proceed to test (if test fails)',
     'FUNCTION': 'Test Code'
 }
+
+logger = logging.getLogger(__name__)
 
 
 def graph_loader(graph_config_file):
@@ -134,6 +138,18 @@ def import_data(sheet_name, graphs):
                 model.db.session.add(action)
                 model.db.session.commit()
 
+                # Parse action's resource urls and add them to database
+                resources = _parse_resources(graph_data.at[idx, DATA_COLUMNS['ACTION_RESOURCES']])
+                for resource_row in resources:
+                    resource = model.Resource(
+                        title=resource_row['title'],
+                        url=resource_row['url'],
+                        action=action
+                    )
+                    model.db.session.add(resource)
+                    model.db.session.commit()
+
+                # Add node to action
                 node_action = model.Node(
                     action_id=action.id
                 )
@@ -216,3 +232,23 @@ def _markdown_to_html(md_in):
         raise ValueError(f'Not valid Markdown: {md_in}')
 
     return html_out
+
+
+def _parse_resources(resource_cell):
+    resources = []
+
+    if pd.isnull(resource_cell):
+        return resources
+
+    resource_rows = resource_cell.split('\n')
+    for row in resource_rows:
+        title = row.split('http')[0].strip()
+        url = row.split(title)[1].strip() 
+
+        try:
+            url_parsed = urlparse(url)
+            resources.append({'title': title, 'url': url_parsed.geturl()})
+        except ValueError as e:
+            logger.error(f'{url} is not a valid URL, omitting resource')
+
+    return resources
