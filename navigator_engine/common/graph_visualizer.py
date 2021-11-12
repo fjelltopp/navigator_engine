@@ -18,6 +18,14 @@ graph_stylesheet = [  # Group selectors
             'content': 'data(label)'
         }
     },
+    {
+        'selector': 'edge',
+        'style': {
+            # The default curve style does not work with certain arrows
+            'curve-style': 'bezier',
+            'target-arrow-shape': 'vee'
+        }
+    },
 
     # Class selectors for nodes
     {
