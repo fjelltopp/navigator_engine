@@ -25,6 +25,7 @@ pydevd-pycharm = "*"
 pytest-mock = "*"
 python-dotenv = "*"
 pytest-vcr = "*"
+mypy = "*"
 
 [requires]
 python_version = "3.9"
