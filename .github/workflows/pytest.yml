@@ -15,22 +15,24 @@ jobs:
           flake8 . --count --show-source --statistics
 
   mypy:
+    needs:
+      - lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: '3.9'
-      - name: Install requirements
-        run: pip install mypy
-      - name: Check syntax
+      - name: Prepare venv
         run: |
-          mypy .
+          pip install pipenv
+          pipenv sync --dev
+      - name: Run mypy
+        run: pipenv run mypy .
 
   test:
     needs:
       - lint
-      - mypy
     name: Navigator-Engine pytest
     runs-on: ubuntu-latest
     env:
