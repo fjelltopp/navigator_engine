@@ -70,7 +70,7 @@ class Node(db.Model):
 
 class Edge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    graph_id = db.Column(db.Integer,  db.ForeignKey('graph.id'), nullable=False)
+    graph_id = db.Column(db.Integer, db.ForeignKey('graph.id'), nullable=False)
     from_id = db.Column(db.Integer, db.ForeignKey('node.id'), nullable=False)
     to_id = db.Column(db.Integer, db.ForeignKey('node.id'), nullable=False)
     type = db.Column(db.Boolean, nullable=False)
