@@ -6,11 +6,11 @@ import navigator_engine.tests.util as test_util
 
 
 @pytest.mark.parametrize("data, expected_node_id", [
-    ({'1': False, '2': True, '3': True, '4': True}, 3),
-    ({'1': True, '2': False, '3': True, '4': True}, 5),
-    ({'1': True, '2': True, '3': False, '4': True}, 7),
-    ({'1': True, '2': True, '3': True, '4': False}, 9),
-    ({'1': True, '2': True, '3': True, '4': True}, 8),
+    ({'1': False, '2': True, '3': True, '4': True}, 'tst-1-4-a'),
+    ({'1': True, '2': False, '3': True, '4': True}, 'tst-1-5-a'),
+    ({'1': True, '2': True, '3': False, '4': True}, 'tst-1-6-a'),
+    ({'1': True, '2': True, '3': True, '4': False}, 'tst-1-7-a'),
+    ({'1': True, '2': True, '3': True, '4': True}, 'tst-1-8-a'),
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_graph_processing(data, expected_node_id):
@@ -22,8 +22,8 @@ def test_graph_processing(data, expected_node_id):
 
 
 @pytest.mark.parametrize("data, skip_steps, expected_node_id", [
-    ({'1': True, '2': False, '3': False, '4': True}, [5], 7),
-    ({'1': True, '2': False, '3': False, '4': False}, [5, 7], 9),
+    ({'1': True, '2': False, '3': False, '4': True}, ['tst-1-5-a'], 'tst-1-6-a'),
+    ({'1': True, '2': False, '3': False, '4': False}, ['tst-1-5-a', 'tst-1-6-a'], 'tst-1-7-a'),
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_with_skip_steps(data, skip_steps, expected_node_id):
@@ -36,8 +36,8 @@ def test_with_skip_steps(data, skip_steps, expected_node_id):
 
 
 @pytest.mark.parametrize("data, skip_steps", [
-    ({'1': False, '2': False, '3': False, '4': False}, [3]),
-    ({'1': True, '2': True, '3': True, '4': True}, [8])
+    ({'1': False, '2': False, '3': False, '4': False}, ['tst-1-4-a']),
+    ({'1': True, '2': True, '3': True, '4': True}, ['tst-1-8-a'])
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_skipping_unskippable_step_raises_error(data, skip_steps):
@@ -49,9 +49,9 @@ def test_skipping_unskippable_step_raises_error(data, skip_steps):
 
 
 @pytest.mark.parametrize("data, expected_node_id", [
-    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': False, '4': True}}, 7),
-    ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}}, 3),
-    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}}, 15)
+    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': False, '4': True}}, 'tst-1-6-a'),
+    ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}}, 'tst-1-4-a'),
+    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}}, 'tst-2-5-a')
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_graph_processing_with_milestones(data, expected_node_id):
@@ -63,9 +63,9 @@ def test_graph_processing_with_milestones(data, expected_node_id):
 
 
 @pytest.mark.parametrize("data, expected_breadcrumbs", [
-    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': False, '4': True}}, [11, 3, 5, 7]),
-    ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}}, [11, 3]),
-    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}}, [11, 3, 5, 7, 9, 14, 15])
+    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': False, '4': True}}, ['tst-2-3-a', 'tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a']),
+    ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}}, ['tst-2-3-a', 'tst-1-4-a']),
+    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}}, ['tst-2-3-a', 'tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a', 'tst-2-4-a', 'tst-2-5-a'])
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_action_breadcrumbs(data, expected_breadcrumbs):
@@ -91,9 +91,9 @@ def test_progress_during_milestone():
     assert progress == {
         'progress': 33,
         'milestoneListFullyResolved': True,
-        'currentMilestoneID': 12,
+        'currentMilestoneID': 'tst-2-1-m',
         'milestones': [{
-            'id': 12,
+            'id': 'tst-2-1-m',
             'title': 'ADR Data',
             'progress': 50,
             'completed': False
@@ -118,7 +118,7 @@ def test_progress_prior_milestone():
         'milestoneListFullyResolved': True,
         'currentMilestoneID': None,
         'milestones': [{
-            'id': 12,
+            'id': 'tst-2-1-m',
             'title': 'ADR Data',
             'progress': 0,
             'completed': False
@@ -143,7 +143,7 @@ def test_progress_after_milestone():
         'milestoneListFullyResolved': True,
         'currentMilestoneID': None,
         'milestones': [{
-            'id': 12,
+            'id': 'tst-2-1-m',
             'title': 'ADR Data',
             'progress': 100,
             'completed': True

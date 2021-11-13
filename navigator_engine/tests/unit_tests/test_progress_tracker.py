@@ -30,7 +30,7 @@ def test_add_milestone(mock_tracker, mocker, completed):
     assert mock_tracker.entire_route == route + milestone_route
     assert mock_tracker.skipped == [2, 3]
     assert mock_tracker.milestones == [{
-        'id': 5,
+        'id': milestone_node.ref,
         'title': 'Test Milestone',
         'progress': 100 if completed else milestone_tracker,
         'completed': completed
@@ -163,26 +163,26 @@ def test_drop_action_breadcrumb(mock_tracker, simple_network):
     ])
     mock_tracker.route = [nodes[0], nodes[1]]
     ProgressTracker.drop_action_breadcrumb(mock_tracker)
-    assert mock_tracker.action_breadcrumbs == [3]
+    assert mock_tracker.action_breadcrumbs == [nodes[2].ref]
 
 
 def test_report_progress(mocker, mock_tracker):
-    milestone = factories.NodeFactory(id=1, milestone=factories.MilestoneFactory())
+    node = factories.NodeFactory(id=1, milestone=factories.MilestoneFactory())
     milestone_tracker = mocker.Mock(spec=ProgressTracker)
     milestone_tracker.percentage_progress.return_value = 70
     mock_tracker.milestones = [
-        {'id': 2, 'title': 'Mock', 'completed': False, 'progress': milestone_tracker}
+        {'id': '2-m', 'title': 'Mock', 'completed': False, 'progress': milestone_tracker}
     ]
     mock_tracker.percentage_progress.return_value = 50
-    mock_tracker.milestones_to_complete.return_value = [milestone], False
+    mock_tracker.milestones_to_complete.return_value = [node], False
 
     result = ProgressTracker.report_progress(mock_tracker)
     assert result == {
         'progress': 50,
-        'currentMilestoneID': 2,
+        'currentMilestoneID': '2-m',
         'milestoneListFullyResolved': False,
         'milestones': [
-            {'id': 2, 'title': 'Mock', 'completed': False, 'progress': 70},
-            {'id': 1, 'title': 'Test Milestone', 'progress': 0, 'completed': False}
+            {'id': '2-m', 'title': 'Mock', 'completed': False, 'progress': 70},
+            {'id': node.ref, 'title': node.milestone.title, 'progress': 0, 'completed': False}
         ]
     }

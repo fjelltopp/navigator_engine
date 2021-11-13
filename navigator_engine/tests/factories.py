@@ -23,6 +23,7 @@ class NodeFactory(factory.Factory):
     class Meta:
         model = models.Node
     id = factory.Sequence(lambda n: int(n))
+    ref = factory.Faker('uuid4')
 
 
 class MilestoneFactory(factory.Factory):
