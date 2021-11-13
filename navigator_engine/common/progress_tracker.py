@@ -28,7 +28,7 @@ class ProgressTracker():
         milestones_to_complete, milestone_list_is_complete = self.milestones_to_complete()
         for node in milestones_to_complete:
             milestones.append({
-                'id': node.id,
+                'id': node.ref,
                 'title': node.milestone.title,
                 'progress': 0,
                 'completed': False
@@ -51,7 +51,7 @@ class ProgressTracker():
         self.entire_route += milestone_progress.entire_route
         self.skipped += milestone_progress.skipped
         self.milestones.append({
-            'id': milestone_node.id,
+            'id': milestone_node.ref,
             'title': milestone_node.milestone.title,
             'progress': 100 if complete else milestone_progress,
             'completed': complete
@@ -73,7 +73,7 @@ class ProgressTracker():
         current_node = self.route[-1]
         for parent_node, child_node in self.network.out_edges(parent_node):
             if child_node != current_node and getattr(child_node, 'action_id'):
-                self.action_breadcrumbs.append(child_node.id)
+                self.action_breadcrumbs.append(child_node.ref)
 
     def pop_node(self) -> model.Node:
         node = self.entire_route[-1]
