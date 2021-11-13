@@ -47,9 +47,9 @@ class DecisionEngine():
         return self.process_node(next_node)
 
     def process_action(self, node: model.Node) -> dict:
-        if node.id in self.skip:
+        if node.ref in self.skip:
             return self.skip_action(node)
-        self.progress.action_breadcrumbs.append(node.id)
+        self.progress.action_breadcrumbs.append(node.ref)
 
         manual_confirmation = False
         parent_node = self.progress.entire_route[-2]
@@ -58,7 +58,7 @@ class DecisionEngine():
             manual_confirmation = function.startswith("check_manual_confirmation")
 
         return {
-            "id": node.id,
+            "id": node.ref,
             "content": node.action.to_dict(),
             "node": node,
             "manualConfirmationRequired": manual_confirmation
@@ -86,10 +86,10 @@ class DecisionEngine():
         for node, child_node, type in self.network.out_edges(node, data="type"):
             if type == edge_type:
                 new_node = child_node
-            if child_node.id == self.stop_action:
+            if child_node.ref == self.stop_action:
                 return child_node
         if not new_node:
-            raise DecisionError(f"No outgoing '{edge_type}' edge for node {node.id}")
+            raise DecisionError(f"No outgoing '{edge_type}' edge for node {node.ref}")
         return new_node
 
     def run_pluggable_logic(self, function_string: str,
@@ -117,10 +117,10 @@ class DecisionEngine():
         previous_node = self.progress.entire_route[-2]
         for previous_node, new_node in self.network.out_edges(previous_node):
             if node != new_node:
-                self.progress.skipped.append(node.id)
+                self.progress.skipped.append(node.ref)
                 self.progress.pop_node()
                 return self.process_node(new_node)
-        raise DecisionError(f"Only one outgoing edge for node: {previous_node.id}")
+        raise DecisionError(f"Only one outgoing edge for node: {previous_node.ref}")
 
 
 def engine_factory(graph, data, data_loader=None, skip=[], stop=None) -> DecisionEngine:

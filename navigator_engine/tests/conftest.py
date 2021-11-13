@@ -6,7 +6,6 @@ import unittest.mock as mock
 from navigator_engine.common.progress_tracker import ProgressTracker
 from navigator_engine.common.decision_engine import DecisionEngine
 import navigator_engine.tests.factories as factories
-from requests import Response
 
 
 @pytest.fixture
@@ -99,25 +98,25 @@ def get_simple_network():
                         \__________ a8
     """
     nodes = [
-        factories.NodeFactory(id=1, conditional_id=1, conditional=factories.ConditionalFactory(id=1)),
-        factories.NodeFactory(id=2, conditional_id=2, conditional=factories.ConditionalFactory(id=2)),
-        factories.NodeFactory(id=3, conditional_id=3, conditional=factories.ConditionalFactory(id=3)),
-        factories.NodeFactory(id=4, conditional_id=4, conditional=factories.ConditionalFactory(id=4)),
-        factories.NodeFactory(id=5, action_id=1, action=factories.ActionFactory(id=1)),
-        factories.NodeFactory(id=6, action_id=2, action=factories.ActionFactory(id=2)),
-        factories.NodeFactory(id=7, action_id=3, action=factories.ActionFactory(id=3)),
-        factories.NodeFactory(id=8, action_id=4, action=factories.ActionFactory(id=4, complete=True)),
-        factories.NodeFactory(id=9, milestone_id=1, milestone=factories.MilestoneFactory(id=1)),
-        factories.NodeFactory(id=10, milestone_id=2, milestone=factories.MilestoneFactory(id=2)),
-        factories.NodeFactory(id=11, milestone_id=3, milestone=factories.MilestoneFactory(id=3)),
-        factories.NodeFactory(id=12, conditional_id=5, conditional=factories.ConditionalFactory(id=5)),
-        factories.NodeFactory(id=13, action_id=5, action=factories.ActionFactory(id=5)),
-        factories.NodeFactory(id=14, conditional_id=6, conditional=factories.ConditionalFactory(id=6)),
-        factories.NodeFactory(id=15, action_id=6, action=factories.ActionFactory(id=6)),
-        factories.NodeFactory(id=16, conditional_id=7, conditional=factories.ConditionalFactory(id=7)),
-        factories.NodeFactory(id=17, action_id=7, action=factories.ActionFactory(id=7)),
-        factories.NodeFactory(id=18, conditional_id=8, conditional=factories.ConditionalFactory(id=8)),
-        factories.NodeFactory(id=19, action_id=8, action=factories.ActionFactory(id=8))
+        factories.NodeFactory(id=1, ref='tst-0-0-c', conditional_id=1, conditional=factories.ConditionalFactory(id=1)),
+        factories.NodeFactory(id=2, ref='tst-0-1-c', conditional_id=2, conditional=factories.ConditionalFactory(id=2)),
+        factories.NodeFactory(id=3, ref='tst-0-2-c', conditional_id=3, conditional=factories.ConditionalFactory(id=3)),
+        factories.NodeFactory(id=4, ref='tst-0-3-c', conditional_id=4, conditional=factories.ConditionalFactory(id=4)),
+        factories.NodeFactory(id=5, ref='tst-0-4-a', action_id=1, action=factories.ActionFactory(id=1)),
+        factories.NodeFactory(id=6, ref='tst-0-5-a', action_id=2, action=factories.ActionFactory(id=2)),
+        factories.NodeFactory(id=7, ref='tst-0-6-a', action_id=3, action=factories.ActionFactory(id=3)),
+        factories.NodeFactory(id=8, ref='tst-0-7-a', action_id=4, action=factories.ActionFactory(id=4, complete=True)),
+        factories.NodeFactory(id=9, ref='tst-0-8-m', milestone_id=1, milestone=factories.MilestoneFactory(id=1)),
+        factories.NodeFactory(id=10, ref='tst-0-9-m', milestone_id=2, milestone=factories.MilestoneFactory(id=2)),
+        factories.NodeFactory(id=11, ref='tst-0-10-m', milestone_id=3, milestone=factories.MilestoneFactory(id=3)),
+        factories.NodeFactory(id=12, ref='tst-0-11-c', conditional_id=5, conditional=factories.ConditionalFactory(id=5)),
+        factories.NodeFactory(id=13, ref='tst-0-12-a', action_id=5, action=factories.ActionFactory(id=5)),
+        factories.NodeFactory(id=14, ref='tst-0-13-c', conditional_id=6, conditional=factories.ConditionalFactory(id=6)),
+        factories.NodeFactory(id=15, ref='tst-0-14-a', action_id=6, action=factories.ActionFactory(id=6)),
+        factories.NodeFactory(id=16, ref='tst-0-15-c', conditional_id=7, conditional=factories.ConditionalFactory(id=7)),
+        factories.NodeFactory(id=17, ref='tst-0-16-a', action_id=7, action=factories.ActionFactory(id=7)),
+        factories.NodeFactory(id=18, ref='tst-0-17-c', conditional_id=8, conditional=factories.ConditionalFactory(id=8)),
+        factories.NodeFactory(id=19, ref='tst-0-18-a', action_id=8, action=factories.ActionFactory(id=8))
     ]
     nodes = dict((n.id, n) for n in nodes)
     network = DiGraph()

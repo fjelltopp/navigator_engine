@@ -102,6 +102,7 @@ def import_data(sheet_name, graphs):
             model.db.session.commit()
 
             node_milestone = model.Node(
+                ref=_get_ref(idx, 'milestone'),
                 milestone_id=milestone.id
             )
 
@@ -118,6 +119,7 @@ def import_data(sheet_name, graphs):
             model.db.session.commit()
 
             node_conditional = model.Node(
+                ref=_get_ref(idx, 'conditional'),
                 conditional_id=conditional.id
             )
 
@@ -151,6 +153,7 @@ def import_data(sheet_name, graphs):
 
                 # Add node to action
                 node_action = model.Node(
+                    ref=_get_ref(idx, 'action'),
                     action_id=action.id
                 )
                 model.db.session.add(node_action)
@@ -163,11 +166,14 @@ def import_data(sheet_name, graphs):
     # Add a completion action
     complete_node = model.Node(action=model.Action(
         title=f"{graph_header[MILESTONE_COLUMNS['TITLE']]} complete!",
-        html=_markdown_to_html("Well done.  You have completed the milestone "
-              f"{graph_header[MILESTONE_COLUMNS['TITLE']]}. Time to move on to the next one..."),
+        html=_markdown_to_html(
+            "Well done.  You have completed the milestone "
+            f"{graph_header[MILESTONE_COLUMNS['TITLE']]}. "
+            "Time to move on to the next one..."
+        ),
         skippable=False,
         complete=True
-    ))
+    ), ref=_get_ref(idx, 'complete'))
     model.db.session.add(complete_node)
     model.db.session.commit()
 
@@ -224,13 +230,11 @@ def _map_excel_boolean(boolean):
 
 def _markdown_to_html(md_in):
     if pd.isnull(md_in):
-            return None
-
+        return None
     try:
         html_out = markdown.markdown(md_in)
-    except Exception as e:
+    except Exception:
         raise ValueError(f'Not valid Markdown: {md_in}')
-
     return html_out
 
 
@@ -243,12 +247,19 @@ def _parse_resources(resource_cell):
     resource_rows = resource_cell.split('\n')
     for row in resource_rows:
         title = row.split('http')[0].strip()
-        url = row.split(title)[1].strip() 
+        url = row.split(title)[1].strip()
 
         try:
             url_parsed = urlparse(url)
             resources.append({'title': title, 'url': url_parsed.geturl()})
-        except ValueError as e:
+        except ValueError:
             logger.error(f'{url} is not a valid URL, omitting resource')
 
     return resources
+
+
+def _get_ref(ref, node_type):
+    if node_type == 'complete':
+        ref = '-'.join(ref.split('-')[:-1]+['C'])
+        node_type = 'action'
+    return f'EST-{ref}-{node_type[0].upper()}'

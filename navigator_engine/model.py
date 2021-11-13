@@ -54,7 +54,9 @@ class Milestone(db.Model):
 
 
 class Node(db.Model):
+    __table_args__ = (db.UniqueConstraint('ref'), )
     id = db.Column(db.Integer, primary_key=True)
+    ref = db.Column(db.String, nullable=False)
     conditional_id = db.Column(db.Integer, db.ForeignKey('conditional.id'))
     action_id = db.Column(db.Integer, db.ForeignKey('action.id'))
     milestone_id = db.Column(db.Integer, db.ForeignKey('milestone.id'))

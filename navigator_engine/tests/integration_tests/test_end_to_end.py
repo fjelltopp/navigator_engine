@@ -9,10 +9,11 @@ def test_end_to_end(client):
     graph_loader('Estimates_Navigator_BDG_Validations.xlsx')
     response = client.post("/api/decide", data=json.dumps({
         'data': {
-            'url': 'https://dev.adr.fjelltopp.org/api/3/action/package_show?id=antarctica-country-estimates-2022-1-2',
+            'url': 'https://dev.adr.fjelltopp.org/api/3/action/package_show'
+                   '?id=antarctica-country-estimates-2022-1-2',
             'authorization_header': "example-api-key"
         },
-        'skipActions': [16]
+        'skipActions': ['EST-1-4-A', 'EST-2-2-A']
     }))
     assert response.status_code == 200
-    assert response.json['decision']['id'] == 30
+    assert response.json['decision']['id'] == 'EST-0-C-A'

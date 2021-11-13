@@ -65,7 +65,7 @@ def test_get_next_node_stop(mocker):
     ])
     engine = mocker.Mock(spec=DecisionEngine)
     engine.network = network
-    engine.stop_action = 1
+    engine.stop_action = nodes[1].ref
     result = DecisionEngine.get_next_node(engine, nodes[0], False)
     assert result == nodes[1]
 
@@ -78,7 +78,7 @@ def test_get_next_node_raises_error(mocker):
     engine = mocker.Mock(spec=DecisionEngine)
     engine.network = network
 
-    with pytest.raises(common.DecisionError, match=f"node {node.id}"):
+    with pytest.raises(common.DecisionError, match=f"node {node.ref}"):
         DecisionEngine.get_next_node(engine, node, True)
 
 
@@ -121,7 +121,7 @@ def test_skip_action(mocker):
     result = DecisionEngine.skip_action(engine, nodes[1])
 
     assert result == 'processed_action'
-    assert engine.progress.skipped == [nodes[1].id]
+    assert engine.progress.skipped == [nodes[1].ref]
     engine.progress.pop_node.assert_called_once()
     engine.process_node.assert_called_once_with(nodes[2])
 
@@ -234,7 +234,7 @@ def test_process_action_unskipped(mock_engine):
 
     result = DecisionEngine.process_action(mock_engine, nodes[1])
     assert result == {
-        "id": nodes[1].id,
+        "id": nodes[1].ref,
         "content": nodes[1].action.to_dict(),
         "node": nodes[1],
         "manualConfirmationRequired": False
@@ -257,7 +257,7 @@ def test_process_action_manual(mock_engine):
     mock_engine.progress.entire_route = nodes
     result = DecisionEngine.process_action(mock_engine, nodes[1])
     assert result == {
-        "id": nodes[1].id,
+        "id": nodes[1].ref,
         "content": nodes[1].action.to_dict(),
         "node": nodes[1],
         "manualConfirmationRequired": True
@@ -267,6 +267,6 @@ def test_process_action_manual(mock_engine):
 def test_process_action_skipped(mocker):
     node = factories.NodeFactory(id=1)
     engine = mocker.Mock(spec=DecisionEngine)
-    engine.skip = [1]
+    engine.skip = [node.ref]
     DecisionEngine.process_action(engine, node)
     engine.skip_action.assert_called_once_with(node)
