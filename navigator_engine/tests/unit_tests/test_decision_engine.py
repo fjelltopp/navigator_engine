@@ -1,6 +1,7 @@
 from navigator_engine.common.decision_engine import DecisionEngine
 import navigator_engine.common as common
 import navigator_engine.tests.factories as factories
+from navigator_engine import model
 import networkx
 import pytest
 
@@ -160,7 +161,7 @@ def test_process_milestone_incomplete(mocker, mock_engine):
 
     result = DecisionEngine.process_milestone(mock_engine, node1)
     mock_engine.progress.add_milestone.assert_called_once_with(node1, milestone_engine.progress)
-    assert result == {'node': node2}
+    assert result == node2
 
 
 def test_process_milestone_complete(mocker, mock_engine):
@@ -202,20 +203,26 @@ def test_process_milestone_complete(mocker, mock_engine):
 
 def test_decide(mocker):
     root_node = factories.NodeFactory(id=1)
+    action_node = factories.NodeFactory(id=2, action=factories.ActionFactory())
     engine = mocker.Mock(spec=DecisionEngine)
     engine.data = {}
     engine.skip = []
-
+    engine.requires_manual_confirmation.return_value = True
     engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
     engine.progress.root_node = root_node
-    engine.progress.skipped = [1, 2, 3]
-    engine.process_node.return_value = 'processed_action'
-    result = DecisionEngine.decide(engine, data={'test': 'data'}, skip=[4, 5])
+    engine.progress.skipped = ['1', '2', '3']
+    engine.process_node.return_value = action_node
+    result = DecisionEngine.decide(engine, data={'test': 'data'}, skip=['4', '5'])
     engine.process_node.assert_called_once_with(root_node)
     engine.progress.reset.assert_called_once()
-    assert result == 'processed_action'
+    assert result == {
+        'id': action_node.ref,
+        'content': model.Action.to_dict(action_node.action),
+        'node': action_node,
+        'manualConfirmationRequired': True
+    }
     assert engine.data == {'test': 'data'}
-    assert engine.skip == [4, 5]
+    assert engine.skip == ['4', '5']
 
 
 def test_process_action_unskipped(mock_engine):
@@ -233,12 +240,7 @@ def test_process_action_unskipped(mock_engine):
     mock_engine.progress.entire_route = nodes
 
     result = DecisionEngine.process_action(mock_engine, nodes[1])
-    assert result == {
-        "id": nodes[1].ref,
-        "content": nodes[1].action.to_dict(),
-        "node": nodes[1],
-        "manualConfirmationRequired": False
-    }
+    assert result == nodes[1]
 
 
 def test_process_action_manual(mock_engine):
@@ -256,12 +258,7 @@ def test_process_action_manual(mock_engine):
     ]
     mock_engine.progress.entire_route = nodes
     result = DecisionEngine.process_action(mock_engine, nodes[1])
-    assert result == {
-        "id": nodes[1].ref,
-        "content": nodes[1].action.to_dict(),
-        "node": nodes[1],
-        "manualConfirmationRequired": True
-    }
+    assert result == nodes[1]
 
 
 def test_process_action_skipped(mocker):

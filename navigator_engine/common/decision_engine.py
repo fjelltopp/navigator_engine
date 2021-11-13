@@ -2,21 +2,22 @@ import ast
 import navigator_engine.model as model
 from navigator_engine.common import CONDITIONAL_FUNCTIONS, DATA_LOADERS, DecisionError
 from navigator_engine.common.progress_tracker import ProgressTracker
-from typing import Callable
+from typing import Callable, Any
+import networkx
 
 
 class DecisionEngine():
 
     def __init__(self, graph: model.Graph, source_data: object, data_loader: str = None,
-                 stop: str = None, skip: list[str] = [], route: list[str] = []) -> None:
-        self.graph = graph
-        self.network = self.graph.to_networkx()
-        self.data = source_data
-        self.skip = skip
-        self.progress = ProgressTracker(self.network, route=route)
-        self.decision = {}
-        self.stop_action = stop
-        self.remove_skips = []
+                 stop: str = "", skip: list[str] = [], route: list[model.Node] = []) -> None:
+        self.graph: model.Graph = graph
+        self.network: networkx.DigGraph = self.graph.to_networkx()
+        self.data: Any = source_data
+        self.skip: list[str] = skip
+        self.progress: ProgressTracker = ProgressTracker(self.network, route=route)
+        self.decision: dict[str, Any] = {}
+        self.stop_action: str = stop
+        self.remove_skips: list[str] = []
         if data_loader:
             self.data = self.run_pluggable_logic(data_loader, DATA_LOADERS)
 
@@ -28,41 +29,37 @@ class DecisionEngine():
         if stop:
             self.stop_action = stop
         self.progress.reset()
-        self.decision = self.process_node(self.progress.root_node)
+        next_action = self.process_node(self.progress.root_node)
+        manual_confirmation_required = self.requires_manual_confirmation(next_action)
+        self.decision = {
+            "id": next_action.ref,
+            "content": next_action.action.to_dict(),
+            "node": next_action,
+            "manualConfirmationRequired": manual_confirmation_required
+        }
         self.progress.report_progress()
         return self.decision
 
-    def process_node(self, node: model.Node) -> model.Action:
+    def process_node(self, node: model.Node) -> model.Node:
         self.progress.add_node(node)
         if getattr(node, 'conditional_id'):
             return self.process_conditional(node)
-        elif getattr(node, 'action_id'):
-            return self.process_action(node)
         elif getattr(node, 'milestone_id'):
             return self.process_milestone(node)
+        elif getattr(node, 'action_id'):
+            return self.process_action(node)
+        raise DecisionError(f"Node {node.ref} is not a conditional, action or milestone")
 
     def process_conditional(self, node: model.Node) -> model.Node:
         edge_type = self.run_pluggable_logic(node.conditional.function)
         next_node = self.get_next_node(node, edge_type)
         return self.process_node(next_node)
 
-    def process_action(self, node: model.Node) -> dict:
+    def process_action(self, node: model.Node) -> model.Node:
         if node.ref in self.skip:
             return self.skip_action(node)
         self.progress.action_breadcrumbs.append(node.ref)
-
-        manual_confirmation = False
-        parent_node = self.progress.entire_route[-2]
-        if getattr(parent_node, 'conditional'):
-            function = parent_node.conditional.function
-            manual_confirmation = function.startswith("check_manual_confirmation")
-
-        return {
-            "id": node.ref,
-            "content": node.action.to_dict(),
-            "node": node,
-            "manualConfirmationRequired": manual_confirmation
-        }
+        return node
 
     def process_milestone(self, node: model.Node) -> model.Node:
         milestone_engine = engine_factory(
@@ -79,7 +76,7 @@ class DecisionEngine():
             return self.process_node(next_node)
         else:
             self.progress.add_milestone(node, milestone_engine.progress)
-            return milestone_result
+            return milestone_result['node']
 
     def get_next_node(self, node: model.Node, edge_type: bool) -> model.Node:
         new_node = None
@@ -100,17 +97,17 @@ class DecisionEngine():
         except KeyError:
             raise DecisionError(f"No pluggable logic for function {function_name}")
         function_args = function_string.split(function_name)[1]
-        function_args = ast.literal_eval(function_args)
-        if type(function_args) is not tuple:
-            function_args = (function_args,)
+        eval_function_args = ast.literal_eval(function_args)
+        if type(eval_function_args) is not tuple:
+            eval_function_args = (eval_function_args,)
         try:
-            return function(*function_args, self)
+            return function(*eval_function_args, self)
         except Exception as e:
             raise DecisionError(
                 f"Error running pluggable logic {function_string} for: {type(e).__name__} {e}"
             )
 
-    def skip_action(self, node: model.Node) -> dict:
+    def skip_action(self, node: model.Node) -> model.Node:
         action = node.action
         if not action.skippable:
             raise DecisionError(f"Action cannot be skipped: {action.id} ({action.title})")
@@ -120,7 +117,15 @@ class DecisionEngine():
                 self.progress.skipped.append(node.ref)
                 self.progress.pop_node()
                 return self.process_node(new_node)
-        raise DecisionError(f"Only one outgoing edge for node: {previous_node.ref}")
+        raise DecisionError(f"Only one outgoing edge for node: {previous_node}")
+
+    def requires_manual_confirmation(self, node: model.Node) -> bool:
+        manual_confirmation = False
+        parent_node = self.progress.entire_route[-2]
+        if getattr(parent_node, 'conditional'):
+            function = parent_node.conditional.function
+            manual_confirmation = function.startswith("check_manual_confirmation")
+        return manual_confirmation
 
 
 def engine_factory(graph, data, data_loader=None, skip=[], stop=None) -> DecisionEngine:

@@ -6,17 +6,17 @@ import copy
 
 class ProgressTracker():
 
-    def __init__(self, network: networkx.DiGraph, route: list[str] = []) -> None:
-        self.network = network
-        self.previous_route = route.copy()
-        self.entire_route = route.copy()
-        self.route = []
-        self.milestones = []
-        self.skipped = []
-        self.action_breadcrumbs = []
-        self.complete_node = self.get_complete_node()
-        self.root_node = self.get_root_node()
-        self.report = {}
+    def __init__(self, network: networkx.DiGraph, route: list[model.Node] = []) -> None:
+        self.network: networkx.DiGraph = network
+        self.previous_route: list[model.Node] = route.copy()
+        self.entire_route: list[model.Node] = route.copy()
+        self.route: list[model.Node] = []
+        self.milestones: list[dict] = []
+        self.skipped: list[str] = []
+        self.action_breadcrumbs: list[str] = []
+        self.complete_node: model.Node = self.get_complete_node()
+        self.root_node: model.Node = self.get_root_node()
+        self.report: dict = {}
 
     def report_progress(self) -> dict:
         milestones = copy.deepcopy(self.milestones)
@@ -75,11 +75,11 @@ class ProgressTracker():
             if child_node != current_node and getattr(child_node, 'action_id'):
                 self.action_breadcrumbs.append(child_node.ref)
 
-    def pop_node(self) -> model.Node:
-        node = self.entire_route[-1]
+    def pop_node(self) -> str:
+        node_ref = self.entire_route[-1]
         self.entire_route = self.entire_route[:-1]
         self.route = self.route[:-1]
-        return node
+        return node_ref
 
     def get_complete_node(self) -> model.Node:
         for node in self.network.nodes():

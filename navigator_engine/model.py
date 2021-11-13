@@ -1,10 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy.model import DefaultMeta
 import networkx
 
 db = SQLAlchemy()
 
+BaseModel: DefaultMeta = db.Model
 
-class Graph(db.Model):
+
+class Graph(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     version = db.Column(db.String, nullable=False)
@@ -18,14 +21,14 @@ class Graph(db.Model):
         return network
 
 
-class Conditional(db.Model):
+class Conditional(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     function = db.Column(db.String)
     nodes = db.relationship("Node", back_populates="conditional")
 
 
-class Action(db.Model):
+class Action(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     html = db.Column(db.String)
@@ -45,7 +48,7 @@ class Action(db.Model):
         }
 
 
-class Milestone(db.Model):
+class Milestone(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     graph_id = db.Column(db.Integer, db.ForeignKey('graph.id'))
@@ -53,7 +56,7 @@ class Milestone(db.Model):
     nodes = db.relationship("Node", back_populates="milestone")
 
 
-class Node(db.Model):
+class Node(BaseModel):
     __table_args__ = (db.UniqueConstraint('ref'), )
     id = db.Column(db.Integer, primary_key=True)
     ref = db.Column(db.String, nullable=False)
@@ -68,7 +71,7 @@ class Node(db.Model):
         return self.id
 
 
-class Edge(db.Model):
+class Edge(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     graph_id = db.Column(db.Integer, db.ForeignKey('graph.id'), nullable=False)
     from_id = db.Column(db.Integer, db.ForeignKey('node.id'), nullable=False)
@@ -82,7 +85,7 @@ class Edge(db.Model):
         return (self.from_node, self.to_node, {'type': self.type, 'object': self})
 
 
-class Resource(db.Model):
+class Resource(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     url = db.Column(db.String, nullable=False)
