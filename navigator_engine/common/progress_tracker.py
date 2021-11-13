@@ -113,7 +113,7 @@ class ProgressTracker():
         ))
         longest_path_length = max(list(all_possible_path_lengths)) - 1
         progress = distance_travelled / (longest_path_length + distance_travelled)
-        percentage_progress = int(round(progress*100))
+        percentage_progress = int(round(progress * 100))
         return percentage_progress
 
     def milestones_to_complete(self) -> tuple[list[model.Node], bool]:

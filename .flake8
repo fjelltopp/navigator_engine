@@ -3,7 +3,7 @@ ignore =
     W605
 
 per-file-ignores =
-    navigator_engine/pluggable_logic/__init__.py: F401 F403 F402 
+    navigator_engine/pluggable_logic/__init__.py: F401 F403 E402
 
 exclude =
     .git
