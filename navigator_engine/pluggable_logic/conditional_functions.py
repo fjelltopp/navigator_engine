@@ -24,10 +24,10 @@ def check_dict_value(key: Hashable, value: Hashable, engine: DecisionEngine) -> 
 
 
 @register_conditional
-def check_not_skipped(actions: list[int], engine: DecisionEngine) -> bool:
+def check_not_skipped(actions: list[str], engine: DecisionEngine) -> bool:
     if type(actions) is not list:
-        raise TypeError(f"Must specify a list of node IDs instead of {actions}")
-    skipped_actions = set(actions) & set(engine.progress.skipped)
+        raise TypeError(f"Must specify an list of node IDs instead of {actions}")
+    skipped_actions = [action for action in actions if action in engine.progress.skipped]
     engine.remove_skips += list(skipped_actions)
     return not bool(skipped_actions)
 

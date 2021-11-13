@@ -1,4 +1,5 @@
 from os.path import dirname, basename, isfile, join
+from typing import Callable
 import glob
 
 # This code loads all modules in the package and makes them available to the importer
@@ -7,8 +8,8 @@ __all__ = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__
 
 from . import *
 
-CONDITIONAL_FUNCTIONS = {}
-DATA_LOADERS = {}
+CONDITIONAL_FUNCTIONS: dict[str, Callable] = {}
+DATA_LOADERS: dict[str, Callable] = {}
 
 """
 The expected use case is to import the registering decorator:
