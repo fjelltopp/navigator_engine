@@ -37,3 +37,39 @@ def test_check_manual_confirmation(mock_engine, action_id, expected):
     }
     result = conditionals.check_manual_confirmation(action_id, mock_engine)
     assert result == expected
+
+
+@pytest.mark.parametrize("resource_type,key,value,expected", [
+    ('navigator-workflow-state', 'format', '.*JSON', True),
+    ('navigator-workflow-state', 'format', 'PJNZ', False),
+    ('navigator-workflow-state', 'url', '..*', True),
+    ('art-data', 'title', 'ART', True),
+    ('art-data', 'url', '.*', False),
+    ('art-data', 'private', False, True),
+    ('anc-data', 'format', 'PJNZ', False)
+
+])
+def test_check_resource_key(mock_engine, resource_type, key, value, expected):
+    source_data = {
+        'dataset': {
+            'data': {
+                'result': {
+                    'name': 'test-dataset',
+                    'resources': [{
+                        'resource_type': 'navigator-workflow-state',
+                        'title': 'Navigator Workflow State',
+                        'format': 'GeoJSON',
+                        'url': 'https://example.com/test-navigator-workflow-state'
+                    }, {
+                        'resource_type': 'art-data',
+                        'title': 'ART',
+                        'format': 'CSV',
+                        'private': False
+                    }]
+                }
+            }
+        }
+    }
+    mock_engine.data = source_data
+    result = conditionals.check_resource_key(resource_type, key, value, mock_engine)
+    assert result == expected
