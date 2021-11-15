@@ -68,7 +68,7 @@ graph_stylesheet = [  # Group selectors
 ]
 
 
-def get_dash_app(flask_app, dash_app):
+def create_visualizer(flask_app, dash_app) -> None:
     with flask_app.app_context():
         graphs = model.Graph.query.all()
 
@@ -109,14 +109,16 @@ def get_dash_app(flask_app, dash_app):
     @dash_app.callback(
         Output(component_id='tapNodeData-output', component_property='children'),
         Input(component_id='cytoscape-figure', component_property='tapNodeData'))
-    def display_tap_node_data(data):
+    def display_tap_node_data(data: dict) -> list:
         if data:
             return [data['infobox']]
+        else:
+            return []
 
     @dash_app.callback(
         Output(component_id='cytoscape-container', component_property='children'),
         Input(component_id='graph-dropdown', component_property='value'))
-    def update_figure(graph_id):
+    def update_figure(graph_id: int) -> list:
 
         with flask_app.app_context():
             graph = model.load_graph(graph_id=graph_id)
