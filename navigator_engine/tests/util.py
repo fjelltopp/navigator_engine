@@ -101,7 +101,7 @@ def create_demo_data():
         ), ref='tst-2-0-c'),  # id=10
         model.Node(milestone=model.Milestone(
             title="ADR Data",
-            data_loader="dict_value('data')",
+            data_loader="load_dict_value('data')",
             graph_id=1
         ), ref='tst-2-1-m'),  # id=12
         model.Node(conditional=model.Conditional(
