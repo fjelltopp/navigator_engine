@@ -108,6 +108,8 @@ def get_dash_app(flask_app, dash_app):
             graph = model.load_graph(graph_id=graph_id)
             graph_x = graph.to_networkx()
 
+        root_nodes = [n for n, d in graph_x.in_degree() if d == 0]
+
         elements = []
         for n in graph_x.nodes:
             node = model.load_node(node_id=n.id)
