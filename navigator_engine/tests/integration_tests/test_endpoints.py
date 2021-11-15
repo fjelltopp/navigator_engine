@@ -1,7 +1,6 @@
 import json
 import pytest
 import navigator_engine.tests.util as test_util
-from requests import Response
 """
 Endpoint tests use the client fixture, which requires the db, meaning they should
 be treated as integration tests.
