@@ -116,21 +116,21 @@ def get_dash_app(flask_app, dash_app):
             if node.action:
                 node_element = {'data': {'id': str(node.id),
                                          'label': f'A {node.action.id}',
-                                         'infobox': f'Action {node.action.id} | {node.action.title}'
+                                         'infobox': f'Action {node.action.id} | Node {node.id} | {node.action.title}'
                                          },
                                 'classes': 'red triangle'
                                 }
             elif node.milestone:
                 node_element = {'data': {'id': str(node.id),
                                          'label': f'M {node.milestone.id}',
-                                         'infobox': f'Milestone {node.milestone.id} | {node.milestone.title}'
+                                         'infobox': f'Milestone {node.milestone.id} | Node {node.id}  | {node.milestone.title}'
                                          },
                                 'classes': 'blue square'
                                 }
             elif node.conditional:
                 node_element = {'data': {'id': str(node.id),
                                          'label': f'C {node.conditional.id}',
-                                         'infobox': f'Conditional {node.conditional.id} | {node.conditional.title}'
+                                         'infobox': f'Conditional {node.conditional.id} | Node {node.id}  | {node.conditional.title}'
                                          },
                                 'classes': 'green circle'
                                 }
