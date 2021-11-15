@@ -1,9 +1,6 @@
 import os
 import sentry_sdk
 from flask import Flask, jsonify
-import flask
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
-import dash
 from sentry_sdk.integrations.flask import FlaskIntegration
 from werkzeug.exceptions import HTTPException
 from navigator_engine import cli
