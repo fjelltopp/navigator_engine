@@ -74,6 +74,7 @@ def get_dash_app(flask_app, dash_app):
             "Input: ",
             dcc.Input(id='graph-selector', value=1, type='number')
         ]),
+        html.Hr(),
         html.Div(
             id='cytoscape-container',
             children=[
@@ -82,10 +83,10 @@ def get_dash_app(flask_app, dash_app):
                     layout={'name': 'preset'},
                     style={'width': '100%', 'height': '400px'},
                     elements=[
-                        {'data': {'id': 'nav', 'label': 'Navigator Engine'}, 'position': {'x': 75, 'y': 75}}
                     ])
             ]
         ),
+        html.Hr(),
         html.P(
             id='tapNodeData-output',
             children=['Click a node to see more information about it']
