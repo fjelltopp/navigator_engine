@@ -59,11 +59,15 @@ graph_stylesheet = [  # Group selectors
     # Class selectors for edges
     {
         'selector': '.true',
-        'style': {'width': 5}
+        'style': {
+            'width': 5
+        }
     },
     {
         'selector': '.false',
-        'style': {'line-style': 'dashed'}
+        'style': {
+            'line-style': 'dashed'
+        }
     }
 ]
 
@@ -89,8 +93,8 @@ def create_visualizer(flask_app, dash_app) -> None:
                     id='cytoscape-figure',
                     layout={'name': 'preset'},
                     style={'width': '100%', 'height': '400px'},
-                    elements=[
-                    ])
+                    elements=[]
+                )
             ]
         ),
         html.Hr(),
@@ -118,7 +122,10 @@ def create_visualizer(flask_app, dash_app) -> None:
 
         dropdown_options = []
         for graph in graphs:
-            dropdown_options.append({'label': f'Graph {graph.id} | {graph.title}', 'value': graph.id})
+            dropdown_options.append({
+                'label': f'Graph {graph.id} | {graph.title}',
+                'value': graph.id
+            })
 
         return dropdown_options
 
@@ -141,42 +148,50 @@ def create_visualizer(flask_app, dash_app) -> None:
         for n in graph_x.nodes:
             node = model.load_node(node_id=n.id)
             if node.action and node.action.complete:
-                node_element = {'data': {'id': str(node.id),
-                                         'label': f'A {node.action.id} COMPLETE',
-                                         'infobox': f'Action {node.action.id} | '
-                                                    f'Node {node.id} | '
-                                                    f'{node.action.title}'
-                                         },
-                                'classes': 'red triangle'
-                                }
+                node_element = {
+                    'classes': 'red triangle',
+                    'data': {
+                        'id': str(node.id),
+                        'label': f'A {node.action.id} COMPLETE',
+                        'infobox': f'Action {node.action.id} | '
+                                   f'Node {node.id} | '
+                                   f'{node.action.title}'
+                    }
+                }
             elif node.action and not node.action.complete:
-                node_element = {'data': {'id': str(node.id),
-                                         'label': f'A {node.action.id}',
-                                         'infobox': f'Action {node.action.id} | '
-                                                    f'Node {node.id} | '
-                                                    f'{node.action.title}'
-                                         },
-                                'classes': 'red triangle'
-                                }
+                node_element = {
+                    'classes': 'red triangle',
+                    'data': {
+                        'id': str(node.id),
+                        'label': f'A {node.action.id}',
+                        'infobox': f'Action {node.action.id} | '
+                                   f'Node {node.id} | '
+                                   f'{node.action.title}'
+                    }
+                }
             elif node.milestone:
-                node_element = {'data': {'id': str(node.id),
-                                         'label': f'M {node.milestone.id}',
-                                         'infobox': f'Milestone {node.milestone.id} | '
-                                                    f'Node {node.id}  | '
-                                                    f'{node.milestone.title}'
-                                         },
-                                'classes': 'blue square'
-                                }
+                node_element = {
+                    'classes': 'blue square',
+                    'data': {
+                        'id': str(node.id),
+                        'label': f'M {node.milestone.id}',
+                        'infobox': f'Milestone {node.milestone.id} | '
+                                   f'Node {node.id}  | '
+                                   f'{node.milestone.title}'
+                    }
+                }
             elif node.conditional:
-                node_element = {'data': {'id': str(node.id),
-                                         'label': f'C {node.conditional.id}',
-                                         'infobox': f'Conditional '
-                                                    f'{node.conditional.id} | '
-                                                    f'Node {node.id}  | '
-                                                    f'{node.conditional.title}'
-                                         },
-                                'classes': 'green circle'
-                                }
+                node_element = {
+                    'classes': 'green circle',
+                    'data': {
+                        'id': str(node.id),
+                        'label': f'C {node.conditional.id}',
+                        'infobox': f'Conditional '
+                                   f'{node.conditional.id} | '
+                                   f'Node {node.id}  | '
+                                   f'{node.conditional.title}'
+                    }
+                }
             else:
                 continue
 
@@ -185,11 +200,21 @@ def create_visualizer(flask_app, dash_app) -> None:
         for e in graph_x.edges:
             edge = model.load_edge(from_id=e[0].id, to_id=e[1].id)
             if edge.type:
-                edge_element = {'data': {'source': str(e[0].id), 'target': str(e[1].id)},
-                                'classes': 'true'}
+                edge_element = {
+                    'classes': 'true',
+                    'data': {
+                        'source': str(e[0].id),
+                        'target': str(e[1].id)
+                    },
+                }
             elif not edge.type:
-                edge_element = {'data': {'source': str(e[0].id), 'target': str(e[1].id)},
-                                'classes': 'false'}
+                edge_element = {
+                    'classes': 'false',
+                    'data': {
+                        'source': str(e[0].id),
+                        'target': str(e[1].id)
+                    },
+                }
             else:
                 continue
 
@@ -197,9 +222,14 @@ def create_visualizer(flask_app, dash_app) -> None:
 
         fig = cyto.Cytoscape(
             id='cytoscape-figure',
-            layout={'name': 'breadthfirst',
-                    'roots': f'[id = "{root_nodes[0].id}"]'},
-            style={'width': '100%', 'height': '400px'},
+            layout={
+                'name': 'breadthfirst',
+                'roots': f'[id = "{root_nodes[0].id}"]'
+            },
+            style={
+                'width': '100%',
+                'height': '400px'
+            },
             stylesheet=graph_stylesheet,
             elements=elements
         )
