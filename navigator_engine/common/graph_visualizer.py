@@ -69,11 +69,24 @@ graph_stylesheet = [  # Group selectors
 
 
 def get_dash_app(flask_app, dash_app):
+    with flask_app.app_context():
+        graphs = model.Graph.query.all()
+
+    dropdown_options = []
+    for graph in graphs:
+        dropdown_options.append({'label': f'Graph {graph.id} | {graph.title}', 'value': graph.id})
+
     dash_app.layout = html.Div(children=[
-        html.Div([
-            "Input: ",
-            dcc.Input(id='graph-selector', value=1, type='number')
-        ]),
+        html.Div(
+            id='dropdown-container',
+            children=[
+                dcc.Dropdown(
+                    id='graph-dropdown',
+                    options=dropdown_options,
+                    placeholder='Select a graph',
+                )
+            ]
+        ),
         html.Hr(),
         html.Div(
             id='cytoscape-container',
@@ -94,15 +107,15 @@ def get_dash_app(flask_app, dash_app):
     ])
 
     @dash_app.callback(
-        Output('tapNodeData-output', 'children'),
-        Input('cytoscape-figure', 'tapNodeData'))
+        Output(component_id='tapNodeData-output', component_property='children'),
+        Input(component_id='cytoscape-figure', component_property='tapNodeData'))
     def display_tap_node_data(data):
         if data:
             return [data['infobox']]
 
     @dash_app.callback(
         Output(component_id='cytoscape-container', component_property='children'),
-        Input(component_id='graph-selector', component_property='value'))
+        Input(component_id='graph-dropdown', component_property='value'))
     def update_figure(graph_id):
 
         with flask_app.app_context():
@@ -182,4 +195,3 @@ def get_dash_app(flask_app, dash_app):
         return [fig]
 
     return dash_app
-
