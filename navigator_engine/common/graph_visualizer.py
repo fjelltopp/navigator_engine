@@ -69,12 +69,6 @@ graph_stylesheet = [  # Group selectors
 
 
 def create_visualizer(flask_app, dash_app) -> None:
-    with flask_app.app_context():
-        graphs = model.Graph.query.all()
-
-    dropdown_options = []
-    for graph in graphs:
-        dropdown_options.append({'label': f'Graph {graph.id} | {graph.title}', 'value': graph.id})
 
     dash_app.layout = html.Div(children=[
         html.Div(
@@ -82,7 +76,7 @@ def create_visualizer(flask_app, dash_app) -> None:
             children=[
                 dcc.Dropdown(
                     id='graph-dropdown',
-                    options=dropdown_options,
+                    options=[],
                     placeholder='Select a graph',
                 )
             ]
@@ -116,9 +110,25 @@ def create_visualizer(flask_app, dash_app) -> None:
             return []
 
     @dash_app.callback(
+        Output(component_id='graph-dropdown', component_property='options'),
+        Input(component_id='graph-dropdown', component_property='placeholder'))
+    def load_dropdown_options(placeholder) -> list:
+        with flask_app.app_context():
+            graphs = model.Graph.query.all()
+
+        dropdown_options = []
+        for graph in graphs:
+            dropdown_options.append({'label': f'Graph {graph.id} | {graph.title}', 'value': graph.id})
+
+        return dropdown_options
+
+    @dash_app.callback(
         Output(component_id='cytoscape-container', component_property='children'),
         Input(component_id='graph-dropdown', component_property='value'))
     def update_figure(graph_id: int) -> list:
+
+        if not graph_id:
+            return []
 
         with flask_app.app_context():
             graph = model.load_graph(graph_id=graph_id)
