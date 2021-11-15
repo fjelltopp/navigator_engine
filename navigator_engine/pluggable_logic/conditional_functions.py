@@ -34,5 +34,4 @@ def check_not_skipped(actions: list[str], engine: DecisionEngine) -> bool:
 
 @register_conditional
 def check_manual_confirmation(action_id: int, engine: DecisionEngine) -> bool:
-    # Stub
-    return True
+    return action_id in engine.data['navigator-workflow-state']['data']['completedSteps']
