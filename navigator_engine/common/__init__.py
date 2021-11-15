@@ -24,11 +24,22 @@ def register_loader(f):
     return f
 
 
+def get_resource_from_dataset(resource_type: str, dataset: dict) -> dict:
+    dataset_name = dataset['name']
+    matching_resources = list(filter(
+        lambda r: r['resource_type'] == resource_type,
+        dataset.get('resources', [])
+    ))
+    if len(matching_resources) > 1:
+        raise DecisionError(
+            f"Multiple resources with type {resource_type} were found in the {dataset_name} dataset."
+        )
+    if matching_resources:
+        return matching_resources[0]
+    else:
+        return {}
+
+
 class DecisionError(Exception):
     """Raised when there is an error in the decision logic."""
-    pass
-
-
-class DataLoadingError(Exception):
-    """Raised when there is an error in loading data."""
     pass

@@ -2,7 +2,7 @@ from navigator_engine.common import register_loader
 import requests
 from typing import Hashable
 from navigator_engine.common.decision_engine import DecisionEngine
-from navigator_engine.common import DataLoadingError
+from navigator_engine.common import get_resource_from_dataset
 import json
 import logging
 
@@ -31,7 +31,7 @@ def load_url(url: str, auth_header: str, name: str, engine: DecisionEngine) -> d
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
         logger.error(f"HTTP Error loading URL {response.status_code}: {response.content!r}")
-        raise DataLoadingError(f"HTTP Error {response.status_code} whilst loading {name}: {url}")
+        raise IOError(f"HTTP Error {response.status_code} whilst loading {name}: {url}")
     data[name] = {'source_url': url, 'auth_header': headers, 'data': response.content}
     return data
 
@@ -46,18 +46,11 @@ def load_json_url(url: str, auth_header: str, name: str, engine: DecisionEngine)
 @register_loader
 def load_estimates_dataset_resource(resource_type: str, auth_header: str, engine: DecisionEngine) -> dict:
     dataset = engine.data['dataset']['data']['result']
-    dataset_name = dataset['name']
-    resources = dataset.get("resources", [])
-    matching_resources = list(filter(lambda r: r['resource_type'] == resource_type, resources))
-    if len(matching_resources) == 0:
-        raise DataLoadingError(
-            f"No resource with type {resource_type} was found in the {dataset_name} dataset."
-        )
-    elif len(matching_resources) > 1:
-        raise DataLoadingError(
-            f"Multiple resources with type {resource_type} were found in the {dataset_name} dataset."
-        )
-    resource = matching_resources[0]
+    resource = get_resource_from_dataset(dataset, resource_type)
+    if not resource:
+        raise IOError(f"No resource of type {resource_type} found in {dataset['name']}")
+    if not resource['url']:
+        raise IOError(f"Resource {resource_type} exists but has no data")
     if 'json' in resource['format'].lower():
         data = load_json_url(
             resource['url'],
@@ -68,7 +61,7 @@ def load_estimates_dataset_resource(resource_type: str, auth_header: str, engine
     else:
         data = load_url(
             resource['url'],
-            dataset['auth_header'],
+            auth_header,
             resource_type,
             engine
         )
