@@ -109,6 +109,7 @@ def get_dash_app(flask_app, dash_app):
             graph_x = graph.to_networkx()
 
         root_nodes = [n for n, d in graph_x.in_degree() if d == 0]
+        assert len(root_nodes) == 1
 
         elements = []
         for n in graph_x.nodes:
@@ -116,21 +117,28 @@ def get_dash_app(flask_app, dash_app):
             if node.action:
                 node_element = {'data': {'id': str(node.id),
                                          'label': f'A {node.action.id}',
-                                         'infobox': f'Action {node.action.id} | Node {node.id} | {node.action.title}'
+                                         'infobox': f'Action {node.action.id} | '
+                                                    f'Node {node.id} | '
+                                                    f'{node.action.title}'
                                          },
                                 'classes': 'red triangle'
                                 }
             elif node.milestone:
                 node_element = {'data': {'id': str(node.id),
                                          'label': f'M {node.milestone.id}',
-                                         'infobox': f'Milestone {node.milestone.id} | Node {node.id}  | {node.milestone.title}'
+                                         'infobox': f'Milestone {node.milestone.id} | '
+                                                    f'Node {node.id}  | '
+                                                    f'{node.milestone.title}'
                                          },
                                 'classes': 'blue square'
                                 }
             elif node.conditional:
                 node_element = {'data': {'id': str(node.id),
                                          'label': f'C {node.conditional.id}',
-                                         'infobox': f'Conditional {node.conditional.id} | Node {node.id}  | {node.conditional.title}'
+                                         'infobox': f'Conditional '
+                                                    f'{node.conditional.id} | '
+                                                    f'Node {node.id}  | '
+                                                    f'{node.conditional.title}'
                                          },
                                 'classes': 'green circle'
                                 }
@@ -154,7 +162,8 @@ def get_dash_app(flask_app, dash_app):
 
         fig = cyto.Cytoscape(
             id='cytoscape-figure',
-            layout={'name': 'cose'},
+            layout={'name': 'breadthfirst',
+                    'roots': f'[id = "{root_nodes[0].id}"]'},
             style={'width': '100%', 'height': '400px'},
             stylesheet=graph_stylesheet,
             elements=elements
