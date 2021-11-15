@@ -6,6 +6,7 @@ from werkzeug.exceptions import HTTPException
 from navigator_engine import cli
 from navigator_engine.api import api_blueprint
 from navigator_engine.model import db
+from navigator_engine.common import dash_app
 import importlib
 import json
 
@@ -57,3 +58,4 @@ def create_app(config_object=None):
 
 
 app = create_app()
+app = dash_app.add_dash_app(app)
