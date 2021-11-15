@@ -4,8 +4,8 @@ import dash_cytoscape as cyto
 from dash import html
 from dash.dependencies import Input, Output
 
-
-graph_stylesheet = [  # Group selectors
+# Group selectors
+graph_stylesheet = [
     {
         'selector': 'node',
         'style': {
@@ -81,7 +81,7 @@ def create_visualizer(flask_app, dash_app) -> None:
                 dcc.Dropdown(
                     id='graph-dropdown',
                     options=[],
-                    placeholder='Select a graph',
+                    placeholder='Select a graph'
                 )
             ]
         ),
