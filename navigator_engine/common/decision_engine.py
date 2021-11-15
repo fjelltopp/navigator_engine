@@ -4,6 +4,9 @@ from navigator_engine.common import CONDITIONAL_FUNCTIONS, DATA_LOADERS, Decisio
 from navigator_engine.common.progress_tracker import ProgressTracker
 from typing import Callable, Any
 import networkx
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class DecisionEngine():
@@ -64,7 +67,7 @@ class DecisionEngine():
     def process_milestone(self, node: model.Node) -> model.Node:
         milestone_engine = engine_factory(
             model.load_graph(node.milestone.graph_id),
-            self.data,
+            self.data.copy(),
             data_loader=node.milestone.data_loader,
             skip=self.skip,
             stop=self.stop_action
@@ -95,7 +98,7 @@ class DecisionEngine():
         try:
             function = functions[function_name]
         except KeyError:
-            raise DecisionError(f"No pluggable logic for function {function_name}")
+            raise DecisionError(f"No pluggable logic for {function_name}")
         function_args = function_string.split(function_name)[1]
         eval_function_args = ast.literal_eval(function_args)
         if type(eval_function_args) is not tuple:
@@ -103,8 +106,9 @@ class DecisionEngine():
         try:
             return function(*eval_function_args, self)
         except Exception as e:
+            logger.exception(e)
             raise DecisionError(
-                f"Error running pluggable logic {function_string} for: {type(e).__name__} {e}"
+                f"Error running pluggable logic {function_string}: {type(e).__name__} {e}"
             )
 
     def skip_action(self, node: model.Node) -> model.Node:

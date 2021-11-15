@@ -1,7 +1,6 @@
 import json
 import pytest
 import navigator_engine.tests.util as test_util
-from requests import Response
 """
 Endpoint tests use the client fixture, which requires the db, meaning they should
 be treated as integration tests.
@@ -21,17 +20,7 @@ def test_decide_complete(client, mocker):
         '2': True,
         'data': {'1': True, '2': True, '3': False, '4': True}
     }
-    mock_response = mocker.Mock(spec=Response)
-    mock_response.json.return_value = data
-    mocker.patch(
-        'navigator_engine.pluggable_logic.data_loaders.requests.get',
-        return_value=mock_response
-    )
-    mocker.patch(
-        'navigator_engine.api.choose_graph',
-        return_value=2
-    )
-    test_util.create_demo_data()
+    setup_endpoint_test(mocker, data)
     response = client.post("/api/decide", data=json.dumps({
         'data': {
             'url': 'https://example.ckan/api/3/action/package_show?id=example',
@@ -70,17 +59,7 @@ def test_decide_incomplete(client, mocker):
         '2': True,
         'data': {'1': True, '2': True, '3': False, '4': True}
     }
-    mock_response = mocker.Mock(spec=Response)
-    mock_response.json.return_value = data
-    mocker.patch(
-        'navigator_engine.pluggable_logic.data_loaders.requests.get',
-        return_value=mock_response
-    )
-    mocker.patch(
-        'navigator_engine.api.choose_graph',
-        return_value=2
-    )
-    test_util.create_demo_data()
+    setup_endpoint_test(mocker, data)
     response = client.post("/api/decide", data=json.dumps({
         'data': {
             'url': 'https://example.ckan/api/3/action/package_show?id=example',
@@ -143,7 +122,7 @@ def test_decide_without_url_raises_bad_request(client, mocker):
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_action(client, mocker, node_id, expected_action):
-    setup_action_endpoint_test(mocker)
+    setup_endpoint_test(mocker)
     response = client.post("/api/action", data=json.dumps({
         'data': {
             'url': 'https://example.ckan/api/3/action/package_show?id=example',
@@ -160,7 +139,7 @@ def test_action(client, mocker, node_id, expected_action):
 
 @pytest.mark.usefixtures('with_app_context')
 def test_action_for_action_not_in_path(client, mocker):
-    setup_action_endpoint_test(mocker)
+    setup_endpoint_test(mocker)
     response = client.post("/api/action", data=json.dumps({
         'data': {
             'url': 'https://example.ckan/api/3/action/package_show?id=example',
@@ -172,20 +151,19 @@ def test_action_for_action_not_in_path(client, mocker):
     assert "Please specify a valid actionID." in response.json['message']
 
 
-def setup_action_endpoint_test(mocker):
-    data = {
-        '1': True,
-        '2': True,
-        'data': {'1': True, '2': True, '3': True, '4': True}
-    }
-    mock_response = mocker.Mock(spec=Response)
-    mock_response.json.return_value = data
-    mocker.patch(
-        'navigator_engine.pluggable_logic.data_loaders.requests.get',
-        return_value=mock_response
-    )
+def setup_endpoint_test(mocker, data=None):
+    if not data:
+        data = {
+            '1': True,
+            '2': True,
+            'data': {'1': True, '2': True, '3': True, '4': True}
+        }
     mocker.patch(
         'navigator_engine.api.choose_graph',
         return_value=2
+    )
+    mocker.patch(
+        'navigator_engine.api.choose_data_loader',
+        return_value=f'load_dict_from_json({json.dumps(json.dumps(data))})'
     )
     test_util.create_demo_data()

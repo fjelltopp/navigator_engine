@@ -8,6 +8,16 @@ from navigator_engine.common.decision_engine import DecisionEngine
 import navigator_engine.tests.factories as factories
 
 
+@pytest.fixture(scope='package')
+def vcr_config():
+    return{
+        "filter_headers": [
+            ('authorization', 'DUMMY'),
+            ('Authorization', 'DUMMY')
+        ]
+    }
+
+
 @pytest.fixture
 def client(scope="module"):
     """

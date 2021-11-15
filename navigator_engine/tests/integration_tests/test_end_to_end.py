@@ -1,6 +1,7 @@
 from navigator_engine.common.graph_loader import graph_loader
 import pytest
 import json
+import os
 
 
 @pytest.mark.vcr()
@@ -10,8 +11,8 @@ def test_end_to_end(client):
     response = client.post("/api/decide", data=json.dumps({
         'data': {
             'url': 'https://dev.adr.fjelltopp.org/api/3/action/package_show'
-                   '?id=antarctica-country-estimates-2022-1-2',
-            'authorization_header': "example-api-key"
+                   '?id=antarctica-country-estimates-2022-1-2-3',
+            'authorization_header': os.getenv('ADR_SYSADMIN_KEY')
         },
         'skipActions': ['EST-1-4-A', 'EST-2-2-A']
     }))
