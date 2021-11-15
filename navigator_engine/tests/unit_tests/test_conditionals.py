@@ -45,7 +45,9 @@ def test_check_manual_confirmation(mock_engine, action_id, expected):
     ('navigator-workflow-state', 'url', '..*', True),
     ('art-data', 'title', 'ART', True),
     ('art-data', 'url', '.*', False),
+    ('art-data', 'private', False, True),
     ('anc-data', 'format', 'PJNZ', False)
+
 ])
 def test_check_resource_key(mock_engine, resource_type, key, value, expected):
     source_data = {
@@ -61,7 +63,8 @@ def test_check_resource_key(mock_engine, resource_type, key, value, expected):
                     }, {
                         'resource_type': 'art-data',
                         'title': 'ART',
-                        'format': 'CSV'
+                        'format': 'CSV',
+                        'private': False
                     }]
                 }
             }

@@ -46,7 +46,7 @@ def load_json_url(url: str, auth_header: str, name: str, engine: DecisionEngine)
 @register_loader
 def load_estimates_dataset_resource(resource_type: str, auth_header: str, engine: DecisionEngine) -> dict:
     dataset = engine.data['dataset']['data']['result']
-    resource = get_resource_from_dataset(dataset, resource_type)
+    resource = get_resource_from_dataset(resource_type, dataset)
     if not resource:
         raise IOError(f"No resource of type {resource_type} found in {dataset['name']}")
     if not resource['url']:

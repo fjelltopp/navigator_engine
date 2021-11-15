@@ -40,10 +40,10 @@ def check_manual_confirmation(action_id: int, engine: DecisionEngine) -> bool:
 
 @register_conditional
 def check_resource_key(resource_type: str, key: Hashable, value: Hashable, engine: DecisionEngine) -> bool:
-    regex = re.compile(value)
     dataset = engine.data['dataset']['data']['result']
     resource = get_resource_from_dataset(resource_type, dataset)
-    if type(resource.get(key)) is str:
+    if type(value) is str and type(resource.get(key)) is str:
+        regex = re.compile(value)
         match_result = regex.match(resource.get(key, ""))
         return bool(match_result)
     else:
