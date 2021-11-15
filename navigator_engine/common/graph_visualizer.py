@@ -115,7 +115,16 @@ def get_dash_app(flask_app, dash_app):
         elements = []
         for n in graph_x.nodes:
             node = model.load_node(node_id=n.id)
-            if node.action:
+            if node.action and node.action.complete:
+                node_element = {'data': {'id': str(node.id),
+                                         'label': f'A {node.action.id} COMPLETE',
+                                         'infobox': f'Action {node.action.id} | '
+                                                    f'Node {node.id} | '
+                                                    f'{node.action.title}'
+                                         },
+                                'classes': 'red triangle'
+                                }
+            elif node.action and not node.action.complete:
                 node_element = {'data': {'id': str(node.id),
                                          'label': f'A {node.action.id}',
                                          'infobox': f'Action {node.action.id} | '
