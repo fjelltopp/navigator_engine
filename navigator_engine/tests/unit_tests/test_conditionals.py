@@ -17,3 +17,23 @@ def test_check_not_skipped(mock_engine, actions, expected, remove_skips):
 def test_check_not_skipped_raises_error(mock_engine):
     with pytest.raises(TypeError, match='123'):
         conditionals.check_not_skipped(123, mock_engine)
+
+
+@pytest.mark.parametrize("action_id,expected", [
+    ('task1', True),
+    ('task5', False)
+])
+def test_check_manual_confirmation(mock_engine, action_id, expected):
+    mock_engine.data = {
+        'navigator-workflow-state': {
+            'data': {
+                'completedSteps': [
+                    "task1",
+                    "task2",
+                    "task3"
+                ]
+            }
+        }
+    }
+    result = conditionals.check_manual_confirmation(action_id, mock_engine)
+    assert result == expected
