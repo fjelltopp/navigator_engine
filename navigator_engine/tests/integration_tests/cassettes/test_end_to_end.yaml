@@ -5,7 +5,7 @@ interactions:
       Accept:
       - '*/*'
       Accept-Encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       Authorization:
       - DUMMY
       Connection:
@@ -21,7 +21,7 @@ interactions:
         "Creative Commons Attribution for Intergovernmental Organisations", "maintainer":
         "Tomasz Sabala", "relationships_as_object": [], "private": true, "maintainer_email":
         "", "num_tags": 4, "year": "2022", "id": "3963fdf5-8915-448d-b8dd-9beca9c04a35",
-        "metadata_created": "2021-11-08T15:27:36.085213", "metadata_modified": "2021-11-12T14:06:33.380286",
+        "metadata_created": "2021-11-08T15:27:36.085213", "metadata_modified": "2021-11-16T19:39:28.377207",
         "author": null, "author_email": null, "type_name": "Country Estimates", "state":
         "active", "version": null, "license_id": "cc-by-igo", "type": "country-estimates-22",
         "resources": [{"cache_last_updated": null, "package_id": "3963fdf5-8915-448d-b8dd-9beca9c04a35",
@@ -85,21 +85,21 @@ interactions:
         null, "name": "ANC Data", "created": "2021-11-08T15:36:29.861837", "url":
         "https://dev.adr.fjelltopp.org/dataset/3963fdf5-8915-448d-b8dd-9beca9c04a35/resource/1619a827-1e31-451b-8ed9-5ee17dc374c0/download/demo_anc_testing3.csv",
         "last_modified": "2021-11-08T15:36:29.712871", "position": 5, "resource_type":
-        "inputs-unaids-anc"}, {"cache_last_updated": null, "package_id": "3963fdf5-8915-448d-b8dd-9beca9c04a35",
-        "datastore_active": false, "id": "fd1b9013-6a2f-461d-b783-a87b6a3b1b38", "size":
-        51, "metadata_modified": "2021-11-10T06:37:16.999608", "restricted": "{\"allowed_organizations\":\"unaids\",\"allowed_users\":\"\",\"level\":\"restricted\"}",
-        "state": "active", "sha256": "6f76e2a52396ffd9a4666fab36962a5ff9972d375233fe85fd35aa66430a3c19",
-        "lfs_prefix": "fjelltopp/antarctica-country-estimates-2022-1-2-3", "hash":
-        "", "description": "", "format": "JSON", "mimetype_inner": null, "url_type":
-        "upload", "mimetype": "application/json", "cache_url": null, "name": "Navigator
-        Workflow", "created": "2021-11-09T20:33:54.684080", "url": "https://dev.adr.fjelltopp.org/dataset/3963fdf5-8915-448d-b8dd-9beca9c04a35/resource/fd1b9013-6a2f-461d-b783-a87b6a3b1b38/download/navigator_workflow.json",
-        "last_modified": "2021-11-09T20:42:23.288552", "position": 6, "resource_type":
-        "navigator-workflow-state"}, {"mimetype": null, "cache_url": null, "hash":
-        "", "name": "Name", "metadata_modified": "2021-11-12T14:06:33.396241", "cache_last_updated":
+        "inputs-unaids-anc"}, {"mimetype": null, "cache_url": null, "hash": "", "name":
+        "Name", "metadata_modified": "2021-11-16T09:50:42.570559", "cache_last_updated":
         null, "url": "", "datastore_active": false, "format": "", "package_id": "3963fdf5-8915-448d-b8dd-9beca9c04a35",
         "created": "2021-11-12T14:06:33.442445", "state": "active", "mimetype_inner":
-        null, "last_modified": null, "position": 7, "url_type": null, "id": "2b66695c-e955-4666-b910-d49dc4b2126a",
-        "resource_type": null, "size": null}], "num_resources": 8, "tags": [{"vocabulary_id":
+        null, "last_modified": null, "position": 6, "url_type": null, "id": "2b66695c-e955-4666-b910-d49dc4b2126a",
+        "resource_type": null, "size": null}, {"cache_last_updated": null, "package_id":
+        "3963fdf5-8915-448d-b8dd-9beca9c04a35", "datastore_active": false, "id": "c06a1d47-dacd-4857-84ed-f7ccba67b7b6",
+        "size": 62, "metadata_modified": "2021-11-16T19:39:28.386036", "filename":
+        "navigator_workflow.json", "state": "active", "sha256": "b69651df4e39956f974fb23a19b80a8ec8307522f5c8403433d4992fe1ea4598",
+        "lfs_prefix": "fjelltopp/antarctica-country-estimates-2022-1-2-3", "hash":
+        "", "format": "JSON", "mimetype_inner": null, "url_type": "upload", "mimetype":
+        null, "cache_url": null, "name": "Navigator Workflow", "created": "2021-11-16T10:02:56.377186",
+        "url": "https://dev.adr.fjelltopp.org/dataset/3963fdf5-8915-448d-b8dd-9beca9c04a35/resource/c06a1d47-dacd-4857-84ed-f7ccba67b7b6/download/upload",
+        "last_modified": "2021-11-16T19:39:28.198727", "position": 7, "resource_type":
+        "navigator-workflow-state"}], "num_resources": 8, "tags": [{"vocabulary_id":
         null, "state": "active", "display_name": "ANC", "id": "f7f90df7-dcfd-4b6a-9521-a7e6fe56eb72",
         "name": "ANC"}, {"vocabulary_id": null, "state": "active", "display_name":
         "ART", "id": "1eed9ad8-3455-4727-861f-6c4f6230c08c", "name": "ART"}, {"vocabulary_id":
@@ -122,11 +122,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '9361'
+      - '9246'
       Content-Type:
       - application/json;charset=utf-8
       Date:
-      - Mon, 15 Nov 2021 15:03:21 GMT
+      - Tue, 16 Nov 2021 19:52:53 GMT
       Server:
       - nginx/1.19.3
     status:
@@ -138,7 +138,7 @@ interactions:
       Accept:
       - '*/*'
       Accept-Encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       Authorization:
       - DUMMY
       Connection:
@@ -146,7 +146,7 @@ interactions:
       User-Agent:
       - python-requests/2.26.0
     method: GET
-    uri: https://dev.adr.fjelltopp.org/dataset/3963fdf5-8915-448d-b8dd-9beca9c04a35/resource/fd1b9013-6a2f-461d-b783-a87b6a3b1b38/download/navigator_workflow.json
+    uri: https://dev.adr.fjelltopp.org/dataset/3963fdf5-8915-448d-b8dd-9beca9c04a35/resource/c06a1d47-dacd-4857-84ed-f7ccba67b7b6/download/upload
   response:
     body:
       string: '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
@@ -155,7 +155,7 @@ interactions:
 
         <h1>Redirecting...</h1>
 
-        <p>You should be redirected automatically to target URL: <a href="https://dev.adr.fjelltopp.org/giftless/fjelltopp/antarctica-country-estimates-2022-1-2-3/objects/storage/6f76e2a52396ffd9a4666fab36962a5ff9972d375233fe85fd35aa66430a3c19?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2MzY5ODg5MDUsImlhdCI6MTYzNjk4ODYwNSwibmJmIjoxNjM2OTg4NjA1LCJzdWIiOiJqYmVycnkiLCJuYW1lIjoiSm9uYXRoYW4gQmVycnkiLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL2FudGFyY3RpY2EtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLTItMy82Zjc2ZTJhNTIzOTZmZmQ5YTQ2NjZmYWIzNjk2MmE1ZmY5OTcyZDM3NTIzM2ZlODVmZDM1YWE2NjQzMGEzYzE5OnJlYWQifQ.QbL1fzbyUYwASlG7QWdAc1lFw_4I8DXWkvPtBoGDHeE&amp;filename=navigator_workflow.json">https://dev.adr.fjelltopp.org/giftless/fjelltopp/antarctica-country-estimates-2022-1-2-3/objects/storage/6f76e2a52396ffd9a4666fab36962a5ff9972d375233fe85fd35aa66430a3c19?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2MzY5ODg5MDUsImlhdCI6MTYzNjk4ODYwNSwibmJmIjoxNjM2OTg4NjA1LCJzdWIiOiJqYmVycnkiLCJuYW1lIjoiSm9uYXRoYW4gQmVycnkiLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL2FudGFyY3RpY2EtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLTItMy82Zjc2ZTJhNTIzOTZmZmQ5YTQ2NjZmYWIzNjk2MmE1ZmY5OTcyZDM3NTIzM2ZlODVmZDM1YWE2NjQzMGEzYzE5OnJlYWQifQ.QbL1fzbyUYwASlG7QWdAc1lFw_4I8DXWkvPtBoGDHeE&amp;filename=navigator_workflow.json</a>.  If
+        <p>You should be redirected automatically to target URL: <a href="https://dev.adr.fjelltopp.org/giftless/fjelltopp/antarctica-country-estimates-2022-1-2-3/objects/storage/b69651df4e39956f974fb23a19b80a8ec8307522f5c8403433d4992fe1ea4598?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2MzcwOTI2NzMsImlhdCI6MTYzNzA5MjM3MywibmJmIjoxNjM3MDkyMzczLCJzdWIiOiJqYmVycnkiLCJuYW1lIjoiSm9uYXRoYW4gQmVycnkiLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL2FudGFyY3RpY2EtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLTItMy9iNjk2NTFkZjRlMzk5NTZmOTc0ZmIyM2ExOWI4MGE4ZWM4MzA3NTIyZjVjODQwMzQzM2Q0OTkyZmUxZWE0NTk4OnJlYWQifQ.hUmL16vvF30Oj6_CJ4BlGyPlzzvQcAG9WeajUZmkoro&amp;filename=upload">https://dev.adr.fjelltopp.org/giftless/fjelltopp/antarctica-country-estimates-2022-1-2-3/objects/storage/b69651df4e39956f974fb23a19b80a8ec8307522f5c8403433d4992fe1ea4598?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2MzcwOTI2NzMsImlhdCI6MTYzNzA5MjM3MywibmJmIjoxNjM3MDkyMzczLCJzdWIiOiJqYmVycnkiLCJuYW1lIjoiSm9uYXRoYW4gQmVycnkiLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL2FudGFyY3RpY2EtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLTItMy9iNjk2NTFkZjRlMzk5NTZmOTc0ZmIyM2ExOWI4MGE4ZWM4MzA3NTIyZjVjODQwMzQzM2Q0OTkyZmUxZWE0NTk4OnJlYWQifQ.hUmL16vvF30Oj6_CJ4BlGyPlzzvQcAG9WeajUZmkoro&amp;filename=upload</a>.  If
         not click the link.'
     headers:
       Cache-Control:
@@ -163,18 +163,18 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '1487'
+      - '1453'
       Content-Type:
       - text/html; charset=utf-8
       Date:
-      - Mon, 15 Nov 2021 15:03:25 GMT
+      - Tue, 16 Nov 2021 19:52:53 GMT
       Location:
-      - https://dev.adr.fjelltopp.org/giftless/fjelltopp/antarctica-country-estimates-2022-1-2-3/objects/storage/6f76e2a52396ffd9a4666fab36962a5ff9972d375233fe85fd35aa66430a3c19?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2MzY5ODg5MDUsImlhdCI6MTYzNjk4ODYwNSwibmJmIjoxNjM2OTg4NjA1LCJzdWIiOiJqYmVycnkiLCJuYW1lIjoiSm9uYXRoYW4gQmVycnkiLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL2FudGFyY3RpY2EtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLTItMy82Zjc2ZTJhNTIzOTZmZmQ5YTQ2NjZmYWIzNjk2MmE1ZmY5OTcyZDM3NTIzM2ZlODVmZDM1YWE2NjQzMGEzYzE5OnJlYWQifQ.QbL1fzbyUYwASlG7QWdAc1lFw_4I8DXWkvPtBoGDHeE&filename=navigator_workflow.json
+      - https://dev.adr.fjelltopp.org/giftless/fjelltopp/antarctica-country-estimates-2022-1-2-3/objects/storage/b69651df4e39956f974fb23a19b80a8ec8307522f5c8403433d4992fe1ea4598?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2MzcwOTI2NzMsImlhdCI6MTYzNzA5MjM3MywibmJmIjoxNjM3MDkyMzczLCJzdWIiOiJqYmVycnkiLCJuYW1lIjoiSm9uYXRoYW4gQmVycnkiLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL2FudGFyY3RpY2EtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLTItMy9iNjk2NTFkZjRlMzk5NTZmOTc0ZmIyM2ExOWI4MGE4ZWM4MzA3NTIyZjVjODQwMzQzM2Q0OTkyZmUxZWE0NTk4OnJlYWQifQ.hUmL16vvF30Oj6_CJ4BlGyPlzzvQcAG9WeajUZmkoro&filename=upload
       Server:
       - nginx/1.19.3
       Set-cookie:
-      - ckan=c2171ccfd7e77db9d8db986f37ffab86dcbbe0acadf3d7075e364ddba8d163e7c87b23d5;
-        expires=Tue, 16-Nov-2021 15:03:25 GMT; Path=/; SameSite=Lax
+      - ckan=5287d2f3aa964509227fab289e5d896f462603949f7a27330c2d41c88f5fd2416e697e5e;
+        expires=Wed, 17-Nov-2021 19:52:53 GMT; Path=/; SameSite=Lax
     status:
       code: 302
       message: FOUND
@@ -184,33 +184,33 @@ interactions:
       Accept:
       - '*/*'
       Accept-Encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       Authorization:
       - DUMMY
       Connection:
       - keep-alive
       Cookie:
-      - ckan=c2171ccfd7e77db9d8db986f37ffab86dcbbe0acadf3d7075e364ddba8d163e7c87b23d5
+      - ckan=5287d2f3aa964509227fab289e5d896f462603949f7a27330c2d41c88f5fd2416e697e5e
       User-Agent:
       - python-requests/2.26.0
     method: GET
-    uri: https://dev.adr.fjelltopp.org/giftless/fjelltopp/antarctica-country-estimates-2022-1-2-3/objects/storage/6f76e2a52396ffd9a4666fab36962a5ff9972d375233fe85fd35aa66430a3c19?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2MzY5ODg5MDUsImlhdCI6MTYzNjk4ODYwNSwibmJmIjoxNjM2OTg4NjA1LCJzdWIiOiJqYmVycnkiLCJuYW1lIjoiSm9uYXRoYW4gQmVycnkiLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL2FudGFyY3RpY2EtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLTItMy82Zjc2ZTJhNTIzOTZmZmQ5YTQ2NjZmYWIzNjk2MmE1ZmY5OTcyZDM3NTIzM2ZlODVmZDM1YWE2NjQzMGEzYzE5OnJlYWQifQ.QbL1fzbyUYwASlG7QWdAc1lFw_4I8DXWkvPtBoGDHeE&filename=navigator_workflow.json
+    uri: https://dev.adr.fjelltopp.org/giftless/fjelltopp/antarctica-country-estimates-2022-1-2-3/objects/storage/b69651df4e39956f974fb23a19b80a8ec8307522f5c8403433d4992fe1ea4598?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2MzcwOTI2NzMsImlhdCI6MTYzNzA5MjM3MywibmJmIjoxNjM3MDkyMzczLCJzdWIiOiJqYmVycnkiLCJuYW1lIjoiSm9uYXRoYW4gQmVycnkiLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL2FudGFyY3RpY2EtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLTItMy9iNjk2NTFkZjRlMzk5NTZmOTc0ZmIyM2ExOWI4MGE4ZWM4MzA3NTIyZjVjODQwMzQzM2Q0OTkyZmUxZWE0NTk4OnJlYWQifQ.hUmL16vvF30Oj6_CJ4BlGyPlzzvQcAG9WeajUZmkoro&filename=upload
   response:
     body:
       string: !!binary |
-        H4sIAAAAAAAAA6vmUlBQSs7PLchJLUlNCS5JLShWslKIVipJLM42VNJRADOMYAxjpViuWgCLHWY8
-        MwAAAA==
+        H4sIAAAAAAAAA6tWSs7PLchJLUlNCUkszi5WslKIVnINDtE11DXQdVTSUQBz/MPCdA0MEXwDsGRs
+        LQBYVZeYPgAAAA==
     headers:
       Connection:
       - keep-alive
       Content-Disposition:
-      - attachment; filename="navigator_workflow.json"
+      - attachment; filename="upload"
       Content-Encoding:
       - gzip
       Content-Type:
       - text/html; charset=utf-8
       Date:
-      - Mon, 15 Nov 2021 15:03:26 GMT
+      - Tue, 16 Nov 2021 19:52:53 GMT
       Server:
       - nginx/1.19.3
       Transfer-Encoding:

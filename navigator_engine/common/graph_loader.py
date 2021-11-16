@@ -20,7 +20,7 @@ DATA_COLUMNS = {
     'ACTION': 'Task Title (Visible to User)',
     'ACTION_CONTENT': 'If test fails, present this to user:',
     'ACTION_RESOURCES': 'Resources / Links',
-    'SKIPPABLE': 'Mandatory right now',
+    'UNSKIPPABLE': 'Mandatory right now',
     'SKIP_TO': 'Proceed to test (if test fails)',
     'FUNCTION': 'Test function'
 }
@@ -136,11 +136,13 @@ def import_data(sheet_name, graphs):
                 if 'check_not_skipped' in conditional.function:
                     graph_data.loc[[idx]] = _create_check_skips_action(conditional, graph_data.loc[[idx]])
 
+                skippable = not _map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['UNSKIPPABLE']])
+
                 action_html = _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
                 action = model.Action(
                     title=graph_data.at[idx, DATA_COLUMNS['ACTION']],
                     html=action_html,
-                    skippable=_map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['SKIPPABLE']]),
+                    skippable=skippable,
                     complete=False
                 )
                 model.db.session.add(action)
