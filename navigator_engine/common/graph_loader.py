@@ -2,7 +2,6 @@ import navigator_engine.model as model
 import navigator_engine.common as common
 import logging
 import os
-import numpy as np
 import pandas as pd
 import re
 import markdown

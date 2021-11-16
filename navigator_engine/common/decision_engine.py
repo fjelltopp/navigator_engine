@@ -1,4 +1,3 @@
-import ast
 import navigator_engine.model as model
 from navigator_engine.common import (
     CONDITIONAL_FUNCTIONS,
