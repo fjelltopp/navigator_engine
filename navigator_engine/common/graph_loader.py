@@ -44,7 +44,6 @@ def graph_loader(graph_config_file):
 
     for index, sheet_name in enumerate(graph_sheets):
 
-
         graph_header = pd.read_excel(
             graph_config_file,
             sheet_name=sheet_name,

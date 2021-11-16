@@ -1,6 +1,4 @@
-from navigator_engine.common.graph_loader import graph_loader
-import navigator_engine.common as common
-import navigator_engine.model as model
+from navigator_engine.common.graph_loader import graph_loader, validate_graph
 import pytest
 import json
 import os

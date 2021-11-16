@@ -1,5 +1,4 @@
 import click
-from flask import current_app
 from navigator_engine.common.graph_loader import graph_loader, validate_graph
 import logging
 
