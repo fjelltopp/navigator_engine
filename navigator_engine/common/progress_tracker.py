@@ -72,7 +72,11 @@ class ProgressTracker():
         parent_node = self.route[-2]
         current_node = self.route[-1]
         for parent_node, child_node in self.network.out_edges(parent_node):
-            if child_node != current_node and getattr(child_node, 'action_id'):
+            child_node_incomplete_action = (
+                getattr(child_node, 'action_id') and not
+                child_node.action.complete
+            )
+            if (child_node != current_node and child_node_incomplete_action):
                 self.action_breadcrumbs.append(child_node.ref)
 
     def pop_node(self) -> str:

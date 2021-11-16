@@ -68,13 +68,30 @@ def test_graph_processing_with_milestones(data, expected_node_id):
     ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}},
      ['tst-2-3-a', 'tst-1-4-a']),
     ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}},
-     ['tst-2-3-a', 'tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a', 'tst-2-4-a', 'tst-2-5-a'])
+     ['tst-2-3-a', 'tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a', 'tst-2-4-a', 'tst-2-5-a']),
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_action_breadcrumbs(data, expected_breadcrumbs):
     test_util.create_demo_data()
     graph = model.load_graph(2)
     engine = DecisionEngine(graph, data)
+    engine.decide()
+    assert engine.progress.action_breadcrumbs == expected_breadcrumbs
+
+
+@pytest.mark.parametrize("data, skip, expected_breadcrumbs", [
+    ({'1': True, '2': False, '3': False, '4': True},
+     ['tst-1-5-a'], ['tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a']),
+    ({'1': True, '2': False, '3': False, '4': False},
+     ['tst-1-5-a', 'tst-1-6-a'], ['tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a']),
+    ({'1': True, '2': False, '3': False, '4': False},
+     ['tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a'], ['tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a', 'tst-1-8-a'])
+])
+@pytest.mark.usefixtures('with_app_context')
+def test_action_breadcrumbs_with_skips(data, skip, expected_breadcrumbs):
+    test_util.create_demo_data()
+    graph = model.load_graph(1)
+    engine = DecisionEngine(graph, data, skip=skip)
     engine.decide()
     assert engine.progress.action_breadcrumbs == expected_breadcrumbs
 
