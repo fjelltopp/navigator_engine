@@ -1,4 +1,5 @@
 import navigator_engine.model as model
+import navigator_engine.common as common
 import logging
 import os
 import numpy as np
@@ -8,9 +9,10 @@ import markdown
 from urllib.parse import urlparse
 
 MILESTONE_COLUMNS = {
-    'TITLE': 'Milestone Title (User Facing):',
+    'TITLE': 'Milestone Title (Visible to User):',
     'VERSION': 'Version:',
-    'DESCRIPTION': 'Milestone Description (Visible to User):'
+    'DESCRIPTION': 'Milestone Description (Visible to User):',
+    'COMPLETE_MESSAGE': 'Complete Message'
 }
 
 DATA_COLUMNS = {
@@ -46,7 +48,7 @@ def graph_loader(graph_config_file):
             graph_config_file,
             sheet_name=sheet_name,
             header=0
-        ).loc[0][0:6]
+        ).loc[0][0:7]
 
         graph_data = pd.read_excel(
             graph_config_file,
@@ -130,6 +132,10 @@ def import_data(sheet_name, graphs):
 
             # If Conditional is False, add an action node if no skip destination is given
             if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
+
+                if 'check_not_skipped' in conditional.function:
+                    graph_data.loc[[idx]] = _create_check_skips_action(conditional, graph_data.loc[[idx]])
+
                 action_html = _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
                 action = model.Action(
                     title=graph_data.at[idx, DATA_COLUMNS['ACTION']],
@@ -164,13 +170,15 @@ def import_data(sheet_name, graphs):
                 model.db.session.commit()
 
     # Add a completion action
+    message = graph_header.get(
+        MILESTONE_COLUMNS['COMPLETE_MESSAGE'],
+        "Well done.  You have completed the milestone "
+        f"{graph_header[MILESTONE_COLUMNS['TITLE']]}. "
+        "Time to move on to the next one..."
+    )
     complete_node = model.Node(action=model.Action(
         title=f"{graph_header[MILESTONE_COLUMNS['TITLE']]} complete!",
-        html=_markdown_to_html(
-            "Well done.  You have completed the milestone "
-            f"{graph_header[MILESTONE_COLUMNS['TITLE']]}. "
-            "Time to move on to the next one..."
-        ),
+        html=_markdown_to_html(message),
         skippable=False,
         complete=True
     ), ref=_get_ref(idx, 'complete'))
@@ -191,6 +199,7 @@ def import_data(sheet_name, graphs):
             to_id=edge_true_to_id,
             type=True
         )
+
         model.db.session.add(edge_true)
         model.db.session.commit()
 
@@ -219,9 +228,9 @@ def import_data(sheet_name, graphs):
 
 
 def _map_excel_boolean(boolean):
-    if boolean in ['TRUE', 1, 1.0, "1", "1.0", "T", "t", "true", "True"]:
+    if boolean in ['TRUE', 1, "1", "1.0", "T", "t", "true", "True"]:
         return True
-    elif boolean in ['FALSE', 0, 1.0, "0", "1.0", "F", "f", "false", "False", ''] or pd.isnull(boolean):
+    elif boolean in ['FALSE', 0, "0.0", "0", "1.0", "F", "f", "false", "False", ''] or pd.isnull(boolean):
         return False
     else:
         raise ValueError('Value {} read from Initial Graph Config is not valid; Only TRUE and FALSE are valid values.'
@@ -246,8 +255,11 @@ def _parse_resources(resource_cell):
 
     resource_rows = resource_cell.split('\n')
     for row in resource_rows:
-        title = row.split('http')[0].strip()
-        url = row.split(title)[1].strip()
+        try:
+            title = row.split('http')[0].strip()
+            url = row.split(title)[1].strip()
+        except ValueError:
+            logger.error(f"There's a problem parsing resources: \n{resource_cell}")
 
         try:
             url_parsed = urlparse(url)
@@ -263,3 +275,24 @@ def _get_ref(ref, node_type):
         ref = '-'.join(ref.split('-')[:-1] + ['C'])
         node_type = 'action'
     return f'EST-{ref}-{node_type[0].upper()}'
+
+
+def _create_check_skips_action(conditional, graph_data):
+
+    function_name, function_args = common.get_pluggable_function_and_args(conditional.function)
+
+    tasks = []
+    for node_ref in function_args[0]:
+        node = model.load_node(node_ref=node_ref)
+        tasks.append(node.action.title)
+    tasks_list = "\n - ".join(tasks)
+
+    graph_data[DATA_COLUMNS['ACTION']] = "You have skipped some essential tasks"
+    graph_data[DATA_COLUMNS['ACTION_CONTENT']] = (
+        f"You have skipped some of following essential tasks:\n\n - {tasks_list}\n\n"
+        "You must ensure you complete all these tasks in order to proceed any further.\n\n"
+        "If you have understood this message, mark this task as complete and click *What's"
+        "Next* to be taken to the first of your incomplete essential tasks."
+    )
+
+    return graph_data
