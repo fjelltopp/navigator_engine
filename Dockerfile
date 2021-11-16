@@ -1,12 +1,7 @@
-FROM python:3.9.6
+FROM fjelltopp/python-fjelltopp-base:3.9
 
-RUN pip3 install uwsgi pipenv
-
+COPY ./ /var/www/navigator_engine
 WORKDIR /var/www/navigator_engine
+RUN mkdir .venv && pipenv sync
 
-ADD Pipfile.lock /var/www/navigator_engine/Pipfile.lock
-RUN pipenv sync --dev
-
-ADD uwsgi-app.ini /var/www/uwsgi/app.ini
-
-CMD ["uwsgi", "/var/www/uwsgi/app.ini"]
+EXPOSE 5001
