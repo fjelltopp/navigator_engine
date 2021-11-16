@@ -1,3 +1,5 @@
+import ast
+
 CONDITIONAL_FUNCTIONS = {}
 DATA_LOADERS = {}
 
@@ -38,6 +40,15 @@ def get_resource_from_dataset(resource_type: str, dataset: dict) -> dict:
         return matching_resources[0]
     else:
         return {}
+
+
+def get_pluggable_function_and_args(function_string: str) -> tuple[str, tuple]:
+    function_name = function_string.split("(")[0]
+    function_args = function_string.split(function_name)[1]
+    eval_function_args = ast.literal_eval(function_args)
+    if type(eval_function_args) is not tuple:
+        eval_function_args = (eval_function_args,)
+    return function_name, eval_function_args
 
 
 class DecisionError(Exception):
