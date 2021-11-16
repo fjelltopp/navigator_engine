@@ -1,6 +1,7 @@
 import pytest
 from navigator_engine import model
 from navigator_engine.common.graph_loader import graph_loader
+from navigator_engine.tests.util import app
 
 
 @pytest.mark.usefixtures('with_app_context')
@@ -8,7 +9,7 @@ class TestGraphLoader:
 
     @classmethod
     def setup_class(cls):
-        graph_loader('Estimates_Navigator_BDG_Validations.xlsx')
+        graph_loader(app.config.get('TEST_DATA_SPREADSHEET'))
 
     @classmethod
     def teardown_class(cls):
