@@ -100,8 +100,11 @@ def load_graph(graph_id: int) -> Graph:
     return Graph.query.filter_by(id=graph_id).first()
 
 
-def load_node(node_id: int) -> Node:
-    return Node.query.filter_by(id=node_id).first()
+def load_node(node_id: int = None, node_ref: str = None) -> Node:
+    if node_id:
+        return Node.query.filter_by(id=node_id).first()
+    else:
+        return Node.query.filter_by(ref=node_ref).first()
 
 
 def load_edge(from_id: int, to_id: int) -> Edge:
