@@ -1,6 +1,10 @@
-import ast
 import navigator_engine.model as model
-from navigator_engine.common import CONDITIONAL_FUNCTIONS, DATA_LOADERS, DecisionError
+from navigator_engine.common import (
+    CONDITIONAL_FUNCTIONS,
+    DATA_LOADERS,
+    DecisionError,
+    get_pluggable_function_and_args
+)
 from navigator_engine.common.progress_tracker import ProgressTracker
 from typing import Callable, Any
 import networkx
@@ -94,17 +98,13 @@ class DecisionEngine():
 
     def run_pluggable_logic(self, function_string: str,
                             functions: dict[str, Callable] = CONDITIONAL_FUNCTIONS):
-        function_name = function_string.split("(")[0]
+        function_name, function_args = get_pluggable_function_and_args(function_string)
         try:
             function = functions[function_name]
         except KeyError:
             raise DecisionError(f"No pluggable logic for {function_name}")
-        function_args = function_string.split(function_name)[1]
-        eval_function_args = ast.literal_eval(function_args)
-        if type(eval_function_args) is not tuple:
-            eval_function_args = (eval_function_args,)
         try:
-            return function(*eval_function_args, self)
+            return function(*function_args, self)
         except Exception as e:
             logger.exception(e)
             raise DecisionError(
