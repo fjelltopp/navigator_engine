@@ -15,11 +15,13 @@ class Config(object):
 class Testing(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/../testing.db'
+    TEST_DATA_SPREADSHEET = f'{base_directory}/tests/test_data/Estimates_Navigator_BDG_Validations.xlsx'
 
 
 class Development(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/../app.db'
+    TEST_DATA_SPREADSHEET = f'{base_directory}/tests/test_data/Estimates_Navigator_BDG_Validations.xlsx'
 
 
 class Production(Config):
