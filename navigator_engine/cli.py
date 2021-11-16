@@ -1,6 +1,10 @@
 import click
+from flask import current_app
+from navigator_engine.common.graph_loader import graph_loader, validate_graph
+import logging
 
-from navigator_engine.common.graph_loader import graph_loader
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def register(app):
@@ -13,4 +17,9 @@ def register(app):
     @click.argument('graph-config-file', default='Estimates 22 BDG [Final].xlsx')
     def load_graph(graph_config_file):
         """Loads binary decision graph into the db"""
+        logger.info(f"Loading the graph {graph_config_file}")
         graph_loader(graph_config_file)
+        logger.info("Loading graph successful")
+        logger.info("Validating graph with graph_id = 1")
+        validate_graph(1)
+        logger.info("Graph validation successful")
