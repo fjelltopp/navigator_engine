@@ -10,7 +10,7 @@ def register(app):
         pass
 
     @navigator_engine.command()
-    @click.argument('graph-config-file', default='Estimates_Navigator_BDG_Validations.xlsx')
+    @click.argument('graph-config-file', default='Estimates 22 BDG [Final].xlsx')
     def load_graph(graph_config_file):
         """Loads binary decision graph into the db"""
         graph_loader(graph_config_file)
