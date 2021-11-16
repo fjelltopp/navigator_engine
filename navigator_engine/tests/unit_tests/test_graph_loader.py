@@ -1,4 +1,5 @@
 import pytest
+import pickle
 from navigator_engine import model
 from navigator_engine.common.graph_loader import graph_loader
 from navigator_engine.tests.util import app
@@ -17,16 +18,21 @@ class TestGraphLoader:
 
     def test_graph_import(self):
         graphs = model.Graph.query.all()
+        assert graphs
 
     def test_node_import(self):
         nodes = model.Node.query.all()
+        assert nodes
 
     def test_conditional_import(self):
         conditionals = model.Node.query.all()
+        assert conditionals
 
     def test_action_import(self):
         actions = model.Action.query.all()
+        assert actions
 
     def test_edge_import(self):
         edges = model.Edge.query.all()
+        assert edges
 
