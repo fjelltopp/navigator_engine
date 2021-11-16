@@ -8,19 +8,19 @@ import markdown
 from urllib.parse import urlparse
 
 MILESTONE_COLUMNS = {
-    'TITLE': 'Milestone Title',
-    'VERSION': 'Version',
-    'DESCRIPTION': 'Description'
+    'TITLE': 'Milestone Title (User Facing):',
+    'VERSION': 'Version:',
+    'DESCRIPTION': 'Milestone Description (Visible to User):'
 }
 
 DATA_COLUMNS = {
-    'TITLE': 'Task Test',
-    'ACTION': 'Action Title (if test fails)',
-    'ACTION_CONTENT': 'Action content',
+    'TITLE': 'Task Test (if test passes, proceed to next test)',
+    'ACTION': 'Task Title (Visible to User)',
+    'ACTION_CONTENT': 'If test fails, present this to user:',
     'ACTION_RESOURCES': 'Resources / Links',
-    'SKIPPABLE': 'Mandatory to proceed?',
+    'SKIPPABLE': 'Mandatory right now',
     'SKIP_TO': 'Proceed to test (if test fails)',
-    'FUNCTION': 'Test Code'
+    'FUNCTION': 'Test function'
 }
 
 logger = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ def graph_loader(graph_config_file):
             graph_config_file,
             sheet_name=sheet_name,
             header=0
-        ).loc[0][0:4]
+        ).loc[0][0:6]
 
         graph_data = pd.read_excel(
             graph_config_file,
@@ -219,9 +219,9 @@ def import_data(sheet_name, graphs):
 
 
 def _map_excel_boolean(boolean):
-    if boolean in ['TRUE', 1, "1", "T", "t", "true", "True"]:
+    if boolean in ['TRUE', 1, 1.0, "1", "1.0", "T", "t", "true", "True"]:
         return True
-    elif boolean in ['FALSE', 0, "0", "F", "f", "false", "False", ''] or np.isnan(boolean):
+    elif boolean in ['FALSE', 0, 1.0, "0", "1.0", "F", "f", "false", "False", ''] or pd.isnull(boolean):
         return False
     else:
         raise ValueError('Value {} read from Initial Graph Config is not valid; Only TRUE and FALSE are valid values.'
