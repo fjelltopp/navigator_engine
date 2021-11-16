@@ -27,7 +27,7 @@ def test_check_manual_confirmation(mock_engine, action_id, expected):
     mock_engine.data = {
         'navigator-workflow-state': {
             'data': {
-                'completedSteps': [
+                'completedTasks': [
                     "task1",
                     "task2",
                     "task3"
