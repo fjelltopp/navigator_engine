@@ -1,2 +1,2 @@
 #!/bin/sh
-pipenv run flask navigator-engine load-graph
+FLASK_APP=navigator_engine/app.py pipenv run flask navigator-engine load-graph

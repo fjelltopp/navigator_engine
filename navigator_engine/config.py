@@ -24,5 +24,5 @@ class Development(Config):
 
 class Production(Config):
     PRODUCTION = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/navigator_engine'
-    LOGGING_LEVEL = logging.WARNING
+    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI", "not-set")
+    LOGGING_LEVEL = logging.ERROR
