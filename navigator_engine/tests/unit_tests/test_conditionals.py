@@ -75,7 +75,7 @@ def test_check_resource_key(mock_engine, resource_type, key, value, expected):
     assert result == expected
 
 
-@pytest.mark.parametrize("resources, expected",[
+@pytest.mark.parametrize("resources, expected", [
     ([{'validation_status': 'success'}, {'validation_status': 'success'}], True),
     ([{'validation_status': 'success'}, {'validation_status': 'error'}], False),
     ([{}, {'validation_status': 'failure'}], False),
