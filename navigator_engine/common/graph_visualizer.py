@@ -152,8 +152,8 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'classes': 'red triangle',
                     'data': {
                         'id': str(node.id),
-                        'label': f'A {node.action.id} COMPLETE',
-                        'infobox': f'Action {node.action.id} | '
+                        'label': f'{node.ref} COMPLETE',
+                        'infobox': f'Action {node.ref} | '
                                    f'Node {node.id} | '
                                    f'{node.action.title}'
                     }
@@ -163,8 +163,8 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'classes': 'red triangle',
                     'data': {
                         'id': str(node.id),
-                        'label': f'A {node.action.id}',
-                        'infobox': f'Action {node.action.id} | '
+                        'label': f'{node.ref}',
+                        'infobox': f'Action {node.ref} | '
                                    f'Node {node.id} | '
                                    f'{node.action.title}'
                     }
@@ -174,8 +174,8 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'classes': 'blue square',
                     'data': {
                         'id': str(node.id),
-                        'label': f'M {node.milestone.id}',
-                        'infobox': f'Milestone {node.milestone.id} | '
+                        'label': f'{node.ref}',
+                        'infobox': f'Milestone {node.ref} | '
                                    f'Node {node.id}  | '
                                    f'{node.milestone.title}'
                     }
@@ -185,9 +185,9 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'classes': 'green circle',
                     'data': {
                         'id': str(node.id),
-                        'label': f'C {node.conditional.id}',
+                        'label': f'{node.ref}',
                         'infobox': f'Conditional '
-                                   f'{node.conditional.id} | '
+                                   f'{node.ref} | '
                                    f'Node {node.id}  | '
                                    f'{node.conditional.title}'
                     }
