@@ -261,9 +261,8 @@ def test_process_action_manual(mock_engine):
     assert result == nodes[1]
 
 
-def test_process_action_skipped(mocker):
+def test_process_action_skipped(mocker, mock_engine):
     node = factories.NodeFactory(id=1)
-    engine = mocker.Mock(spec=DecisionEngine)
-    engine.skip = [node.ref]
-    DecisionEngine.process_action(engine, node)
-    engine.skip_action.assert_called_once_with(node)
+    mock_engine.skip = [node.ref]
+    DecisionEngine.process_action(mock_engine, node)
+    mock_engine.skip_action.assert_called_once_with(node)

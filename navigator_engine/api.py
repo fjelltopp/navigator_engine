@@ -29,11 +29,6 @@ def decide():
         abort(400, "No data specified in request")
     if not input_data['data'].get('url'):
         abort(400, "No url to data specified in request")
-    if input_data.get("actionID", None) in input_data.get('skipActions', []):
-        abort(
-            400,
-            "The value of actionID is found in skipActions. Can't get action that is skipped."
-        )
 
     graph = load_graph(choose_graph(input_data['data']['url']))
     data_loader = choose_data_loader(input_data['data']['url'])
