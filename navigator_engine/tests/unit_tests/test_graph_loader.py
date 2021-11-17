@@ -1,5 +1,7 @@
 import pytest
 import pickle
+import networkx
+import json
 from navigator_engine import model
 from navigator_engine.common.graph_loader import graph_loader
 from navigator_engine.tests.util import app
@@ -36,3 +38,12 @@ class TestGraphLoader:
         edges = model.Edge.query.all()
         assert edges
 
+    def test_network_isomorphism(self):
+        graphs = model.Graph.query.all()
+
+        network_test_data = json.loads(app.config.get('TEST_DATA_GRAPH_JSON'))
+
+        for graph in graphs:
+            network = graph.to_networkx()
+
+            assert networkx.algorithms.isomorphism.is_isomorphic(network, network_test_data[graph.id])
