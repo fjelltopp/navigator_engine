@@ -63,7 +63,7 @@ class DecisionEngine():
         return self.process_node(next_node)
 
     def process_action(self, node: model.Node) -> model.Node:
-        if node.ref in self.skip:
+        if node.ref != self.stop_action and node.ref in self.skip:
             return self.skip_action(node)
         self.progress.action_breadcrumbs.append(node.ref)
         return node
