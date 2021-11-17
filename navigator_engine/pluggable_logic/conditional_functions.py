@@ -48,3 +48,12 @@ def check_resource_key(resource_type: str, key: Hashable, value: Hashable, engin
         return bool(match_result)
     else:
         return resource.get(key) == value
+
+
+@register_conditional
+def check_dataset_valid(engine: DecisionEngine) -> bool:
+    dataset = engine.data['dataset']['data']['result']
+    for resource in dataset.get('resources', []):
+        if resource.get('validation_status', 'success') != 'success':
+            return False
+    return True
