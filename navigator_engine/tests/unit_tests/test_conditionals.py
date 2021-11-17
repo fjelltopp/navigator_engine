@@ -73,3 +73,13 @@ def test_check_resource_key(mock_engine, resource_type, key, value, expected):
     mock_engine.data = source_data
     result = conditionals.check_resource_key(resource_type, key, value, mock_engine)
     assert result == expected
+
+
+@pytest.mark.parametrize("resources, expected",[
+    ([{'validation_status': 'success'}, {'validation_status': 'success'}], True),
+    ([{'validation_status': 'success'}, {'validation_status': 'error'}], False),
+    ([{}, {'validation_status': 'failure'}], False),
+])
+def test_check_dataset_valid(resources, expected, mock_engine):
+    with pytest.raises(TypeError, match='123'):
+        conditionals.check_not_skipped(123, mock_engine)
