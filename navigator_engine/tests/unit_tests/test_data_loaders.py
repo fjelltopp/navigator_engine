@@ -147,3 +147,42 @@ def test_load_estimates_dataset(mock_engine, mocker):
         mock_engine
     )
     assert result == mock_load_estimates_dataset_resource.return_value
+
+
+def test_load_estimates_dataset_without_workflow_state(mock_engine, mocker):
+    source_data = {
+        'url': 'https://example.com/test-data',
+        'auth_header': 'Bearer xxxx-xxxx-xxxx-xxxx'
+    }
+    mock_engine.data = deepcopy(source_data)
+    mock_load_json_url = mocker.patch(
+        'navigator_engine.pluggable_logic.data_loaders.load_json_url',
+        return_value={'dataset': {'data': {'test': 'dataset'}}}
+    )
+    mock_load_estimates_dataset_resource = mocker.patch(
+        'navigator_engine.pluggable_logic.data_loaders.load_estimates_dataset_resource',
+        side_effect=IOError()
+    )
+    result = data_loaders.load_estimates_dataset('url', 'auth_header', mock_engine)
+
+    mock_load_json_url.assert_called_once_with(
+        source_data['url'],
+        source_data['auth_header'],
+        'dataset',
+        mock_engine
+    )
+    mock_load_estimates_dataset_resource.assert_called_once_with(
+        'navigator-workflow-state',
+        source_data['auth_header'],
+        mock_engine
+    )
+    assert result == {
+        'dataset': {
+            'data': {'test': 'dataset'}
+        },
+        'navigator-workflow-state': {
+            'url': None,
+            'auth_header': None,
+            'data': {'completedTasks': []}
+        }
+    }
