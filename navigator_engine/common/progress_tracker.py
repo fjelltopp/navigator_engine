@@ -18,6 +18,9 @@ class ProgressTracker():
         self.root_node: model.Node = self.get_root_node()
         self.report: dict = {}
 
+    def finalize(self) -> dict:
+        return self.report_progress()
+
     def report_progress(self) -> dict:
         milestones = copy.deepcopy(self.milestones)
         current_milestone = None
@@ -133,12 +136,13 @@ class ProgressTracker():
         milestone_paths = []
         # Get all "milestone" paths
         for path in all_possible_paths:
-            path = path[1:]
+            path = path[1:]  # Remove the current node
+            # Remove all nodes except milestones from each path
             milestone_paths.append([node for node in path if getattr(node, 'milestone_id')])
         # The first n elements that are the same in every milestone path consitute "known" milestones
         milestones_to_complete = [x[0] for x in zip(*milestone_paths) if len(x) == x.count(x[0])]
         # If all paths are equal, we know we have the complete list of remaining milestones
         milestone_list_is_complete = False
-        if len(milestone_paths) == milestone_paths.count(milestone_paths[0]):
+        if not milestone_paths or len(milestone_paths) == milestone_paths.count(milestone_paths[0]):
             milestone_list_is_complete = True
         return milestones_to_complete, milestone_list_is_complete

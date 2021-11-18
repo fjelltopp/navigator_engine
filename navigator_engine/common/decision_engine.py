@@ -21,10 +21,10 @@ class DecisionEngine():
         self.network: networkx.DigGraph = self.graph.to_networkx()
         self.data: Any = source_data
         self.skip: list[str] = skip
+        self.remove_skips: list[str] = []
         self.progress: ProgressTracker = ProgressTracker(self.network, route=route)
         self.decision: dict[str, Any] = {}
         self.stop_action: str = stop
-        self.remove_skips: list[str] = []
         if data_loader:
             self.data = self.run_pluggable_logic(data_loader, DATA_LOADERS)
 
@@ -45,6 +45,7 @@ class DecisionEngine():
             "manualConfirmationRequired": manual_confirmation_required
         }
         self.progress.report_progress()
+        self.remove_skips_not_needed()
         return self.decision
 
     def process_node(self, node: model.Node) -> model.Node:
@@ -63,8 +64,13 @@ class DecisionEngine():
         return self.process_node(next_node)
 
     def process_action(self, node: model.Node) -> model.Node:
-        if node.ref != self.stop_action and node.ref in self.skip:
+        not_stop_action = node.ref != self.stop_action
+        in_skip_requests = node.ref in self.skip
+        skippable = node.action.skippable
+        if not_stop_action and in_skip_requests and skippable:
             return self.skip_action(node)
+        elif in_skip_requests and not skippable:
+            self.remove_skips.append(node.ref)
         self.progress.action_breadcrumbs.append(node.ref)
         return node
 
@@ -112,9 +118,6 @@ class DecisionEngine():
             )
 
     def skip_action(self, node: model.Node) -> model.Node:
-        action = node.action
-        if not action.skippable:
-            raise DecisionError(f"Action cannot be skipped: {action.id} ({action.title})")
         previous_node = self.progress.entire_route[-2]
         for previous_node, new_node in self.network.out_edges(previous_node):
             if node != new_node:
@@ -122,6 +125,11 @@ class DecisionEngine():
                 self.progress.pop_node()
                 return self.process_node(new_node)
         raise DecisionError(f"Only one outgoing edge for node: {previous_node}")
+
+    def remove_skips_not_needed(self):
+        ignored_skips = [ref for ref in self.skip if ref not in self.progress.skipped]
+        ignored_skips_in_path = [ref for ref in ignored_skips if ref in self.progress.action_breadcrumbs]
+        self.remove_skips.extend(ref for ref in ignored_skips_in_path if ref not in self.remove_skips)
 
     def requires_manual_confirmation(self, node: model.Node) -> bool:
         manual_confirmation = False
