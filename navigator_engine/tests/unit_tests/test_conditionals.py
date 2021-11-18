@@ -8,10 +8,10 @@ import pytest
     (['1', '2', '3'], False, ['2', '3'])
 ])
 def test_check_not_skipped(mock_engine, actions, expected, remove_skips):
-    mock_engine.progress.skipped = ['2', '3', '4']
+    mock_engine.progress.skipped_actions = ['2', '3', '4']
     result = conditionals.check_not_skipped(actions, mock_engine)
     assert result == expected
-    assert mock_engine.remove_skips == remove_skips
+    assert mock_engine.remove_skip_requests == remove_skips
 
 
 def test_check_not_skipped_raises_error(mock_engine):

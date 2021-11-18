@@ -33,14 +33,14 @@ def decide():
     graph = load_graph(choose_graph(input_data['data']['url']))
     data_loader = choose_data_loader(input_data['data']['url'])
     source_data = input_data['data']
-    skip_actions = input_data.get('skipActions', [])
+    skip_requests = input_data.get('skipActions', [])
     stop_action = input_data.get('actionID')
 
     engine = DecisionEngine(
         graph,
         source_data,
         data_loader=data_loader,
-        skip=skip_actions,
+        skip_requests=skip_requests,
         stop=stop_action
     )
     engine.decide()
@@ -56,8 +56,8 @@ def decide():
     return jsonify({
         "decision": engine.decision,
         "actions": engine.progress.action_breadcrumbs,
-        "skippedActions": engine.progress.skipped,
-        "removeSkipActions": engine.remove_skips,
+        "skippedActions": engine.progress.skipped_actions,
+        "removeSkipActions": engine.remove_skip_requests,
         "progress": engine.progress.report
     })
 

@@ -16,23 +16,23 @@ logger = logging.getLogger(__name__)
 class DecisionEngine():
 
     def __init__(self, graph: model.Graph, source_data: object, data_loader: str = None,
-                 stop: str = "", skip: list[str] = [], route: list[model.Node] = []) -> None:
+                 stop: str = "", skip_requests: list[str] = [], route: list[model.Node] = []) -> None:
         self.graph: model.Graph = graph
         self.network: networkx.DigGraph = self.graph.to_networkx()
         self.data: Any = source_data
-        self.skip: list[str] = skip
+        self.skip_requests: list[str] = skip_requests
+        self.remove_skip_requests: list[str] = []
         self.progress: ProgressTracker = ProgressTracker(self.network, route=route)
         self.decision: dict[str, Any] = {}
         self.stop_action: str = stop
-        self.remove_skips: list[str] = []
         if data_loader:
             self.data = self.run_pluggable_logic(data_loader, DATA_LOADERS)
 
-    def decide(self, data: object = None, skip: list[str] = None, stop=None) -> dict:
+    def decide(self, data: object = None, skip_requests: list[str] = None, stop=None) -> dict:
         if data:
             self.data = data
-        if skip:
-            self.skip = skip
+        if skip_requests:
+            self.skip_requests = skip_requests
         if stop:
             self.stop_action = stop
         self.progress.reset()
@@ -45,6 +45,7 @@ class DecisionEngine():
             "manualConfirmationRequired": manual_confirmation_required
         }
         self.progress.report_progress()
+        self.remove_skip_requests_not_needed()
         return self.decision
 
     def process_node(self, node: model.Node) -> model.Node:
@@ -63,8 +64,13 @@ class DecisionEngine():
         return self.process_node(next_node)
 
     def process_action(self, node: model.Node) -> model.Node:
-        if node.ref != self.stop_action and node.ref in self.skip:
+        not_stop_action = node.ref != self.stop_action
+        in_skip_requests = node.ref in self.skip_requests
+        skippable = node.action.skippable
+        if not_stop_action and in_skip_requests and skippable:
             return self.skip_action(node)
+        elif in_skip_requests and not skippable:
+            self.remove_skip_requests.append(node.ref)
         self.progress.action_breadcrumbs.append(node.ref)
         return node
 
@@ -73,7 +79,7 @@ class DecisionEngine():
             model.load_graph(node.milestone.graph_id),
             self.data.copy(),
             data_loader=node.milestone.data_loader,
-            skip=self.skip,
+            skip_requests=self.skip_requests,
             stop=self.stop_action
         )
         milestone_result = milestone_engine.decide()
@@ -112,16 +118,18 @@ class DecisionEngine():
             )
 
     def skip_action(self, node: model.Node) -> model.Node:
-        action = node.action
-        if not action.skippable:
-            raise DecisionError(f"Action cannot be skipped: {action.id} ({action.title})")
         previous_node = self.progress.entire_route[-2]
         for previous_node, new_node in self.network.out_edges(previous_node):
             if node != new_node:
-                self.progress.skipped.append(node.ref)
+                self.progress.skipped_actions.append(node.ref)
                 self.progress.pop_node()
                 return self.process_node(new_node)
         raise DecisionError(f"Only one outgoing edge for node: {previous_node}")
+
+    def remove_skip_requests_not_needed(self):
+        ignored_skips = [ref for ref in self.skip_requests if ref not in self.progress.skipped_actions]
+        ignored_skips_in_path = [ref for ref in ignored_skips if ref in self.progress.action_breadcrumbs]
+        self.remove_skip_requests.extend(ref for ref in ignored_skips_in_path if ref not in self.remove_skip_requests)
 
     def requires_manual_confirmation(self, node: model.Node) -> bool:
         manual_confirmation = False
@@ -132,12 +140,12 @@ class DecisionEngine():
         return manual_confirmation
 
 
-def engine_factory(graph, data, data_loader=None, skip=[], stop=None) -> DecisionEngine:
+def engine_factory(graph, data, data_loader=None, skip_requests=[], stop=None) -> DecisionEngine:
     # Used to mock out engine creation in tests
     return DecisionEngine(
         graph,
         data,
-        skip=skip,
+        skip_requests=skip_requests,
         data_loader=data_loader,
         stop=stop
     )

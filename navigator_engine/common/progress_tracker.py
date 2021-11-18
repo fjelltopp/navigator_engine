@@ -12,7 +12,7 @@ class ProgressTracker():
         self.entire_route: list[model.Node] = route.copy()
         self.route: list[model.Node] = []
         self.milestones: list[dict] = []
-        self.skipped: list[str] = []
+        self.skipped_actions: list[str] = []
         self.action_breadcrumbs: list[str] = []
         self.complete_node: model.Node = self.get_complete_node()
         self.root_node: model.Node = self.get_root_node()
@@ -44,12 +44,12 @@ class ProgressTracker():
     def reset(self) -> None:
         self.entire_route = self.previous_route
         self.route = []
-        self.skipped = []
+        self.skipped_actions = []
 
     def add_milestone(self, milestone_node: model.Node,
                       milestone_progress, complete: bool = False) -> None:
         self.entire_route += milestone_progress.entire_route
-        self.skipped += milestone_progress.skipped
+        self.skipped_actions += milestone_progress.skipped_actions
         self.milestones.append({
             'id': milestone_node.ref,
             'title': milestone_node.milestone.title,
@@ -133,12 +133,13 @@ class ProgressTracker():
         milestone_paths = []
         # Get all "milestone" paths
         for path in all_possible_paths:
-            path = path[1:]
+            path = path[1:]  # Remove the current node
+            # Remove all nodes except milestones from each path
             milestone_paths.append([node for node in path if getattr(node, 'milestone_id')])
         # The first n elements that are the same in every milestone path consitute "known" milestones
         milestones_to_complete = [x[0] for x in zip(*milestone_paths) if len(x) == x.count(x[0])]
         # If all paths are equal, we know we have the complete list of remaining milestones
         milestone_list_is_complete = False
-        if len(milestone_paths) == milestone_paths.count(milestone_paths[0]):
+        if not milestone_paths or len(milestone_paths) == milestone_paths.count(milestone_paths[0]):
             milestone_list_is_complete = True
         return milestones_to_complete, milestone_list_is_complete

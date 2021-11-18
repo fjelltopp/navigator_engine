@@ -11,7 +11,7 @@ def test_add_milestone(mock_tracker, mocker, completed):
     mock_tracker.route = route.copy()
     mock_tracker.entire_route = route.copy()
     mock_tracker.action_breadcrumbs = [1, 2, 3]
-    mock_tracker.skipped = [2]
+    mock_tracker.skipped_actions = [2]
 
     milestone_route = [factories.NodeFactory(id=3), factories.NodeFactory(id=4)]
     milestone_node = factories.NodeFactory(id=5, milestone=factories.MilestoneFactory())
@@ -19,7 +19,7 @@ def test_add_milestone(mock_tracker, mocker, completed):
     milestone_tracker.route = milestone_route.copy()
     milestone_tracker.entire_route = milestone_route.copy()
     milestone_tracker.action_breadcrumbs = [4, 5, 6]
-    milestone_tracker.skipped = [3]
+    milestone_tracker.skipped_actions = [3]
 
     ProgressTracker.add_milestone(mock_tracker, milestone_node, milestone_tracker, complete=completed)
 
@@ -28,7 +28,7 @@ def test_add_milestone(mock_tracker, mocker, completed):
     else:
         assert mock_tracker.action_breadcrumbs == [1, 2, 3, 4, 5, 6]
     assert mock_tracker.entire_route == route + milestone_route
-    assert mock_tracker.skipped == [2, 3]
+    assert mock_tracker.skipped_actions == [2, 3]
     assert mock_tracker.milestones == [{
         'id': milestone_node.ref,
         'title': 'Test Milestone',

@@ -1,7 +1,6 @@
 import pytest
 import navigator_engine.model as model
 from navigator_engine.common.decision_engine import DecisionEngine
-from navigator_engine.common import DecisionError
 import navigator_engine.tests.util as test_util
 
 
@@ -29,10 +28,10 @@ def test_graph_processing(data, expected_node_id):
 def test_with_skip_steps(data, skip_steps, expected_node_id):
     test_util.create_demo_data()
     graph = model.load_graph(1)
-    engine = DecisionEngine(graph, data, skip=skip_steps)
+    engine = DecisionEngine(graph, data, skip_requests=skip_steps)
     result = engine.decide()
     assert result['id'] == expected_node_id
-    assert engine.progress.skipped == skip_steps
+    assert engine.progress.skipped_actions == skip_steps
 
 
 @pytest.mark.parametrize("data, skip_steps", [
@@ -43,9 +42,11 @@ def test_with_skip_steps(data, skip_steps, expected_node_id):
 def test_skipping_unskippable_step_raises_error(data, skip_steps):
     test_util.create_demo_data()
     graph = model.load_graph(1)
-    engine = DecisionEngine(graph, data, skip=skip_steps)
-    with pytest.raises(DecisionError):
-        engine.decide()
+    engine = DecisionEngine(graph, data, skip_requests=skip_steps)
+    engine.decide()
+    assert engine.remove_skip_requests == skip_steps
+    assert engine.progress.skipped_actions == []
+    assert engine.decision['id'] == skip_steps[0]
 
 
 @pytest.mark.parametrize("data, expected_node_id", [
@@ -91,9 +92,24 @@ def test_action_breadcrumbs(data, expected_breadcrumbs):
 def test_action_breadcrumbs_with_skips(data, skip, expected_breadcrumbs):
     test_util.create_demo_data()
     graph = model.load_graph(1)
-    engine = DecisionEngine(graph, data, skip=skip)
+    engine = DecisionEngine(graph, data, skip_requests=skip)
     engine.decide()
     assert engine.progress.action_breadcrumbs == expected_breadcrumbs
+
+
+@pytest.mark.parametrize("skip, expected_remove_skips", [
+    (['tst-1-4-a', 'tst-1-5-a'], ['tst-1-4-a']),
+    (['tst-1-5-a', 'tst-1-8-a'], []),
+    (['tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a', 'tst-1-8-a'], ['tst-1-8-a', 'tst-1-7-a'])
+])
+@pytest.mark.usefixtures('with_app_context')
+def test_action_breadcrumbs_with_remove_skips(skip, expected_remove_skips):
+    test_util.create_demo_data()
+    graph = model.load_graph(1)
+    data = {'1': True, '2': False, '3': False, '4': True}
+    engine = DecisionEngine(graph, data, skip_requests=skip)
+    engine.decide()
+    assert engine.remove_skip_requests == expected_remove_skips
 
 
 @pytest.mark.usefixtures('with_app_context')
