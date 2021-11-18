@@ -64,8 +64,8 @@ def get_mock_engine():
     engine = mock.Mock(spec=DecisionEngine)
     engine.data = {}
     engine.network = mock.Mock(spec=DiGraph)
-    engine.remove_skips = []
-    engine.skip = []
+    engine.remove_skip_requests = []
+    engine.skip_requests = []
     engine.progress = get_mock_tracker()
     engine.stop_action = None
     return engine
@@ -77,7 +77,7 @@ def get_mock_tracker():
     tracker.route = []
     tracker.entire_route = []
     tracker.previous_route = []
-    tracker.skipped = []
+    tracker.skipped_actions = []
     tracker.milestones = []
     tracker.complete_node = factories.NodeFactory()
     tracker.action_breadcrumbs = []

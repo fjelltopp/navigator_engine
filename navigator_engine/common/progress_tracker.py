@@ -12,14 +12,11 @@ class ProgressTracker():
         self.entire_route: list[model.Node] = route.copy()
         self.route: list[model.Node] = []
         self.milestones: list[dict] = []
-        self.skipped: list[str] = []
+        self.skipped_actions: list[str] = []
         self.action_breadcrumbs: list[str] = []
         self.complete_node: model.Node = self.get_complete_node()
         self.root_node: model.Node = self.get_root_node()
         self.report: dict = {}
-
-    def finalize(self) -> dict:
-        return self.report_progress()
 
     def report_progress(self) -> dict:
         milestones = copy.deepcopy(self.milestones)
@@ -47,12 +44,12 @@ class ProgressTracker():
     def reset(self) -> None:
         self.entire_route = self.previous_route
         self.route = []
-        self.skipped = []
+        self.skipped_actions = []
 
     def add_milestone(self, milestone_node: model.Node,
                       milestone_progress, complete: bool = False) -> None:
         self.entire_route += milestone_progress.entire_route
-        self.skipped += milestone_progress.skipped
+        self.skipped_actions += milestone_progress.skipped_actions
         self.milestones.append({
             'id': milestone_node.ref,
             'title': milestone_node.milestone.title,

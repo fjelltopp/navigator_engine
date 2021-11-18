@@ -116,13 +116,13 @@ def test_skip_action(mocker):
     engine.network = network
     engine.progress.route = [nodes[0], nodes[1]]
     engine.progress.entire_route = [nodes[0], nodes[1]]
-    engine.progress.skipped = []
+    engine.progress.skipped_actions = []
     engine.process_node.return_value = 'processed_action'
 
     result = DecisionEngine.skip_action(engine, nodes[1])
 
     assert result == 'processed_action'
-    assert engine.progress.skipped == [nodes[1].ref]
+    assert engine.progress.skipped_actions == [nodes[1].ref]
     engine.progress.pop_node.assert_called_once()
     engine.process_node.assert_called_once_with(nodes[2])
 
@@ -133,10 +133,10 @@ def test_process_action_skip_unskippable(mocker, mock_engine):
         action_id=2,
         action=factories.ActionFactory(title="Test Action", id=2, skippable=False)
     )
-    mock_engine.skip = ['test-ref']
+    mock_engine.skip_requests = ['test-ref']
     result = DecisionEngine.process_action(mock_engine, node)
     assert result == node
-    assert 'test-ref' in mock_engine.remove_skips
+    assert 'test-ref' in mock_engine.remove_skip_requests
     assert mock_engine.progress.action_breadcrumbs == ['test-ref']
 
 
@@ -209,16 +209,16 @@ def test_decide(mocker):
     action_node = factories.NodeFactory(id=2, action=factories.ActionFactory())
     engine = mocker.Mock(spec=DecisionEngine)
     engine.data = {}
-    engine.skip = []
+    engine.skip_requests = []
     engine.requires_manual_confirmation.return_value = True
     engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
     engine.progress.root_node = root_node
-    engine.progress.skipped = ['1', '2', '3']
+    engine.progress.skipped_actions = ['1', '2', '3']
     engine.process_node.return_value = action_node
-    result = DecisionEngine.decide(engine, data={'test': 'data'}, skip=['4', '5'])
+    result = DecisionEngine.decide(engine, data={'test': 'data'}, skip_requests=['4', '5'])
     engine.process_node.assert_called_once_with(root_node)
     engine.progress.reset.assert_called_once()
-    engine.remove_skips_not_needed.assert_called_once()
+    engine.remove_skip_requests_not_needed.assert_called_once()
     assert result == {
         'id': action_node.ref,
         'content': model.Action.to_dict(action_node.action),
@@ -226,7 +226,7 @@ def test_decide(mocker):
         'manualConfirmationRequired': True
     }
     assert engine.data == {'test': 'data'}
-    assert engine.skip == ['4', '5']
+    assert engine.skip_requests == ['4', '5']
 
 
 def test_process_action_unskipped(mock_engine):
@@ -267,15 +267,15 @@ def test_process_action_manual(mock_engine):
 
 def test_process_action_skipped(mocker, mock_engine):
     node = factories.NodeFactory(id=1, action=factories.ActionFactory(skippable=True))
-    mock_engine.skip = [node.ref]
+    mock_engine.skip_requests = [node.ref]
     DecisionEngine.process_action(mock_engine, node)
     mock_engine.skip_action.assert_called_once_with(node)
 
 
-def test_remove_skips_not_needed(mock_engine):
-    mock_engine.progress.skipped = ['1', '3']
-    mock_engine.skip = ['1', '2', '3', '4', '5']
+def test_remove_skip_requests_not_needed(mock_engine):
+    mock_engine.progress.skipped_actions = ['1', '3']
+    mock_engine.skip_requests = ['1', '2', '3', '4', '5']
     mock_engine.progress.action_breadcrumbs = ['0', '1', '2', '3', '4']
-    mock_engine.remove_skips = ['0', '2']
-    DecisionEngine.remove_skips_not_needed(mock_engine)
-    assert mock_engine.remove_skips == ['0', '2', '4']
+    mock_engine.remove_skip_requests = ['0', '2']
+    DecisionEngine.remove_skip_requests_not_needed(mock_engine)
+    assert mock_engine.remove_skip_requests == ['0', '2', '4']
