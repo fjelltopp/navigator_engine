@@ -13,7 +13,7 @@ def register(app):
         pass
 
     @navigator_engine.command()
-    @click.argument('graph-config-file', default='Estimates 22 BDG [Final].xlsx')
+    @click.argument('graph-config-file', default=app.config.get('TEST_DATA_SPREADSHEET'))
     def load_graph(graph_config_file):
         """Loads binary decision graph into the db"""
         logger.info(f"Loading the graph {graph_config_file}")
