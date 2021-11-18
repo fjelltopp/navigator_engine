@@ -74,9 +74,16 @@ def load_estimates_dataset(url_key: Hashable, auth_header_key: Hashable, engine:
     auth_header = engine.data[auth_header_key]
     engine.data = {}
     data = load_json_url(dataset_url, auth_header, 'dataset', engine)
-    data = load_estimates_dataset_resource(
-        'navigator-workflow-state',
-        auth_header,
-        engine
-    )
+    try:
+        data = load_estimates_dataset_resource(
+            'navigator-workflow-state',
+            auth_header,
+            engine
+        )
+    except IOError:
+        data['navigator-workflow-state'] = {
+            'url': None,
+            'auth_header': None,
+            'data': {'completedTasks': []}
+        }
     return data
