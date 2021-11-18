@@ -42,7 +42,7 @@ def test_decide_complete(client, mocker):
         },
         'actions': ['tst-2-3-a', 'tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a', 'tst-2-4-a', 'tst-2-5-a'],
         'skippedActions': ['tst-1-6-a'],
-        'removeSkipActions': [],
+        'removeSkipActions': ['tst-1-5-a'],
         'progress': {
             'progress': 100,
             'currentMilestoneID': None,
@@ -70,7 +70,7 @@ def test_decide_incomplete(client, mocker):
     assert response.json == {
         'actions': ['tst-2-3-a', 'tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a'],
         'skippedActions': [],
-        'removeSkipActions': [],
+        'removeSkipActions': ['tst-1-5-a'],
         'decision': {
             'id': 'tst-1-6-a',
             'manualConfirmationRequired': False,

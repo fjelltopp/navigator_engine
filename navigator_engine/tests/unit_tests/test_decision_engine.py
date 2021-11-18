@@ -127,14 +127,17 @@ def test_skip_action(mocker):
     engine.process_node.assert_called_once_with(nodes[2])
 
 
-def test_skip_action_unskippable(mocker):
+def test_process_action_skip_unskippable(mocker, mock_engine):
     node = factories.NodeFactory(
+        ref='test-ref',
         action_id=2,
         action=factories.ActionFactory(title="Test Action", id=2, skippable=False)
     )
-    engine = mocker.Mock(spec=DecisionEngine)
-    with pytest.raises(common.DecisionError, match="Action cannot be skipped"):
-        DecisionEngine.skip_action(engine, node)
+    mock_engine.skip = ['test-ref']
+    result = DecisionEngine.process_action(mock_engine, node)
+    assert result == node
+    assert 'test-ref' in mock_engine.remove_skips
+    assert mock_engine.progress.action_breadcrumbs == ['test-ref']
 
 
 def test_process_milestone_incomplete(mocker, mock_engine):
@@ -215,6 +218,7 @@ def test_decide(mocker):
     result = DecisionEngine.decide(engine, data={'test': 'data'}, skip=['4', '5'])
     engine.process_node.assert_called_once_with(root_node)
     engine.progress.reset.assert_called_once()
+    engine.remove_skips_not_needed.assert_called_once()
     assert result == {
         'id': action_node.ref,
         'content': model.Action.to_dict(action_node.action),
@@ -262,7 +266,16 @@ def test_process_action_manual(mock_engine):
 
 
 def test_process_action_skipped(mocker, mock_engine):
-    node = factories.NodeFactory(id=1)
+    node = factories.NodeFactory(id=1, action=factories.ActionFactory(skippable=True))
     mock_engine.skip = [node.ref]
     DecisionEngine.process_action(mock_engine, node)
     mock_engine.skip_action.assert_called_once_with(node)
+
+
+def test_remove_skips_not_needed(mock_engine):
+    mock_engine.progress.skipped = ['1', '3']
+    mock_engine.skip = ['1', '2', '3', '4', '5']
+    mock_engine.progress.action_breadcrumbs = ['0', '1', '2', '3', '4']
+    mock_engine.remove_skips = ['0', '2']
+    DecisionEngine.remove_skips_not_needed(mock_engine)
+    assert mock_engine.remove_skips == ['0', '2', '4']
