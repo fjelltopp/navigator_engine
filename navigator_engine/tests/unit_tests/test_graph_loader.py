@@ -5,6 +5,7 @@ from navigator_engine import model
 from navigator_engine.common.graph_loader import graph_loader
 from navigator_engine.tests.util import app
 
+
 @pytest.mark.usefixtures('with_app_context')
 class TestGraphLoader:
 
