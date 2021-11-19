@@ -10,6 +10,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/navigator_engine'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LOGGING_LEVEL = logging.INFO
+    DASH_REROUTE_PREFIX = '/engine'
 
 
 class Testing(Config):
@@ -17,6 +18,7 @@ class Testing(Config):
     SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/../testing.db'
     TEST_DATA_SPREADSHEET = f'{base_directory}/tests/test_data/Estimates Test Data.xlsx'
     TEST_DATA_GRAPH_FOLDER = f'{base_directory}/tests/test_data/test_graphs/'
+    DASH_REROUTE_PREFIX = ''
 
 
 class Development(Config):
