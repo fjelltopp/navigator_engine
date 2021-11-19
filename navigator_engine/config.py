@@ -15,7 +15,7 @@ class Config(object):
 class Testing(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/../testing.db'
-    TEST_DATA_SPREADSHEET = f'{base_directory}/tests/test_data/Estimates 22 BDG [Final].xlsx'
+    TEST_DATA_SPREADSHEET = f'{base_directory}/tests/test_data/Estimates Test Data.xlsx'
     TEST_DATA_GRAPH_FOLDER = f'{base_directory}/tests/test_data/test_graphs/'
 
 
