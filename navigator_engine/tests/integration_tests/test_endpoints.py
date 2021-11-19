@@ -36,7 +36,7 @@ def test_decide_complete(client, mocker):
                 'title': 'Complete',
                 'displayHTML': 'Action Complete',
                 'skippable': False,
-                'complete': True,
+                'terminus': True,
                 'helpURLs': []
             }
         },
@@ -76,7 +76,7 @@ def test_decide_incomplete(client, mocker):
             'manualConfirmationRequired': False,
             'content': {
                 'title': 'Upload your survey data',
-                'complete': False,
+                'terminus': False,
                 'displayHTML': 'Upload survey data html',
                 'skippable': True,
                 'helpURLs': [
@@ -108,20 +108,52 @@ def test_decide_without_url_raises_bad_request(client, mocker):
     assert "No url to data specified in request" in response.json['message']
 
 
-@pytest.mark.parametrize("node_id, expected_action", [
-    ('tst-2-3-a', {'skippable': False, 'complete': False, 'helpURLs': [],
-                   'displayHTML': 'Action 1 HTML', 'title': 'Action 1'}),
-    ('tst-1-5-a', {'skippable': True, 'displayHTML': 'Validate geographic data html',
-                   'complete': False, 'title': 'Validate your geographic data',
-                   'helpURLs': [
-                       {'label': 'The AIDS Data Repository', 'url': 'https://adr.unaids.org'},
-                       {'label': 'HIV Tools', 'url': 'https://hivtools.unaids.org'}
-                   ]}),
-    ('tst-2-5-a', {'skippable': False, 'complete': True, 'helpURLs': [],
-                   'displayHTML': 'Action Complete', 'title': 'Complete'})
+@pytest.mark.parametrize("node_id, expected_result", [
+    ('tst-2-3-a', {
+        'id': 'tst-2-3-a',
+        'content': {
+            'displayHTML': 'Action 1 HTML',
+            'helpURLs': [],
+            'skippable': False,
+            'terminus': False,
+            'title': 'Action 1'
+        },
+        'currentMilestone': None,
+        'manualConfirmationRequired': False,
+        'skipped': False
+    }),
+    ('tst-1-5-a', {
+        'id': 'tst-1-5-a',
+        'content': {
+            'displayHTML': 'Validate geographic data html',
+            'helpURLs': [
+                {'label': 'The AIDS Data Repository', 'url': 'https://adr.unaids.org'},
+                {'label': 'HIV Tools', 'url': 'https://hivtools.unaids.org'}
+            ],
+            'skippable': True,
+            'terminus': False,
+            'title': 'Validate your geographic data'
+        },
+        'currentMilestone': 'tst-2-1-m',
+        'manualConfirmationRequired': False,
+        'skipped': False
+    }),
+    ('tst-2-5-a', {
+        'id': 'tst-2-5-a',
+        'content': {
+            'displayHTML': 'Action Complete',
+            'helpURLs': [],
+            'skippable': False,
+            'terminus': True,
+            'title': 'Complete'
+        },
+        'currentMilestone': None,
+        'manualConfirmationRequired': False,
+        'skipped': False
+    })
 ])
 @pytest.mark.usefixtures('with_app_context')
-def test_action(client, mocker, node_id, expected_action):
+def test_action(client, mocker, node_id, expected_result):
     setup_endpoint_test(mocker)
     response = client.post("/api/action", data=json.dumps({
         'data': {
@@ -130,11 +162,7 @@ def test_action(client, mocker, node_id, expected_action):
         },
         'actionID': node_id
     }))
-    assert response.json['decision'] == {
-        'id': node_id,
-        'manualConfirmationRequired': False,
-        'content': expected_action
-    }
+    assert response.json == expected_result
 
 
 @pytest.mark.usefixtures('with_app_context')
