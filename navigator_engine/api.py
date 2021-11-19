@@ -78,4 +78,8 @@ def action():
         }
     ```
     """
-    return decide()
+    result = decide().json
+    action = result['decision']
+    action['currentMilestone'] = result['progress']['currentMilestoneID']
+    action['skipped'] = result['decision']['id'] in result['skippedActions']
+    return jsonify(action)
