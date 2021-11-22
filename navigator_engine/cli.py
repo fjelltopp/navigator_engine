@@ -14,9 +14,9 @@ def register(app):
 
     @navigator_engine.command()
     @click.argument(
-        'graph-config-file', 
+        'graph-config-file',
         default=app.config.get(
-            'DEFAULT_DECISION_GRAPH', 
+            'DEFAULT_DECISION_GRAPH',
             'Estimates 22 BDG [Final].xlsx'
         )
     )
