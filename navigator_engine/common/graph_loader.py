@@ -310,10 +310,6 @@ def validate_pluggable_logic(node, network):
         for node, child_node in network.out_edges(node):
             if child_node.ref == function_args[0]:
                 arg_action_is_child = True
-            elif child_node.action:
-                # Check if child node is complete action
-                if child_node.action.complete:
-                    arg_action_is_child = True
 
         assert arg_action_is_child, f"{node.ref} has bad function {function_string}"
 
