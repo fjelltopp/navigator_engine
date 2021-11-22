@@ -8,7 +8,7 @@ import os
 @pytest.mark.vcr()
 @pytest.mark.usefixtures('with_app_context')
 def test_end_to_end(client):
-    graph_loader(app.config.get('TEST_DATA_SPREADSHEET'))
+    graph_loader(app.config.get('DEFAULT_DECISION_GRAPH'))
     validate_graph(1)
     # For the time being the following code is ignored
     # It will be updated once the production graph is loading properly

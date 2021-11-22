@@ -141,5 +141,5 @@ def update_test_data_from_db():
 
     for graph in graphs:
         graph_storage[str(graph.id)] = graph.to_networkx()
-    with open(f'{app.config.get("TEST_DATA_GRAPH_FOLDER")}/graph_test_data.p', 'wb') as f:
+    with open(f'{app.config.get("DECISION_GRAPH_FOLDER")}/graph_test_data.p', 'wb') as f:
         pickle.dump(graph_storage, f)

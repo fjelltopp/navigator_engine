@@ -11,7 +11,7 @@ class TestGraphLoader:
 
     @classmethod
     def setup_class(cls):
-        graph_loader(app.config.get('TEST_DATA_SPREADSHEET'))
+        graph_loader(app.config.get('DEFAULT_DECISION_GRAPH'))
 
     @classmethod
     def teardown_class(cls):
@@ -40,7 +40,7 @@ class TestGraphLoader:
     def test_network_isomorphism(self):
         graphs = model.Graph.query.all()
 
-        with open(f'{app.config.get("TEST_DATA_GRAPH_FOLDER")}/graph_test_data.p', 'rb') as test_data_file:
+        with open(f'{app.config.get("DECISION_GRAPH_FOLDER")}/graph_test_data.p', 'rb') as test_data_file:
             graph_test_data = pickle.load(test_data_file)
 
         for graph in graphs:
