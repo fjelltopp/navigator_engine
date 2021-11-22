@@ -272,6 +272,15 @@ def test_process_action_skipped(mocker, mock_engine):
     mock_engine.skip_action.assert_called_once_with(node)
 
 
+def test_process_action_stop_action_skipped(mocker, mock_engine):
+    node = factories.NodeFactory(id=1, action=factories.ActionFactory(skippable=True))
+    mock_engine.skip_requests = [node.ref]
+    mock_engine.stop_action = node.ref
+    DecisionEngine.process_action(mock_engine, node)
+    mock_engine.skip_action.assert_not_called()
+    assert mock_engine.progress.skipped_actions == [node.ref]
+
+
 def test_remove_skip_requests_not_needed(mock_engine):
     mock_engine.progress.skipped_actions = ['1', '3']
     mock_engine.skip_requests = ['1', '2', '3', '4', '5']
