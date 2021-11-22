@@ -64,11 +64,13 @@ class DecisionEngine():
         return self.process_node(next_node)
 
     def process_action(self, node: model.Node) -> model.Node:
-        not_stop_action = node.ref != self.stop_action
+        stop_action = node.ref == self.stop_action
         in_skip_requests = node.ref in self.skip_requests
         skippable = node.action.skippable
-        if not_stop_action and in_skip_requests and skippable:
+        if not stop_action and in_skip_requests and skippable:
             return self.skip_action(node)
+        elif stop_action and in_skip_requests and skippable:
+            self.progress.skipped_actions.append(node.ref)
         elif in_skip_requests and not skippable:
             self.remove_skip_requests.append(node.ref)
         self.progress.action_breadcrumbs.append(node.ref)
