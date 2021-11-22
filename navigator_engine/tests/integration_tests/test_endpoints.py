@@ -31,7 +31,6 @@ def test_decide_complete(client, mocker):
     assert response.json == {
         'decision': {
             'id': 'tst-2-5-a',
-            'manualConfirmationRequired': False,
             'content': {
                 'title': 'Complete',
                 'displayHTML': 'Action Complete',
@@ -40,8 +39,15 @@ def test_decide_complete(client, mocker):
                 'helpURLs': []
             }
         },
-        'actions': ['tst-2-3-a', 'tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a', 'tst-2-4-a', 'tst-2-5-a'],
-        'skippedActions': ['tst-1-6-a'],
+        'actions': [
+            {'actionID': 'tst-2-3-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+            {'actionID': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+            {'actionID': 'tst-1-5-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+            {'actionID': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': True, 'manualConfirmationRequired': False},
+            {'actionID': 'tst-1-7-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+            {'actionID': 'tst-2-4-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+            {'actionID': 'tst-2-5-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}
+        ],
         'removeSkipActions': ['tst-1-5-a'],
         'progress': {
             'progress': 100,
@@ -68,12 +74,15 @@ def test_decide_incomplete(client, mocker):
         'skipActions': ['tst-1-5-a']
     }))
     assert response.json == {
-        'actions': ['tst-2-3-a', 'tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a'],
-        'skippedActions': [],
+        'actions': [
+            {'actionID': 'tst-2-3-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+            {'actionID': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+            {'actionID': 'tst-1-5-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+            {'actionID': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False}
+        ],
         'removeSkipActions': ['tst-1-5-a'],
         'decision': {
             'id': 'tst-1-6-a',
-            'manualConfirmationRequired': False,
             'content': {
                 'title': 'Upload your survey data',
                 'terminus': False,
@@ -117,10 +126,7 @@ def test_decide_without_url_raises_bad_request(client, mocker):
             'skippable': False,
             'terminus': False,
             'title': 'Action 1'
-        },
-        'currentMilestone': None,
-        'manualConfirmationRequired': False,
-        'skipped': False
+        }
     }),
     ('tst-1-5-a', {
         'id': 'tst-1-5-a',
@@ -133,10 +139,7 @@ def test_decide_without_url_raises_bad_request(client, mocker):
             'skippable': True,
             'terminus': False,
             'title': 'Validate your geographic data'
-        },
-        'currentMilestone': 'tst-2-1-m',
-        'manualConfirmationRequired': False,
-        'skipped': False
+        }
     }),
     ('tst-2-5-a', {
         'id': 'tst-2-5-a',
@@ -146,37 +149,22 @@ def test_decide_without_url_raises_bad_request(client, mocker):
             'skippable': False,
             'terminus': True,
             'title': 'Complete'
-        },
-        'currentMilestone': None,
-        'manualConfirmationRequired': False,
-        'skipped': False
+        }
     })
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_action(client, mocker, node_id, expected_result):
     setup_endpoint_test(mocker)
-    response = client.post("/api/action", data=json.dumps({
-        'data': {
-            'url': 'https://example.ckan/api/3/action/package_show?id=example',
-            'authorization_header': "example-api-key"
-        },
-        'actionID': node_id
-    }))
+    response = client.get(f"/api/action/{node_id}")
     assert response.json == expected_result
 
 
 @pytest.mark.usefixtures('with_app_context')
-def test_action_for_action_not_in_path(client, mocker):
+def test_action_bad_node_id(client, mocker):
     setup_endpoint_test(mocker)
-    response = client.post("/api/action", data=json.dumps({
-        'data': {
-            'url': 'https://example.ckan/api/3/action/package_show?id=example',
-            'authorization_header': "example-api-key"
-        },
-        'actionID': 6
-    }))
+    response = client.get("/api/action/wrong-id")
     assert 400 == response.status_code
-    assert "Please specify a valid actionID." in response.json['message']
+    assert "Please specify a valid action ID." in response.json['message']
 
 
 def setup_endpoint_test(mocker, data=None):

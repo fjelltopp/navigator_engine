@@ -137,7 +137,6 @@ def test_process_action_skip_unskippable(mocker, mock_engine):
     result = DecisionEngine.process_action(mock_engine, node)
     assert result == node
     assert 'test-ref' in mock_engine.remove_skip_requests
-    assert mock_engine.progress.action_breadcrumbs == ['test-ref']
 
 
 def test_process_milestone_incomplete(mocker, mock_engine):
@@ -210,7 +209,6 @@ def test_decide(mocker):
     engine = mocker.Mock(spec=DecisionEngine)
     engine.data = {}
     engine.skip_requests = []
-    engine.requires_manual_confirmation.return_value = True
     engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
     engine.progress.root_node = root_node
     engine.progress.skipped_actions = ['1', '2', '3']
@@ -222,8 +220,7 @@ def test_decide(mocker):
     assert result == {
         'id': action_node.ref,
         'content': model.Action.to_dict(action_node.action),
-        'node': action_node,
-        'manualConfirmationRequired': True
+        'node': action_node
     }
     assert engine.data == {'test': 'data'}
     assert engine.skip_requests == ['4', '5']
@@ -278,13 +275,18 @@ def test_process_action_stop_action_skipped(mocker, mock_engine):
     mock_engine.stop_action = node.ref
     DecisionEngine.process_action(mock_engine, node)
     mock_engine.skip_action.assert_not_called()
-    assert mock_engine.progress.skipped_actions == [node.ref]
 
 
 def test_remove_skip_requests_not_needed(mock_engine):
     mock_engine.progress.skipped_actions = ['1', '3']
     mock_engine.skip_requests = ['1', '2', '3', '4', '5']
-    mock_engine.progress.action_breadcrumbs = ['0', '1', '2', '3', '4']
+    mock_engine.progress.action_breadcrumbs = [
+        {'actionID': '0'},
+        {'actionID': '1'},
+        {'actionID': '2'},
+        {'actionID': '3'},
+        {'actionID': '4'}
+    ]
     mock_engine.remove_skip_requests = ['0', '2']
     DecisionEngine.remove_skip_requests_not_needed(mock_engine)
     assert mock_engine.remove_skip_requests == ['0', '2', '4']
