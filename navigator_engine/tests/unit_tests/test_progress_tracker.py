@@ -163,7 +163,7 @@ def test_milestones_to_complete(mock_tracker, simple_network, route, expected_re
     assert result == (expected_milestones, expected_result[1])
 
 
-@pytest.mark.parametrize('function_name, manual',[
+@pytest.mark.parametrize('function_name, manual', [
     ('check_other_confirmation("test")', False),
     ('check_manual_confirmation("test")', True)
 ])
