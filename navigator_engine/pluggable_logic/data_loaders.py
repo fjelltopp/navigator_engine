@@ -104,12 +104,16 @@ def load_csv_from_zipped_resource(resource_type: str,
     filename_re = re.compile(csv_filename_regex, flags=re.IGNORECASE)
     matching_filenames = []
 
-    with zipfile.ZipFile(io.BytesIO(data[resource_type]['data'])) as zip_file:
-        for filename in zip_file.namelist():
-            if filename_re.match(filename):
-                matching_filenames.append(filename)
-        assert len(matching_filenames) == 1, "Multiple files match filename regex"
-        with zip_file.open(matching_filenames[0], 'r') as csv_file:
-            dataframe = pd.read_csv(csv_file)
+    try:
+        with zipfile.ZipFile(io.BytesIO(data[resource_type]['data'])) as zip_file:
+            for filename in zip_file.namelist():
+                if filename_re.match(filename):
+                    matching_filenames.append(filename)
+            if len(matching_filenames) != 1:
+                raise ValueError("Multiple files match filename regex")
+            with zip_file.open(matching_filenames[0], 'r') as csv_file:
+                dataframe = pd.read_csv(csv_file)
+    except zipfile.BadZipFile as e:
+        raise ValueError(f'Invalid file: {e.message}')
 
     return dataframe
