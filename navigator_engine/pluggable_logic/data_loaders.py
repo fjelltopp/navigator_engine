@@ -112,9 +112,4 @@ def load_csv_from_zipped_resource(resource_type: str,
         with zip_file.open(matching_filenames[0], 'r') as csv_file:
             dataframe = pd.read_csv(csv_file)
 
-    data[name] = {
-      'data': dataframe,
-      'auth_header': auth_header,
-      'url': None
-    }
-    return data
+    return dataframe
