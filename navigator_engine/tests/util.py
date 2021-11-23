@@ -1,6 +1,7 @@
 from navigator_engine.app import create_app
 import navigator_engine.model as model
 import logging
+import pickle
 
 # We should only need one seperate flask app for testing, so import from here.
 app = create_app('navigator_engine.config.Testing')
@@ -132,3 +133,19 @@ def create_demo_data():
     ]
     model.db.session.add(graph_with_milestone)
     model.db.session.commit()
+
+
+def update_test_data_from_db():
+    """
+    This function can be manually called when the test graph requires updating. It will fetch all the graphs
+    in the database into an array of Graph objects and dump the array into a pickle file.
+
+    The function is not intended to be called as a part of normal navigator engine usage or tests.
+    """
+    graphs = model.Graph.query.all()
+    graph_storage = {}
+
+    for graph in graphs:
+        graph_storage[str(graph.id)] = graph.to_networkx()
+    with open(f'{app.config.get("DECISION_GRAPH_FOLDER")}/graph_test_data.p', 'wb') as f:
+        pickle.dump(graph_storage, f)
