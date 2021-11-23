@@ -126,7 +126,7 @@ class DecisionEngine():
         raise DecisionError(f"Only one outgoing edge for node: {previous_node}")
 
     def remove_skip_requests_not_needed(self):
-        action_breadcrumbs_ref = [a['actionID'] for a in self.progress.action_breadcrumbs]
+        action_breadcrumbs_ref = [a['id'] for a in self.progress.action_breadcrumbs]
         ignored_skips = [ref for ref in self.skip_requests if ref not in self.progress.skipped_actions]
         ignored_skips_in_path = [ref for ref in ignored_skips if ref in action_breadcrumbs_ref]
         self.remove_skip_requests.extend(ref for ref in ignored_skips_in_path if ref not in self.remove_skip_requests)

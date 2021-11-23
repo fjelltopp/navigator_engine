@@ -10,7 +10,11 @@ def test_add_milestone(mock_tracker, mocker, completed):
     route = [factories.NodeFactory(id=1), factories.NodeFactory(id=2)]
     mock_tracker.route = route.copy()
     mock_tracker.entire_route = route.copy()
-    mock_tracker.action_breadcrumbs = [{'actionID': 1}, {'actionID': 2}, {'actionID': 3}]
+    mock_tracker.action_breadcrumbs = [
+        {'actionID': 1, 'milestoneID': None},
+        {'actionID': 2, 'milestoneID': None},
+        {'actionID': 3, 'milestoneID': None}
+    ]
     mock_tracker.skipped_actions = [2]
 
     milestone_route = [factories.NodeFactory(id=3), factories.NodeFactory(id=4)]
@@ -18,24 +22,28 @@ def test_add_milestone(mock_tracker, mocker, completed):
     milestone_tracker = mocker.Mock(spec=ProgressTracker)
     milestone_tracker.route = milestone_route.copy()
     milestone_tracker.entire_route = milestone_route.copy()
-    milestone_tracker.action_breadcrumbs = [{'actionID': 4}, {'actionID': 5}, {'actionID': 6}]
+    milestone_tracker.action_breadcrumbs = [
+        {'actionID': 4, 'milestoneID': None},
+        {'actionID': 5, 'milestoneID': None},
+        {'actionID': 6, 'milestoneID': None}
+    ]
     milestone_tracker.skipped_actions = [3]
 
     ProgressTracker.add_milestone(mock_tracker, milestone_node, milestone_tracker, complete=completed)
 
     if completed:
         assert mock_tracker.action_breadcrumbs == [
-            {'actionID': 1},
-            {'actionID': 2},
-            {'actionID': 3},
+            {'actionID': 1, 'milestoneID': None},
+            {'actionID': 2, 'milestoneID': None},
+            {'actionID': 3, 'milestoneID': None},
             {'actionID': 4, 'milestoneID': milestone_node.ref},
             {'actionID': 5, 'milestoneID': milestone_node.ref},
         ]
     else:
         assert mock_tracker.action_breadcrumbs == [
-            {'actionID': 1},
-            {'actionID': 2},
-            {'actionID': 3},
+            {'actionID': 1, 'milestoneID': None},
+            {'actionID': 2, 'milestoneID': None},
+            {'actionID': 3, 'milestoneID': None},
             {'actionID': 4, 'milestoneID': milestone_node.ref},
             {'actionID': 5, 'milestoneID': milestone_node.ref},
             {'actionID': 6, 'milestoneID': milestone_node.ref}
@@ -183,7 +191,7 @@ def test_drop_action_breadcrumb(mock_tracker, simple_network, function_name, man
     mock_tracker.skipped_actions = [nodes[2].ref]
     ProgressTracker.drop_action_breadcrumb(mock_tracker)
     assert mock_tracker.action_breadcrumbs == [{
-        'actionID': nodes[2].ref,
+        'id': nodes[2].ref,
         'milestoneID': None,
         'skipped': True,
         'manualConfirmationRequired': manual

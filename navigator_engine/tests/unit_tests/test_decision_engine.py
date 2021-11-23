@@ -281,11 +281,11 @@ def test_remove_skip_requests_not_needed(mock_engine):
     mock_engine.progress.skipped_actions = ['1', '3']
     mock_engine.skip_requests = ['1', '2', '3', '4', '5']
     mock_engine.progress.action_breadcrumbs = [
-        {'actionID': '0'},
-        {'actionID': '1'},
-        {'actionID': '2'},
-        {'actionID': '3'},
-        {'actionID': '4'}
+        {'id': '0'},
+        {'id': '1'},
+        {'id': '2'},
+        {'id': '3'},
+        {'id': '4'}
     ]
     mock_engine.remove_skip_requests = ['0', '2']
     DecisionEngine.remove_skip_requests_not_needed(mock_engine)

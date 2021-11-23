@@ -90,7 +90,7 @@ class ProgressTracker():
                     and getattr(child_node, 'action_id')
                     and not child_node.action.complete):
                 self.action_breadcrumbs.append({
-                    'actionID': child_node.ref,
+                    'id': child_node.ref,
                     'milestoneID': None,  # Updated under self.add_milestone
                     'skipped': child_node.ref in self.skipped_actions,
                     'manualConfirmationRequired': manual_confirmation
@@ -98,7 +98,7 @@ class ProgressTracker():
 
         if getattr(current_node, 'action_id'):
             self.action_breadcrumbs.append({
-                'actionID': current_node.ref,
+                'id': current_node.ref,
                 'milestoneID': None,  # Updated under self.add_milestone
                 'skipped': False,
                 'manualConfirmationRequired': manual_confirmation
