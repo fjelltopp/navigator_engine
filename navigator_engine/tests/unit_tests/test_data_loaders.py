@@ -186,3 +186,20 @@ def test_load_estimates_dataset_without_workflow_state(mock_engine, mocker):
             'data': {'completedTasks': []}
         }
     }
+
+
+def test_load_csv_from_zipped_resource(mock_engine, mocker):
+    # TODO: Encode and load spectrum file exactly as returned by load_url function
+    spectrum_file = None
+    # This is a unit test, so mock out the function that actually loads the resource file
+    mock_load_estimates_dataset_resource = mocker.patch(
+        'navigator_engine.pluggable_logic.data_loaders.load_estimates_dataset_resource',
+        return_value={'spectrum-file': {'data': spectrum_file}}
+    )
+    result = data_loaders.load_csv_from_zipped_resource(
+        "spectrum-file",
+        "[.*]_check.CSV",
+        "test-auth-header",
+        "spectrum-file-check",
+        mock_engine
+    )
