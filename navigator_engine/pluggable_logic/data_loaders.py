@@ -113,7 +113,7 @@ def load_csv_from_zipped_resource(resource_type: str,
                 raise ValueError("Multiple files match filename regex")
             with zip_file.open(matching_filenames[0], 'r') as csv_file:
                 dataframe = pd.read_csv(csv_file)
-    except zipfile.BadZipFile as e:
-        raise ValueError(f'Invalid file: {e.message}')
+    except zipfile.BadZipFile:
+        raise ValueError(f'Invalid archive file')
 
     return dataframe
