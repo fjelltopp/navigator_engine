@@ -190,7 +190,7 @@ def test_load_estimates_dataset_without_workflow_state(mock_engine, mocker):
 
 def test_load_csv_from_zipped_resource(mock_engine, mocker):
 
-    with open('../test_data/test_spectrum_file.pjnz', 'rb') as f:
+    with open('navigator_engine/tests/test_data/test_spectrum_file.pjnz', 'rb') as f:
         spectrum_file = f.read()
 
     mock_load_estimates_dataset_resource = mocker.patch(
