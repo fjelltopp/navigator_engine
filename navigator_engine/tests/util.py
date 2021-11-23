@@ -136,6 +136,12 @@ def create_demo_data():
 
 
 def update_test_data_from_db():
+    """
+    This function can be manually called when the test graph requires updating. It will fetch all the graphs
+    in the database into an array of Graph objects and dump the array into a pickle file.
+
+    The function is not intended to be called as a part of normal navigator engine usage or tests.
+    """
     graphs = model.Graph.query.all()
     graph_storage = {}
 
