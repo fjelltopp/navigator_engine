@@ -183,3 +183,77 @@ def setup_endpoint_test(mocker, data=None):
         return_value=f'load_dict_from_json({json.dumps(json.dumps(data))})'
     )
     test_util.create_demo_data()
+
+
+@pytest.mark.usefixtures('with_app_context')
+def test_checklist(client, mocker):
+    data = {
+        '1': True,
+        '2': True,
+        'data': {'1': True, '2': True, '3': False, '4': True}
+    }
+    setup_endpoint_test(mocker, data)
+    response = client.post("/api/checklist", data=json.dumps({
+        'data': {
+            'url': 'https://example.ckan/api/3/action/package_show?id=example',
+            'authorization_header': "example-api-key"
+        },
+        'skipActions': ['tst-1-5-a', 'tst-1-6-a']
+    }))
+    assert response.json == {
+        'progress': 100,
+        'checklist': [{
+            'complete': True,
+            'id': 'tst-2-3-a',
+            'manualConfirmationRequired': False,
+            'reached': True, 'skipped': False,
+            'title': 'Action 1'
+        }, {
+            'completed': True,
+            'id': 'tst-2-1-m',
+            'progress': 100,
+            'title': 'ADR Data',
+            'checklist': [{
+                'complete': True,
+                'id': 'tst-1-4-a',
+                'manualConfirmationRequired': False,
+                'reached': True,
+                'skipped': False,
+                'title': 'Upload your geographic data'
+            }, {
+                'complete': True,
+                'id': 'tst-1-5-a',
+                'manualConfirmationRequired': False,
+                'reached': True,
+                'skipped': False,
+                'title': 'Validate your geographic data'
+            }, {
+                'complete': False,
+                'id': 'tst-1-6-a',
+                'manualConfirmationRequired': False,
+                'reached': True,
+                'skipped': True,
+                'title': 'Upload your survey data'
+            }, {
+                'complete': True,
+                'id': 'tst-1-7-a',
+                'manualConfirmationRequired': False,
+                'reached': True, 'skipped': False,
+                'title': 'Validate your survey data'
+            }]
+        }, {
+            'complete': True,
+            'id': 'tst-2-4-a',
+            'manualConfirmationRequired': False,
+            'reached': True,
+            'skipped': False,
+            'title': 'Action 2'
+        }, {
+            'complete': False,
+            'id': 'tst-2-5-a',
+            'manualConfirmationRequired': False,
+            'reached': True,
+            'skipped': False,
+            'title': 'Complete'
+        }]
+    }
