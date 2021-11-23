@@ -209,3 +209,6 @@ def test_load_csv_from_zipped_resource(mock_engine, mocker):
         'test-auth-header',
         mock_engine
     )
+    assert all(i for i in result.columns == ['Condition checked', 'Status']), \
+        "Unexpected column names in Spectrum check file"
+    assert result.shape == (28, 2), "Unexpected shape of Spectrum check file"
