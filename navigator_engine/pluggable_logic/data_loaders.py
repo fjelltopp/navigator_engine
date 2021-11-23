@@ -5,6 +5,8 @@ from navigator_engine.common.decision_engine import DecisionEngine
 from navigator_engine.common import get_resource_from_dataset
 import json
 import logging
+import pandas as pd
+import zipfile
 
 logger = logging.getLogger(__name__)
 
@@ -86,4 +88,23 @@ def load_estimates_dataset(url_key: Hashable, auth_header_key: Hashable, engine:
             'auth_header': None,
             'data': {'completedTasks': []}
         }
+    return data
+
+
+@register_loader
+def load_csv_from_zipped_resource(resource_type: str,
+                                   csv_filename_regex: str,
+                                   auth_header: str,
+                                   name: str,
+                                   engine: DecisionEngine) -> pd.DataFrame:
+    data = load_estimates_dataset_resource(resource_type, auth_header, engine)
+    zipped_file = data[resource_type]['data']
+    # TODO: Open zipped_file and get CSV
+    # TODO: Load CSV file using regex argument as variable `dataframe`
+    dataframe = pd.DataFrame()
+    data[name] = {
+      'data': dataframe,
+      'auth_header': auth_header,
+      'url': data[resource_type]['url']
+    }
     return data
