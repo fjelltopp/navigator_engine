@@ -7,6 +7,7 @@ import json
 import logging
 import pandas as pd
 import zipfile
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -93,15 +94,22 @@ def load_estimates_dataset(url_key: Hashable, auth_header_key: Hashable, engine:
 
 @register_loader
 def load_csv_from_zipped_resource(resource_type: str,
-                                   csv_filename_regex: str,
-                                   auth_header: str,
-                                   name: str,
-                                   engine: DecisionEngine) -> pd.DataFrame:
+                                  csv_filename_regex: str,
+                                  auth_header: str,
+                                  name: str,
+                                  engine: DecisionEngine) -> pd.DataFrame:
     data = load_estimates_dataset_resource(resource_type, auth_header, engine)
-    zipped_file = data[resource_type]['data']
-    # TODO: Open zipped_file and get CSV
-    # TODO: Load CSV file using regex argument as variable `dataframe`
-    dataframe = pd.DataFrame()
+    filename_re = re.compile(csv_filename_regex)
+    matching_filenames = []
+
+    with zipfile.ZipFile(data[resource_type]['data']) as zip_file:
+        for filename in zip_file.namelist():
+            if filename_re.match(filename):
+                matching_filenames.append(filename)
+        assert len(matching_filenames) == 1, "Multiple files match filename regex"
+        with zip_file.open(matching_filenames[0], 'r') as csv_file:
+            dataframe = pd.read_csv(csv_file)
+
     data[name] = {
       'data': dataframe,
       'auth_header': auth_header,
