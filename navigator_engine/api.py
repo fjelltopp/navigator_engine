@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, abort
 from navigator_engine.common.decision_engine import DecisionEngine
 from navigator_engine.model import load_graph
-from navigator_engine.common import choose_graph, choose_data_loader
+from navigator_engine.common import choose_graph, choose_data_loader, checklist_builder
 from navigator_engine import model
 import json
 
@@ -20,37 +20,19 @@ def decide():
                 "url": "<url from estimates dataset json datadict>",
                 "authorization_header": "<optional value to be supplied as the Authorization header tag>"
             },
-            "skipActions": ["<action_id>", "<action_id>"]
+            "skipActions": ["<action_id>", "<action_id>"],
+            "stopAction": "<action_id>"
         }
     ```
     """
-    input_data = json.loads(request.data)
-
-    if not input_data.get('data'):
-        abort(400, "No data specified in request")
-    if not input_data['data'].get('url'):
-        abort(400, "No url to data specified in request")
-
-    graph = load_graph(choose_graph(input_data['data']['url']))
-    data_loader = choose_data_loader(input_data['data']['url'])
-    source_data = input_data['data']
-    skip_requests = input_data.get('skipActions', [])
-    stop_action = input_data.get('actionID')
-
-    engine = DecisionEngine(
-        graph,
-        source_data,
-        data_loader=data_loader,
-        skip_requests=skip_requests,
-        stop=stop_action
-    )
+    engine = create_engine()
     engine.decide()
     del engine.decision['node']
 
-    if stop_action and stop_action != engine.decision['id']:
+    if engine.stop_action and engine.stop_action != engine.decision['id']:
         abort(
             400,
-            f"Please specify a valid actionID. The actionID {stop_action}"
+            f"Please specify a valid actionID. The actionID {engine.stop_action}"
             f" is not found in the action path {engine.progress.action_breadcrumbs}"
         )
 
@@ -77,3 +59,47 @@ def action(action_id):
         'id': action_id,
         'content': action.to_dict()
     })
+
+
+@api_blueprint.route('/checklist', methods=['POST'])
+def checklist():
+    """
+    Get a checklist showing what has and what needs to be done.
+
+    POST Request takes the following json input:
+    ```
+        {
+            "data": {
+                "url": "<url from estimates dataset json datadict>",
+                "authorization_header": "<optional value to be supplied as the Authorization header tag>"
+            },
+            "skipActions": ["<action_id>", "<action_id>"]
+        }
+    ```
+    """
+    engine = create_engine()
+    checklist = checklist_builder.build_checklist(engine)
+    return jsonify(checklist)
+
+
+def create_engine():
+    input_data = json.loads(request.data)
+
+    if not input_data.get('data'):
+        abort(400, "No data specified in request")
+    if not input_data['data'].get('url'):
+        abort(400, "No url to data specified in request")
+
+    graph = load_graph(choose_graph(input_data['data']['url']))
+    data_loader = choose_data_loader(input_data['data']['url'])
+    source_data = input_data['data']
+    skip_requests = input_data.get('skipActions', [])
+    stop_action = input_data.get('actionID')
+
+    return DecisionEngine(
+        graph,
+        source_data,
+        data_loader=data_loader,
+        skip_requests=skip_requests,
+        stop=stop_action
+    )
