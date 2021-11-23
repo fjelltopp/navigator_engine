@@ -114,6 +114,6 @@ def load_csv_from_zipped_resource(resource_type: str,
             with zip_file.open(matching_filenames[0], 'r') as csv_file:
                 dataframe = pd.read_csv(csv_file)
     except zipfile.BadZipFile:
-        raise ValueError(f'Invalid archive file')
+        raise ValueError('Invalid archive file')
 
     return dataframe
