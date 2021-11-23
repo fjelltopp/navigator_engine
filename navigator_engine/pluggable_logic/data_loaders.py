@@ -8,6 +8,7 @@ import logging
 import pandas as pd
 import zipfile
 import re
+import io
 
 logger = logging.getLogger(__name__)
 
@@ -97,12 +98,13 @@ def load_csv_from_zipped_resource(resource_type: str,
                                   csv_filename_regex: str,
                                   auth_header: str,
                                   name: str,
-                                  engine: DecisionEngine) -> pd.DataFrame:
+                                  engine: DecisionEngine) -> dict:
     data = load_estimates_dataset_resource(resource_type, auth_header, engine)
-    filename_re = re.compile(csv_filename_regex)
+
+    filename_re = re.compile(csv_filename_regex, flags=re.IGNORECASE)
     matching_filenames = []
 
-    with zipfile.ZipFile(data[resource_type]['data']) as zip_file:
+    with zipfile.ZipFile(io.BytesIO(data[resource_type]['data'])) as zip_file:
         for filename in zip_file.namelist():
             if filename_re.match(filename):
                 matching_filenames.append(filename)
@@ -113,6 +115,6 @@ def load_csv_from_zipped_resource(resource_type: str,
     data[name] = {
       'data': dataframe,
       'auth_header': auth_header,
-      'url': data[resource_type]['url']
+      'url': None
     }
     return data
