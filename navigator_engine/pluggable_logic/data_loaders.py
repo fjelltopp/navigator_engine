@@ -102,10 +102,10 @@ def load_csv_from_zipped_resource(resource_type: str,
     data = load_estimates_dataset_resource(resource_type, auth_header, engine)
 
     # Check if the returned data is empty and return None if it is
-    if not data.get('url') and not data['auth_header'] and not data['data']:
+    if not data[resource_type]['url'] and not data[resource_type]['auth_header'] and not data[resource_type]['data']:
         data[name] = {
             'data': None,
-            'auth_header': auth_header,
+            'auth_header': None,
             'url': None
         }
         return data
@@ -123,12 +123,14 @@ def load_csv_from_zipped_resource(resource_type: str,
             with zip_file.open(matching_filenames[0], 'r') as csv_file:
                 dataframe = pd.read_csv(csv_file)
     except zipfile.BadZipFile:
-        raise ValueError('Invalid archive file')
+        zipfile.BadZipFile(
+            f"Bad zip file for {resource_type}: {data[resource_type]['url']}"
+        )
 
     data[name] = {
         'data': dataframe,
         'auth_header': auth_header,
-        'url': None
+        'url': data[resource_type]['url']
     }
 
     return data
