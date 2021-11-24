@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, abort
 from navigator_engine.common.decision_engine import DecisionEngine
 from navigator_engine.model import load_graph
 from navigator_engine.common import choose_graph, choose_data_loader
+from navigator_engine import model
 import json
 
 api_blueprint = Blueprint('main', __name__, url_prefix='/api/')
@@ -56,26 +57,23 @@ def decide():
     return jsonify({
         "decision": engine.decision,
         "actions": engine.progress.action_breadcrumbs,
-        "skippedActions": engine.progress.skipped_actions,
         "removeSkipActions": engine.remove_skip_requests,
         "progress": engine.progress.report
     })
 
 
-@api_blueprint.route('/action', methods=['POST'])
-def action():
+@api_blueprint.route('/action/<action_id>')
+def action(action_id):
     """
     Get the details of a specific action in the task breadcrumbs.
-
-    POST Request takes the following json input:
-    ```
-        {
-            "data": {
-                "url": "<url from estimates dataset json datadict>",
-                "authorization_header": "<optional value to be supplied as the Authorization header tag>"
-            },
-            "actionID": "<action_id>"
-        }
-    ```
     """
-    return decide()
+
+    node = model.load_node(node_ref=action_id)
+    action = getattr(node, 'action', None)
+    if not action:
+        abort(400, f"Please specify a valid action ID. Action {action_id} not found.")
+
+    return jsonify({
+        'id': action_id,
+        'content': action.to_dict()
+    })

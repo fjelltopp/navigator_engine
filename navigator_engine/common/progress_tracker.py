@@ -1,4 +1,5 @@
 from navigator_engine.common import DecisionError
+from typing import Any
 import navigator_engine.model as model
 import networkx
 import copy
@@ -13,7 +14,7 @@ class ProgressTracker():
         self.route: list[model.Node] = []
         self.milestones: list[dict] = []
         self.skipped_actions: list[str] = []
-        self.action_breadcrumbs: list[str] = []
+        self.action_breadcrumbs: list[dict[str, Any]] = []
         self.complete_node: model.Node = self.get_complete_node()
         self.root_node: model.Node = self.get_root_node()
         self.report: dict = {}
@@ -56,7 +57,15 @@ class ProgressTracker():
             'progress': 100 if complete else milestone_progress,
             'completed': complete
         })
-        self.action_breadcrumbs += milestone_progress.action_breadcrumbs
+
+        def add_milestone_id(breadcrumb):
+            breadcrumb['milestoneID'] = milestone_node.ref
+            return breadcrumb
+        self.action_breadcrumbs += list(map(
+            add_milestone_id,
+            milestone_progress.action_breadcrumbs
+        ))
+
         if complete:
             # Don't include the complete action in the action_breadcrumbs
             self.action_breadcrumbs.pop()
@@ -71,18 +80,35 @@ class ProgressTracker():
             return
         parent_node = self.route[-2]
         current_node = self.route[-1]
+
+        if getattr(parent_node, 'conditional_id'):
+            function = parent_node.conditional.function
+            manual_confirmation = function.startswith("check_manual_confirmation")
+
         for parent_node, child_node in self.network.out_edges(parent_node):
-            child_node_incomplete_action = (
-                getattr(child_node, 'action_id') and not
-                child_node.action.complete
-            )
-            if (child_node != current_node and child_node_incomplete_action):
-                self.action_breadcrumbs.append(child_node.ref)
+            if (child_node != current_node
+                    and getattr(child_node, 'action_id')
+                    and not child_node.action.complete):
+                self.action_breadcrumbs.append({
+                    'id': child_node.ref,
+                    'milestoneID': None,  # Updated under self.add_milestone
+                    'skipped': child_node.ref in self.skipped_actions,
+                    'manualConfirmationRequired': manual_confirmation
+                })
+
+        if getattr(current_node, 'action_id'):
+            self.action_breadcrumbs.append({
+                'id': current_node.ref,
+                'milestoneID': None,  # Updated under self.add_milestone
+                'skipped': False,
+                'manualConfirmationRequired': manual_confirmation
+            })
 
     def pop_node(self) -> str:
         node_ref = self.entire_route[-1]
         self.entire_route = self.entire_route[:-1]
         self.route = self.route[:-1]
+        self.action_breadcrumbs = self.action_breadcrumbs[:-1]
         return node_ref
 
     def get_complete_node(self) -> model.Node:

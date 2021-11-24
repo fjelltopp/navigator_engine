@@ -65,11 +65,21 @@ def test_graph_processing_with_milestones(data, expected_node_id):
 
 @pytest.mark.parametrize("data, expected_breadcrumbs", [
     ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': False, '4': True}},
-     ['tst-2-3-a', 'tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a']),
+     [{'id': 'tst-2-3-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-5-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False}]),
     ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}},
-     ['tst-2-3-a', 'tst-1-4-a']),
+     [{'id': 'tst-2-3-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False}]),
     ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}},
-     ['tst-2-3-a', 'tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a', 'tst-2-4-a', 'tst-2-5-a']),
+     [{'id': 'tst-2-3-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-5-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-7-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-2-4-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-2-5-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}])
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_action_breadcrumbs(data, expected_breadcrumbs):
@@ -81,12 +91,21 @@ def test_action_breadcrumbs(data, expected_breadcrumbs):
 
 
 @pytest.mark.parametrize("data, skip, expected_breadcrumbs", [
-    ({'1': True, '2': False, '3': False, '4': True},
-     ['tst-1-5-a'], ['tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a']),
-    ({'1': True, '2': False, '3': False, '4': False},
-     ['tst-1-5-a', 'tst-1-6-a'], ['tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a']),
-    ({'1': True, '2': False, '3': False, '4': False},
-     ['tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a'], ['tst-1-4-a', 'tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a', 'tst-1-8-a'])
+    ({'1': True, '2': False, '3': False, '4': True}, ['tst-1-5-a'],
+     [{'id': 'tst-1-4-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-5-a', 'milestoneID': None, 'skipped': True, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-6-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}]),
+    ({'1': True, '2': False, '3': False, '4': False}, ['tst-1-5-a', 'tst-1-6-a'],
+     [{'id': 'tst-1-4-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-5-a', 'milestoneID': None, 'skipped': True, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-6-a', 'milestoneID': None, 'skipped': True, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}]),
+    ({'1': True, '2': False, '3': False, '4': False}, ['tst-1-5-a', 'tst-1-6-a', 'tst-1-7-a'],
+     [{'id': 'tst-1-4-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-5-a', 'milestoneID': None, 'skipped': True, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-6-a', 'milestoneID': None, 'skipped': True, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-7-a', 'milestoneID': None, 'skipped': True, 'manualConfirmationRequired': False},
+      {'id': 'tst-1-8-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}])
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_action_breadcrumbs_with_skips(data, skip, expected_breadcrumbs):

@@ -38,7 +38,7 @@ def graph_loader(graph_config_file):
     assert file_extension == '.xlsx', 'File extension of Initial Graph Config must be XLSX'
 
     xl = pd.ExcelFile(graph_config_file)
-    regex = re.compile('[\d]{2,2}-')
+    regex = re.compile(r'[\d]{2,2}-')
     graph_sheets = list(filter(lambda x: regex.match(x), xl.sheet_names))
     graphs = {}
 
@@ -92,7 +92,7 @@ def import_data(sheet_name, graphs):
     # Loop through the graph dataframe to create nodes, conditionals and actions
     for idx in graph_data.index:
         # Create a Milestone or a Conditional depending on which one the row represents
-        p = re.compile('[\d]{2,2}-')
+        p = re.compile(r'[\d]{2,2}-')
         is_milestone = p.match(graph_data.loc[idx, DATA_COLUMNS['TITLE']])
         if is_milestone:
             milestone_sheet_name = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
@@ -206,7 +206,7 @@ def import_data(sheet_name, graphs):
         model.db.session.commit()
 
         false_edge_to_id = None
-        is_milestone = re.compile('[\d]{2,2}-').match(graph_data.loc[idx, DATA_COLUMNS['TITLE']])
+        is_milestone = re.compile(r'[\d]{2,2}-').match(graph_data.loc[idx, DATA_COLUMNS['TITLE']])
 
         # Add a "False" edge from conditional to the relevant action if no skip destination is given
         if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx] and not is_milestone:

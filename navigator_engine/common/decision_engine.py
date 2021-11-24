@@ -37,12 +37,10 @@ class DecisionEngine():
             self.stop_action = stop
         self.progress.reset()
         next_action = self.process_node(self.progress.root_node)
-        manual_confirmation_required = self.requires_manual_confirmation(next_action)
         self.decision = {
             "id": next_action.ref,
             "content": next_action.action.to_dict(),
-            "node": next_action,
-            "manualConfirmationRequired": manual_confirmation_required
+            "node": next_action
         }
         self.progress.report_progress()
         self.remove_skip_requests_not_needed()
@@ -73,7 +71,6 @@ class DecisionEngine():
             self.progress.skipped_actions.append(node.ref)
         elif in_skip_requests and not skippable:
             self.remove_skip_requests.append(node.ref)
-        self.progress.action_breadcrumbs.append(node.ref)
         return node
 
     def process_milestone(self, node: model.Node) -> model.Node:
@@ -129,17 +126,10 @@ class DecisionEngine():
         raise DecisionError(f"Only one outgoing edge for node: {previous_node}")
 
     def remove_skip_requests_not_needed(self):
+        action_breadcrumbs_ref = [a['id'] for a in self.progress.action_breadcrumbs]
         ignored_skips = [ref for ref in self.skip_requests if ref not in self.progress.skipped_actions]
-        ignored_skips_in_path = [ref for ref in ignored_skips if ref in self.progress.action_breadcrumbs]
+        ignored_skips_in_path = [ref for ref in ignored_skips if ref in action_breadcrumbs_ref]
         self.remove_skip_requests.extend(ref for ref in ignored_skips_in_path if ref not in self.remove_skip_requests)
-
-    def requires_manual_confirmation(self, node: model.Node) -> bool:
-        manual_confirmation = False
-        parent_node = self.progress.entire_route[-2]
-        if getattr(parent_node, 'conditional'):
-            function = parent_node.conditional.function
-            manual_confirmation = function.startswith("check_manual_confirmation")
-        return manual_confirmation
 
 
 def engine_factory(graph, data, data_loader=None, skip_requests=[], stop=None) -> DecisionEngine:

@@ -1,9 +1,10 @@
 [flake8]
 ignore =
-    W605
+    W503
 
 per-file-ignores =
     navigator_engine/pluggable_logic/__init__.py: F401 F403 E402
+    navigator_engine/tests/conftest.py: W605
 
 exclude =
     .git

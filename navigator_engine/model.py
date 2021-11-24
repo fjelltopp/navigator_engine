@@ -43,7 +43,7 @@ class Action(BaseModel):
             "title": self.title,
             "displayHTML": self.html,
             "skippable": self.skippable,
-            "complete": self.complete,
+            "terminus": self.complete,
             "helpURLs": [resource.to_dict() for resource in self.resources]
         }
 
