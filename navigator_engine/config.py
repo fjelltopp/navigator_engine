@@ -16,7 +16,7 @@ class Config(object):
 
 class Testing(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:///{base_directory}/../testing.db'
+    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/../testing.db'
     DEFAULT_DECISION_GRAPH = f'{base_directory}/tests/test_data/Estimates Test Data.xlsx'
     DECISION_GRAPH_FOLDER = f'{base_directory}/tests/test_data/test_graphs/'
     DASH_REROUTE_PREFIX = ''
