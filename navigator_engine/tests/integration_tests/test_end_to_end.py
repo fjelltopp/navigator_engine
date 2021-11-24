@@ -8,7 +8,7 @@ import os
 @pytest.mark.usefixtures('with_app_context')
 def test_end_to_end(client):
     base_directory = os.path.abspath(os.path.dirname(__file__))
-    graph_loader(f'{base_directory}/../test_data/Estimates 22 BDG [Final].xlsx')
+    graph_loader(f'{base_directory}/../../../Estimates 22 BDG [Final].xlsx')
     validate_graph(1)
     # For the time being the following code is ignored
     # It will be updated once the production graph is loading properly
