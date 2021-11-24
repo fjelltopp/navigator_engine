@@ -63,7 +63,8 @@ def check_dataset_valid(engine: DecisionEngine) -> bool:
 def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
     # Loads the CSV as a dataframe as you have stored it in your data loader
     # Here we have called the data loader with "name" arg = 'spectrum-checker'
-    indicators = engine.data['spectrum-checker']['data']
-    # ToDo: Get boolean value by name for each indicator in indicators list
-    # ToDo:  Return the boolean conjunction of the checks (check that all are True)
-    return False
+    checklist = engine.data['spectrum-checker']['data']
+
+    indicator_checks = checklist.loc[checklist.index.isin(indicators), 'Status']
+
+    return indicator_checks.loc[:, 'Status'].eq(True).all()
