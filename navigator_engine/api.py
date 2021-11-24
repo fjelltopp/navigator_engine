@@ -105,5 +105,5 @@ def action_list():
         'milestones': decide_response['progress']['milestones'],
         'progress': decide_response['progress']['progress'],
         'actionList': reached_actions,
-        'actionListFullyResolved': False
+        'fullyResolved': False
     })

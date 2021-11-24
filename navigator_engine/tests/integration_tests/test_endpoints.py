@@ -202,7 +202,7 @@ def test_action_list(client, mocker):
     }))
     assert response.json == {
         'progress': 100,
-        'actionListFullyResolved': False,
+        'fullyResolved': False,
         'actionList': [{
             'id': 'tst-2-3-a',
             'manualConfirmationRequired': False,
@@ -249,7 +249,7 @@ def test_action_list(client, mocker):
             'id': 'tst-2-5-a',
             'manualConfirmationRequired': False,
             'milestoneID': None,
-            'reached':True,
+            'reached': True,
             'skipped': False,
             'title': 'Complete'
         }],
