@@ -195,7 +195,13 @@ def test_load_csv_from_zipped_resource(mock_engine, mocker):
 
     mock_load_estimates_dataset_resource = mocker.patch(
         'navigator_engine.pluggable_logic.data_loaders.load_estimates_dataset_resource',
-        return_value={'spectrum-file': {'data': spectrum_file}}
+        return_value={
+            'spectrum-file': {
+                'data': spectrum_file,
+                'auth_header': 'Bearer xxxx-xxxx-xxxx-xxxx',
+                'url': 'https://example.com/test-data'
+            }
+        }
     )
     result = data_loaders.load_csv_from_zipped_resource(
         "spectrum-file",
