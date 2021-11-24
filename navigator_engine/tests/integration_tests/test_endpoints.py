@@ -203,6 +203,7 @@ def test_action_list(client, mocker):
     assert response.json == {
         'progress': 100,
         'fullyResolved': False,
+        'removeSkipActions': ['tst-1-5-a'],
         'actionList': [{
             'id': 'tst-2-3-a',
             'manualConfirmationRequired': False,
