@@ -101,6 +101,15 @@ def load_csv_from_zipped_resource(resource_type: str,
                                   engine: DecisionEngine) -> dict:
     data = load_estimates_dataset_resource(resource_type, auth_header, engine)
 
+    # Check if the returned data is empty and return None if it is
+    if not data.get('url') and not data['auth_header'] and not data['data']:
+        data[name] = {
+            'data': None,
+            'auth_header': auth_header,
+            'url': None
+        }
+        return data
+
     filename_re = re.compile(csv_filename_regex, flags=re.IGNORECASE)
     matching_filenames = []
 
@@ -116,4 +125,10 @@ def load_csv_from_zipped_resource(resource_type: str,
     except zipfile.BadZipFile:
         raise ValueError('Invalid archive file')
 
-    return dataframe
+    data[name] = {
+        'data': dataframe,
+        'auth_header': auth_header,
+        'url': None
+    }
+
+    return data
