@@ -16,8 +16,7 @@ def register(app):
     @click.argument(
         'graph-config-file',
         default=app.config.get(
-            'DEFAULT_DECISION_GRAPH',
-            'Estimates 22 BDG [Final].xlsx'
+            'DEFAULT_DECISION_GRAPH'
         )
     )
     def load_graph(graph_config_file):
