@@ -11,7 +11,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LOGGING_LEVEL = logging.INFO
     DASH_REROUTE_PREFIX = '/engine'
-    DEFAULT_DECISION_GRAPH = f'{base_directory}/Estimates 22 BDG [Final].xlsx'
+    DEFAULT_DECISION_GRAPH = f'{base_directory}/../Estimates 22 BDG [Final].xlsx'
 
 
 class Testing(Config):

@@ -13,12 +13,7 @@ def register(app):
         pass
 
     @navigator_engine.command()
-    @click.argument(
-        'graph-config-file',
-        default=app.config.get(
-            'DEFAULT_DECISION_GRAPH'
-        )
-    )
+    @click.argument('graph-config-file', default=app.config.get('DEFAULT_DECISION_GRAPH'))
     def load_graph(graph_config_file):
         """Loads binary decision graph into the db"""
         logger.info(f"Loading the graph {graph_config_file}")
