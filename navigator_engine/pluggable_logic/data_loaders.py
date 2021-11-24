@@ -99,7 +99,20 @@ def load_csv_from_zipped_resource(resource_type: str,
                                   auth_header: str,
                                   name: str,
                                   engine: DecisionEngine) -> dict:
-    data = load_estimates_dataset_resource(resource_type, auth_header, engine)
+    try:
+        data = load_estimates_dataset_resource(resource_type, auth_header, engine)
+        if not data[resource_type]['url'] \
+                and not data[resource_type]['auth_header'] \
+                and not data[resource_type]['data']:
+            raise ValueError(f"Empty resource {resource_type} in {data[resource_type]['url']}")
+    except [ValueError, IOError]:
+        data[name] = {
+            'data': None,
+            'auth_header': None,
+            'url': None
+        }
+        return data
+
 
     # Check if the returned data is empty and return None if it is
     if not data[resource_type]['url'] and not data[resource_type]['auth_header'] and not data[resource_type]['data']:
@@ -118,12 +131,20 @@ def load_csv_from_zipped_resource(resource_type: str,
             for filename in zip_file.namelist():
                 if filename_re.match(filename):
                     matching_filenames.append(filename)
-            if len(matching_filenames) != 1:
-                raise ValueError("Multiple files match filename regex")
+            if len(matching_filenames) > 1:
+                raise ValueError(
+                    f"Multiple files match filename regex {csv_filename_regex}"
+                    f"in: {data[resource_type]['url']}"
+                )
+            elif len(matching_filenames) == 0:
+                raise ValueError(
+                    f"No files match filename regex {csv_filename_regex}"
+                    f"in: {data[resource_type]['url']}"
+                )
             with zip_file.open(matching_filenames[0], 'r') as csv_file:
                 dataframe = pd.read_csv(csv_file)
     except zipfile.BadZipFile:
-        zipfile.BadZipFile(
+        raise zipfile.BadZipFile(
             f"Bad zip file for {resource_type}: {data[resource_type]['url']}"
         )
 
