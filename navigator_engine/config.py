@@ -11,12 +11,12 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LOGGING_LEVEL = logging.INFO
     DASH_REROUTE_PREFIX = '/engine'
-    DEFAULT_DECISION_GRAPH = f'{base_directory}/tests/test_data/Estimates 22 BDG [Final].xlsx'
+    DEFAULT_DECISION_GRAPH = f'{base_directory}/Estimates 22 BDG [Final].xlsx'
 
 
 class Testing(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/../testing.db'
+    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:///{base_directory}/../testing.db'
     DEFAULT_DECISION_GRAPH = f'{base_directory}/tests/test_data/Estimates Test Data.xlsx'
     DECISION_GRAPH_FOLDER = f'{base_directory}/tests/test_data/test_graphs/'
     DASH_REROUTE_PREFIX = ''
