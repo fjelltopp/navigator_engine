@@ -183,3 +183,80 @@ def setup_endpoint_test(mocker, data=None):
         return_value=f'load_dict_from_json({json.dumps(json.dumps(data))})'
     )
     test_util.create_demo_data()
+
+
+@pytest.mark.usefixtures('with_app_context')
+def test_action_list(client, mocker):
+    data = {
+        '1': True,
+        '2': True,
+        'data': {'1': True, '2': True, '3': False, '4': True}
+    }
+    setup_endpoint_test(mocker, data)
+    response = client.post("/api/actionlist", data=json.dumps({
+        'data': {
+            'url': 'https://example.ckan/api/3/action/package_show?id=example',
+            'authorization_header': "example-api-key"
+        },
+        'skipActions': ['tst-1-5-a', 'tst-1-6-a']
+    }))
+    assert response.json == {
+        'progress': 100,
+        'actionListFullyResolved': False,
+        'actionList': [{
+            'id': 'tst-2-3-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': None,
+            'reached': True,
+            'skipped': False,
+            'title': 'Action 1'
+        }, {
+            'id': 'tst-1-4-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': 'tst-2-1-m',
+            'reached': True,
+            'skipped': False,
+            'title': 'Upload your geographic data'
+        }, {
+            'id': 'tst-1-5-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': 'tst-2-1-m',
+            'reached': True,
+            'skipped': False,
+            'title': 'Validate your geographic data'
+        }, {
+            'id': 'tst-1-6-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': 'tst-2-1-m',
+            'reached': True,
+            'skipped': True,
+            'title': 'Upload your survey data'
+        }, {
+            'id': 'tst-1-7-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': 'tst-2-1-m',
+            'reached': True,
+            'skipped': False,
+            'title': 'Validate your survey data'
+        }, {
+            'id': 'tst-2-4-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': None,
+            'reached': True,
+            'skipped': False,
+            'title': 'Action 2'
+        }, {
+            'id': 'tst-2-5-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': None,
+            'reached':True,
+            'skipped': False,
+            'title': 'Complete'
+        }],
+        'milestones': [{
+            'completed': True,
+            'id': 'tst-2-1-m',
+            'progress': 100,
+            'title': 'ADR Data'
+        }],
+    }
