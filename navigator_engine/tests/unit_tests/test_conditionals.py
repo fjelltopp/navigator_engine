@@ -87,19 +87,14 @@ def test_check_dataset_valid(resources, expected, mock_engine):
         conditionals.check_not_skipped(123, mock_engine)
 
 
-def test_check_spectrum_file(mock_engine, mocker):
+@pytest.mark.parametrize("checklist, expected", [
+    (['Adult male ART has 2020 data', 'Ped VS as 2020 data', 'Adult ART coverage never exceeds 100%'], True),
+    (['Uncertainty analysis is valid', 'Adult off ART mortality is default'], False)
+])
+def test_check_spectrum_file(checklist, expected, mock_engine):
     dataframe = pd.read_csv('../test_data/test_spectrum_check.csv')
-    mock_load_csv_from_zipped_resource = mocker.patch(
-        'navigator_engine.pluggable_logic.data_loaders.load_csv_from_zipped_resource',
-        return_value={
-            'spectrum-file': {
-                'data': dataframe,
-                'auth_header': 'test-auth-header',
-                'url': 'https://example.com/test-data'
-            }
+    mock_engine.data = {
+        'spectrum-checker': {
+            'data': dataframe
         }
-    )
-    checklist = ['Adult male ART has 2020 data', 'Ped VS as 2020 data', 'Adult ART coverage never exceeds 100%']
-    check_result = conditionals.check_spectrum_file(checklist, mock_engine)
-
-    assert check_result
+    }
