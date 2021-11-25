@@ -65,6 +65,6 @@ def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
     # Here we have called the data loader with "name" arg = 'spectrum-checker'
     checklist = engine.data['spectrum-checker']['data']
 
-    indicator_checks = checklist.loc[checklist.index.isin(indicators), 'Status']
+    indicator_checks = checklist[checklist['Condition checked'].isin(indicators)]
 
-    return indicator_checks.loc[:, 'Status'].eq(True).all()
+    return indicator_checks['Status'].eq(True).all()
