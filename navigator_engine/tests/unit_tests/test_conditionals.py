@@ -1,3 +1,5 @@
+import pandas as pd
+
 import navigator_engine.pluggable_logic.conditional_functions as conditionals
 import pytest
 
@@ -83,3 +85,21 @@ def test_check_resource_key(mock_engine, resource_type, key, value, expected):
 def test_check_dataset_valid(resources, expected, mock_engine):
     with pytest.raises(TypeError, match='123'):
         conditionals.check_not_skipped(123, mock_engine)
+
+
+def test_check_spectrum_file(mock_engine, mocker):
+    dataframe = pd.read_csv('../test_data/test_spectrum_check.csv')
+    mock_load_csv_from_zipped_resource = mocker.patch(
+        'navigator_engine.pluggable_logic.data_loaders.load_csv_from_zipped_resource',
+        return_value={
+            'spectrum-file': {
+                'data': dataframe,
+                'auth_header': 'test-auth-header',
+                'url': 'https://example.com/test-data'
+            }
+        }
+    )
+    checklist = ['Adult male ART has 2020 data', 'Ped VS as 2020 data', 'Adult ART coverage never exceeds 100%']
+    check_result = conditionals.check_spectrum_file(checklist, mock_engine)
+
+    assert check_result
