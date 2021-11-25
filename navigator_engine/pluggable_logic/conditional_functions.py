@@ -66,13 +66,12 @@ def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
     # Here we have called the data loader with "name" arg = 'spectrum-checker'
     checklist = engine.data['spectrum-checker']['data']
 
-    if checklist is not None:
-        for indicator in indicators:
-            if indicator not in checklist['Condition checked'].values:
-                raise navigator_engine.common.DecisionError(
-                    f'Indicator "{indicator}" not found in Spectrum checklist'
-                )
-        indicator_checks = checklist[checklist['Condition checked'].isin(indicators)]
-        return indicator_checks['Status'].eq(True).all()
-    else:
+    if checklist is None:
         return False
+    for indicator in indicators:
+        if indicator not in checklist['Condition checked'].values:
+            raise navigator_engine.common.DecisionError(
+                f'Indicator "{indicator}" not found in Spectrum checklist'
+            )
+    indicator_checks = checklist[checklist['Condition checked'].isin(indicators)]
+    return indicator_checks['Status'].eq(True).all()
