@@ -225,7 +225,13 @@ def test_load_csv_from_zipped_resource_returns_empty_on_http_error(mock_engine, 
 
     mocker.patch(
         'navigator_engine.pluggable_logic.data_loaders.load_estimates_dataset_resource',
-        side_effect=IOError()
+        return_value={
+            'spectrum-file': {
+                'data': None,
+                'auth_header': None,
+                'url': None
+            }
+        }
     )
     result = data_loaders.load_csv_from_zipped_resource(
         "spectrum-file",
