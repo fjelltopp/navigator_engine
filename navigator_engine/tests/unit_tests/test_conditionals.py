@@ -107,4 +107,5 @@ def test_check_spectrum_file(checklist, dataframe, expected, raises_error, mock_
         }
     }
     with raises_error:
-        conditionals.check_spectrum_file(checklist, mock_engine)
+        check_result = conditionals.check_spectrum_file(checklist, mock_engine)
+        assert check_result == expected
