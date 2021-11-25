@@ -132,6 +132,8 @@ def load_csv_from_zipped_resource(resource_type: str,
             f"Bad zip file for {resource_type}: {data[resource_type]['url']}"
         )
 
+    del data[resource_type]
+
     data[name] = {
         'data': dataframe,
         'auth_header': auth_header,
