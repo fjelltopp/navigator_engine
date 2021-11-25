@@ -62,8 +62,6 @@ def check_dataset_valid(engine: DecisionEngine) -> bool:
 
 @register_conditional
 def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
-    # Loads the CSV as a dataframe as you have stored it in your data loader
-    # Here we have called the data loader with "name" arg = 'spectrum-checker'
     checklist = engine.data['spectrum-checker']['data']
 
     if checklist is None:
