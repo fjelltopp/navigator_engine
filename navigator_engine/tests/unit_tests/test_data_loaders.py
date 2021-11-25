@@ -186,3 +186,61 @@ def test_load_estimates_dataset_without_workflow_state(mock_engine, mocker):
             'data': {'completedTasks': []}
         }
     }
+
+
+def test_load_csv_from_zipped_resource(mock_engine, mocker):
+
+    with open('navigator_engine/tests/test_data/test_spectrum_file.pjnz', 'rb') as f:
+        spectrum_file = f.read()
+
+    mock_load_estimates_dataset_resource = mocker.patch(
+        'navigator_engine.pluggable_logic.data_loaders.load_estimates_dataset_resource',
+        return_value={
+            'spectrum-file': {
+                'data': spectrum_file,
+                'auth_header': 'test-auth-header',
+                'url': 'https://example.com/test-data'
+            }
+        }
+    )
+    result = data_loaders.load_csv_from_zipped_resource(
+        "spectrum-file",
+        "(.*)_check.CSV",
+        "test-auth-header",
+        "spectrum-file-check",
+        mock_engine
+    )
+    mock_load_estimates_dataset_resource.assert_called_once_with(
+        'spectrum-file',
+        'test-auth-header',
+        mock_engine
+    )
+    data = result['spectrum-file-check']['data']
+    assert all(i for i in data.columns == ['Condition checked', 'Status']), \
+        "Unexpected column names in Spectrum check file"
+    assert data.shape == (28, 2), "Unexpected shape of Spectrum check file"
+
+
+def test_load_csv_from_zipped_resource_returns_empty_on_http_error(mock_engine, mocker):
+
+    mocker.patch(
+        'navigator_engine.pluggable_logic.data_loaders.load_estimates_dataset_resource',
+        return_value={
+            'spectrum-file': {
+                'data': None,
+                'auth_header': None,
+                'url': None
+            }
+        }
+    )
+    result = data_loaders.load_csv_from_zipped_resource(
+        "spectrum-file",
+        "(.*)_check.CSV",
+        "test-auth-header",
+        "spectrum-file-check",
+        mock_engine
+    )
+
+    assert result['spectrum-file-check']['data'] is None
+    assert result['spectrum-file-check']['auth_header'] is None
+    assert result['spectrum-file-check']['url'] is None

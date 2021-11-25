@@ -5,6 +5,10 @@ from navigator_engine.common.decision_engine import DecisionEngine
 from navigator_engine.common import get_resource_from_dataset
 import json
 import logging
+import pandas as pd
+import zipfile
+import re
+import io
 
 logger = logging.getLogger(__name__)
 
@@ -86,4 +90,54 @@ def load_estimates_dataset(url_key: Hashable, auth_header_key: Hashable, engine:
             'auth_header': None,
             'data': {'completedTasks': []}
         }
+    return data
+
+
+@register_loader
+def load_csv_from_zipped_resource(resource_type: str,
+                                  csv_filename_regex: str,
+                                  auth_header: str,
+                                  name: str,
+                                  engine: DecisionEngine) -> dict:
+
+    data = load_estimates_dataset_resource(resource_type, auth_header, engine)
+    if not data[resource_type]['data']:
+        data[name] = {
+            'data': None,
+            'auth_header': None,
+            'url': None
+        }
+        return data
+
+    filename_re = re.compile(csv_filename_regex, flags=re.IGNORECASE)
+    matching_filenames = []
+
+    try:
+        with zipfile.ZipFile(io.BytesIO(data[resource_type]['data'])) as zip_file:
+            for filename in zip_file.namelist():
+                if filename_re.match(filename):
+                    matching_filenames.append(filename)
+            if len(matching_filenames) > 1:
+                raise ValueError(
+                    f"Multiple files match filename regex {csv_filename_regex}"
+                    f"in: {data[resource_type]['url']}"
+                )
+            elif len(matching_filenames) == 0:
+                dataframe = None
+            else:
+                with zip_file.open(matching_filenames[0], 'r') as csv_file:
+                    dataframe = pd.read_csv(csv_file)
+    except zipfile.BadZipFile:
+        raise zipfile.BadZipFile(
+            f"Bad zip file for {resource_type}: {data[resource_type]['url']}"
+        )
+
+    data[name] = {
+        'data': dataframe,
+        'auth_header': auth_header,
+        'url': data[resource_type]['url']
+    }
+
+    del data[resource_type]
+
     return data
