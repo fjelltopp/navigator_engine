@@ -137,12 +137,10 @@ def load_csv_from_zipped_resource(resource_type: str,
                     f"in: {data[resource_type]['url']}"
                 )
             elif len(matching_filenames) == 0:
-                raise ValueError(
-                    f"No files match filename regex {csv_filename_regex}"
-                    f"in: {data[resource_type]['url']}"
-                )
-            with zip_file.open(matching_filenames[0], 'r') as csv_file:
-                dataframe = pd.read_csv(csv_file)
+                dataframe = None
+            else:
+                with zip_file.open(matching_filenames[0], 'r') as csv_file:
+                    dataframe = pd.read_csv(csv_file)
     except zipfile.BadZipFile:
         raise zipfile.BadZipFile(
             f"Bad zip file for {resource_type}: {data[resource_type]['url']}"
