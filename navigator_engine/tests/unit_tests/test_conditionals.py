@@ -39,6 +39,12 @@ def test_check_manual_confirmation(mock_engine, action_id, expected):
     assert result == expected
 
 
+def test_check_manual_confirmation_for_missing_workflow_state(mock_engine):
+    mock_engine.data = {'navigator-workflow-state': {'data': None}}
+    result = conditionals.check_manual_confirmation('test-id', mock_engine)
+    assert result is False
+
+
 @pytest.mark.parametrize("resource_type,key,value,expected", [
     ('navigator-workflow-state', 'format', '.*JSON', True),
     ('navigator-workflow-state', 'format', 'PJNZ', False),
