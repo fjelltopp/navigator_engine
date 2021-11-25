@@ -198,7 +198,7 @@ def test_load_csv_from_zipped_resource(mock_engine, mocker):
         return_value={
             'spectrum-file': {
                 'data': spectrum_file,
-                'auth_header': 'Bearer xxxx-xxxx-xxxx-xxxx',
+                'auth_header': 'test-auth-header',
                 'url': 'https://example.com/test-data'
             }
         }
