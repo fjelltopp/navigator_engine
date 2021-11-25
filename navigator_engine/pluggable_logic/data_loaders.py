@@ -100,26 +100,12 @@ def load_csv_from_zipped_resource(resource_type: str,
                                   name: str,
                                   engine: DecisionEngine) -> dict:
 
-    try:
-        data = load_estimates_dataset_resource(resource_type, auth_header, engine)
-        if not data[resource_type]['url'] \
-                and not data[resource_type]['auth_header'] \
-                and not data[resource_type]['data']:
-            raise ValueError(f"Empty resource {resource_type} in {data[resource_type]['url']}")
-    except IOError:
-        data = {
-            name: {
-                'data': None,
-                'auth_header': None,
-                'url': None
-            }
-        }
-        return data
-    except ValueError:
+    data = load_estimates_dataset_resource(resource_type, auth_header, engine)
+    if not data[resource_type]['data']:
         data[name] = {
             'data': None,
-            'auth_header': data[resource_type].get('auth_header'),
-            'url': data[resource_type].get('url')
+            'auth_header': None,
+            'url': None
         }
         return data
 
