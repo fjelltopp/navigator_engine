@@ -33,10 +33,8 @@ def load_url(url: str, auth_header: str, name: str, engine: DecisionEngine) -> d
     data = engine.data
     headers = {"Authorization": auth_header}
     response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        logger.error(f"HTTP Error loading URL {response.status_code}: {response.content!r}")
-        raise IOError(f"HTTP Error {response.status_code} whilst loading {name}: {url}")
-    data[name] = {'source_url': url, 'auth_header': headers, 'data': response.content}
+    response.raise_for_status()
+    data[name] = {'source_url': url, 'auth_header': auth_header, 'data': response.content}
     return data
 
 
@@ -48,13 +46,17 @@ def load_json_url(url: str, auth_header: str, name: str, engine: DecisionEngine)
 
 
 @register_loader
-def load_estimates_dataset_resource(resource_type: str, auth_header: str, engine: DecisionEngine) -> dict:
+def load_dataset_resource(resource_type: str, engine: DecisionEngine) -> dict:
     dataset = engine.data['dataset']['data']['result']
+    auth_header = engine.data['dataset']['auth_header']
     resource = get_resource_from_dataset(resource_type, dataset)
-    if not resource:
-        raise IOError(f"No resource of type {resource_type} found in {dataset['name']}")
-    if not resource['url']:
-        raise IOError(f"Resource {resource_type} exists but has no data")
+    if not resource or not resource['url']:
+        engine.data[resource_type] = {
+            'data': None,
+            'auth_header': auth_header,
+            'url': None
+        }
+        return engine.data
     if 'json' in resource['format'].lower():
         data = load_json_url(
             resource['url'],
@@ -78,34 +80,24 @@ def load_estimates_dataset(url_key: Hashable, auth_header_key: Hashable, engine:
     auth_header = engine.data[auth_header_key]
     engine.data = {}
     data = load_json_url(dataset_url, auth_header, 'dataset', engine)
-    try:
-        data = load_estimates_dataset_resource(
-            'navigator-workflow-state',
-            auth_header,
-            engine
-        )
-    except IOError:
-        data['navigator-workflow-state'] = {
-            'url': None,
-            'auth_header': None,
-            'data': {'completedTasks': []}
-        }
+    data = load_dataset_resource(
+        'navigator-workflow-state',
+        engine
+    )
     return data
 
 
 @register_loader
-def load_csv_from_zipped_resource(resource_type: str,
-                                  csv_filename_regex: str,
-                                  auth_header: str,
-                                  name: str,
-                                  engine: DecisionEngine) -> dict:
+def load_csv_from_zipped_resource(resource_type: str, csv_filename_regex: str,
+                                  name: str, engine: DecisionEngine) -> dict:
+    data = load_dataset_resource(resource_type, engine)
+    auth_header = data[resource_type]['auth_header']
 
-    data = load_estimates_dataset_resource(resource_type, auth_header, engine)
     if not data[resource_type]['data']:
         data[name] = {
             'data': None,
-            'auth_header': None,
-            'url': None
+            'auth_header': auth_header,
+            'url': data[resource_type]['url']
         }
         return data
 
@@ -137,7 +129,5 @@ def load_csv_from_zipped_resource(resource_type: str,
         'auth_header': auth_header,
         'url': data[resource_type]['url']
     }
-
     del data[resource_type]
-
     return data

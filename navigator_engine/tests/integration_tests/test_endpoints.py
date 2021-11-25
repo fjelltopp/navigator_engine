@@ -193,7 +193,7 @@ def test_action_list(client, mocker):
         'data': {'1': True, '2': True, '3': False, '4': True}
     }
     setup_endpoint_test(mocker, data)
-    response = client.post("/api/actionlist", data=json.dumps({
+    response = client.post("/api/decide/list", data=json.dumps({
         'data': {
             'url': 'https://example.ckan/api/3/action/package_show?id=example',
             'authorization_header': "example-api-key"
