@@ -1,6 +1,6 @@
 from navigator_engine.common import register_conditional, get_resource_from_dataset
 from navigator_engine.common.decision_engine import DecisionEngine
-from typing import Hashable
+from typing import Hashable, Union
 import re
 
 
@@ -44,7 +44,7 @@ def check_manual_confirmation(action_id: int, engine: DecisionEngine) -> bool:
 
 
 @register_conditional
-def check_resource_key(resource_types: list[str], key: Hashable, value: Hashable, engine: DecisionEngine) -> bool:
+def check_resource_key(resource_types: Union[list[str], str], key: Hashable, value: Hashable, engine: DecisionEngine) -> bool:
     dataset = engine.data['dataset']['data']['result']
     if type(resource_types) is str:
         resource_types = [resource_types]
