@@ -44,15 +44,20 @@ def check_manual_confirmation(action_id: int, engine: DecisionEngine) -> bool:
 
 
 @register_conditional
-def check_resource_key(resource_type: str, key: Hashable, value: Hashable, engine: DecisionEngine) -> bool:
+def check_resource_key(resource_types: list[str], key: Hashable, value: Hashable, engine: DecisionEngine) -> bool:
     dataset = engine.data['dataset']['data']['result']
-    resource = get_resource_from_dataset(resource_type, dataset)
-    if type(value) is str and type(resource.get(key)) is str:
-        regex = re.compile(value)
-        match_result = regex.match(resource.get(key, ""))
-        return bool(match_result)
-    else:
-        return resource.get(key) == value
+    if type(resource_types) is str:
+        resource_types = [resource_types]
+    results = []
+    for resource_type in resource_types:
+        resource = get_resource_from_dataset(resource_type, dataset)
+        if type(value) is str and type(resource.get(key)) is str:
+            regex = re.compile(value)
+            match_result = bool(regex.match(resource.get(key, "")))
+        else:
+            match_result = resource.get(key) == value
+        results.append(match_result)
+    return all(results)
 
 
 @register_conditional

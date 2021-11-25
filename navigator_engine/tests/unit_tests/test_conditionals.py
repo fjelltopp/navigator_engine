@@ -52,8 +52,10 @@ def test_check_manual_confirmation_for_missing_workflow_state(mock_engine):
     ('art-data', 'title', 'ART', True),
     ('art-data', 'url', '.*', False),
     ('art-data', 'private', False, True),
-    ('anc-data', 'format', 'PJNZ', False)
-
+    ('anc-data', 'format', 'PJNZ', False),
+    (['art-data', 'navigator-workflow-state'], 'format', '.*', True),
+    (['art-data', 'navigator-workflow-state'], 'url', '.*', False),
+    (['anc-data', 'navigator-workflow-state'], 'format', '.*', False)
 ])
 def test_check_resource_key(mock_engine, resource_type, key, value, expected):
     source_data = {
