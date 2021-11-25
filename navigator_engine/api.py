@@ -62,6 +62,37 @@ def decide():
     })
 
 
+@api_blueprint.route('/decide/list', methods=['POST'])
+def action_list():
+    """
+    Get a list of actions that need to be completed.
+
+    POST Request takes the following json input:
+    ```
+        {
+            "data": {
+                "url": "<url from estimates dataset json datadict>",
+                "authorization_header": "<optional value to be supplied as the Authorization header tag>"
+            },
+            "skipActions": ["<action_id>", "<action_id>"]
+        }
+    ```
+    """
+    decide_response = decide().json
+    reached_actions = decide_response['actions']
+    for action in reached_actions:
+        action['title'] = model.load_node(node_ref=action['id']).action.title
+        action['reached'] = True
+
+    return jsonify({
+        'milestones': decide_response['progress']['milestones'],
+        'progress': decide_response['progress']['progress'],
+        'actionList': reached_actions,
+        'fullyResolved': False,
+        'removeSkipActions': decide_response['removeSkipActions']
+    })
+
+
 @api_blueprint.route('/action/<action_id>')
 def action(action_id):
     """
