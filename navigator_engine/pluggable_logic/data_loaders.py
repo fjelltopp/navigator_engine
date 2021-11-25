@@ -34,7 +34,7 @@ def load_url(url: str, auth_header: str, name: str, engine: DecisionEngine) -> d
     headers = {"Authorization": auth_header}
     response = requests.get(url, headers=headers)
     response.raise_for_status()
-    data[name] = {'source_url': url, 'auth_header': headers, 'data': response.content}
+    data[name] = {'source_url': url, 'auth_header': auth_header, 'data': response.content}
     return data
 
 
