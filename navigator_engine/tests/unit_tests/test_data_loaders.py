@@ -41,7 +41,7 @@ def test_load_url(mock_engine, mocker):
     assert result == {
         args[2]: {
             'source_url': args[0],
-            'auth_header': {'Authorization': args[1]},
+            'auth_header': args[1],
             'data': mock_response.content
         }
     }
