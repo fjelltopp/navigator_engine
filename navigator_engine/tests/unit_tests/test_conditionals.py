@@ -5,6 +5,7 @@ from navigator_engine.common import DecisionError
 import pytest
 from contextlib import nullcontext as does_not_raise
 
+
 @pytest.mark.parametrize("actions,expected,remove_skips", [
     (['1'], True, []),
     (['2'], False, ['2']),
