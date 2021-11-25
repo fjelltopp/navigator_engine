@@ -104,7 +104,7 @@ def load_csv_from_zipped_resource(resource_type: str,
             'data': None,
             'auth_header': None,
             'url': None
-             }
+        }
     }
     try:
         data = load_estimates_dataset_resource(resource_type, auth_header, engine)
@@ -117,16 +117,6 @@ def load_csv_from_zipped_resource(resource_type: str,
             'data': None,
             'auth_header': data[resource_type]['auth_header'],
             'url': data[resource_type]['url']
-        }
-        return data
-
-
-    # Check if the returned data is empty and return None if it is
-    if not data[resource_type]['url'] and not data[resource_type]['auth_header'] and not data[resource_type]['data']:
-        data[name] = {
-            'data': None,
-            'auth_header': None,
-            'url': None
         }
         return data
 
