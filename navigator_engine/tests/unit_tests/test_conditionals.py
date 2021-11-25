@@ -96,6 +96,8 @@ def test_check_dataset_valid(resources, expected, mock_engine):
      pd.read_csv('../test_data/test_spectrum_check.csv'), False, does_not_raise()),
     (['Adult male ART has 2020 data', 'Ped VS as 2020 data', 'Adult ART coverage never exceeds 100%'],
      None, False, does_not_raise()),
+    (['Adult male ART has 2020 data', 'Ped VS as 2020 data', 'Adult ART coverage never exceeds 100%'],
+     pd.read_csv('../test_data/test_spectrum_check_na.csv'), True, does_not_raise()),
     (['Adult male ART has 2020 data', 'Ped VS as 2020 data', 'This indicator does not exist'],
      pd.read_csv('../test_data/test_spectrum_check.csv'), None, pytest.raises(DecisionError))
 ])
