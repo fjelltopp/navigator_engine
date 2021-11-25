@@ -62,24 +62,7 @@ def decide():
     })
 
 
-@api_blueprint.route('/action/<action_id>')
-def action(action_id):
-    """
-    Get the details of a specific action in the task breadcrumbs.
-    """
-
-    node = model.load_node(node_ref=action_id)
-    action = getattr(node, 'action', None)
-    if not action:
-        abort(400, f"Please specify a valid action ID. Action {action_id} not found.")
-
-    return jsonify({
-        'id': action_id,
-        'content': action.to_dict()
-    })
-
-
-@api_blueprint.route('/actionlist', methods=['POST'])
+@api_blueprint.route('/decide/list', methods=['POST'])
 def action_list():
     """
     Get a list of actions that need to be completed.
@@ -107,4 +90,21 @@ def action_list():
         'actionList': reached_actions,
         'fullyResolved': False,
         'removeSkipActions': decide_response['removeSkipActions']
+    })
+
+
+@api_blueprint.route('/action/<action_id>')
+def action(action_id):
+    """
+    Get the details of a specific action in the task breadcrumbs.
+    """
+
+    node = model.load_node(node_ref=action_id)
+    action = getattr(node, 'action', None)
+    if not action:
+        abort(400, f"Please specify a valid action ID. Action {action_id} not found.")
+
+    return jsonify({
+        'id': action_id,
+        'content': action.to_dict()
     })
