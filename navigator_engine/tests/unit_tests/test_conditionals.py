@@ -8,6 +8,7 @@ import os
 
 base_directory = os.path.abspath(os.path.dirname(__file__))
 
+
 @pytest.mark.parametrize("actions,expected,remove_skips", [
     (['1'], True, []),
     (['2'], False, ['2']),
