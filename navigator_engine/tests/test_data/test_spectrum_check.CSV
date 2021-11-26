@@ -13,7 +13,7 @@ Child progression is default,True
 Child distribution of new infections is default,True
 Child mortality off ART is default,True
 Child mortality on ART is default,True
-Adult progression is default,True
+Adult progression is default,NA
 Adult distribution of new infections by CD4 count is default,True
 Adult off ART mortality is default,True
 Adult ART mortality is default,True
@@ -22,7 +22,7 @@ FRR by age off ART is default,True
 FRR by age on ART is default,True
 MTCT transmission probabilities are default,True
 ART allocation method is default,True
-Shiny90 is valid,False
+Shiny90 is valid,NA
 Uncertainty analysis is valid,False
 Adult ART coverage never exceeds 100%,True
 Pediatric ART coverage never exceed 100%,True
