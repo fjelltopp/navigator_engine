@@ -72,4 +72,5 @@ def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
                 f'Indicator "{indicator}" not found in Spectrum checklist'
             )
     indicator_checks = checklist[checklist['Condition checked'].isin(indicators)]
+    indicator_checks['Status'] = indicator_checks['Status'].fillna(True)
     return indicator_checks['Status'].eq(True).all()
