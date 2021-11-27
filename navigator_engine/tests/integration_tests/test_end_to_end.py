@@ -18,7 +18,8 @@ def test_end_to_end(client):
                    '?id=antarctica-country-estimates-2022-1-2-3',
             'authorization_header': os.getenv('ADR_SYSADMIN_KEY')
         },
-        'skipActions': []
+        'skipActions': ['EST-OVV-01-10-A']
     }))
     assert response.status_code == 200
-    assert response.json['decision']['id'] == 'EST-OVV-02-A'
+    assert response.json['decision']['id'] == 'EST-OVV-01-10-A'
+    assert 'EST-OVV-01-10-A' in response.json['removeSkipActions']
