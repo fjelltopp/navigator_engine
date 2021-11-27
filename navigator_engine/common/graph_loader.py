@@ -91,85 +91,89 @@ def import_data(sheet_name, graphs):
 
     # Loop through the graph dataframe to create nodes, conditionals and actions
     for idx in graph_data.index:
-        # Create a Milestone or a Conditional depending on which one the row represents
-        p = re.compile(r'[\d]{2,2}-')
-        is_milestone = p.match(graph_data.loc[idx, DATA_COLUMNS['TITLE']])
-        if is_milestone:
-            milestone_sheet_name = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
-            milestone = model.Milestone(
-                title=graphs[milestone_sheet_name]['title'],
-                graph_id=graphs[milestone_sheet_name]['graph_id']
-            )
-            model.db.session.add(milestone)
-            model.db.session.commit()
-
-            node_milestone = model.Node(
-                ref=_get_ref(idx, 'milestone'),
-                milestone_id=milestone.id
-            )
-
-            model.db.session.add(node_milestone)
-            model.db.session.commit()
-
-            graph_data.at[idx, 'DbNodeId'] = node_milestone.id
-        else:
-            conditional = model.Conditional(
-                title=graph_data.loc[idx, DATA_COLUMNS['TITLE']],
-                function=graph_data.loc[idx, DATA_COLUMNS['FUNCTION']]
-            )
-            model.db.session.add(conditional)
-            model.db.session.commit()
-
-            node_conditional = model.Node(
-                ref=_get_ref(idx, 'conditional'),
-                conditional_id=conditional.id
-            )
-
-            model.db.session.add(node_conditional)
-            model.db.session.commit()
-
-            graph_data.at[idx, 'DbNodeId'] = node_conditional.id
-
-            # If Conditional is False, add an action node if no skip destination is given
-            if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
-
-                if 'check_not_skipped' in conditional.function:
-                    graph_data.loc[[idx]] = _create_check_skips_action(conditional, graph_data.loc[[idx]])
-
-                skippable = not _map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['UNSKIPPABLE']])
-
-                action_html = _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
-                action = model.Action(
-                    title=graph_data.at[idx, DATA_COLUMNS['ACTION']],
-                    html=action_html,
-                    skippable=skippable,
-                    complete=False
+        try:
+            # Create a Milestone or a Conditional depending on which one the row represents
+            p = re.compile(r'[\d]{2,2}-')
+            is_milestone = p.match(graph_data.loc[idx, DATA_COLUMNS['TITLE']])
+            if is_milestone:
+                milestone_sheet_name = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
+                milestone = model.Milestone(
+                    title=graphs[milestone_sheet_name]['title'],
+                    graph_id=graphs[milestone_sheet_name]['graph_id']
                 )
-                model.db.session.add(action)
+                model.db.session.add(milestone)
                 model.db.session.commit()
 
-                # Parse action's resource urls and add them to database
-                resources = _parse_resources(graph_data.at[idx, DATA_COLUMNS['ACTION_RESOURCES']])
-                for resource_row in resources:
-                    resource = model.Resource(
-                        title=resource_row['title'],
-                        url=resource_row['url'],
-                        action=action
+                node_milestone = model.Node(
+                    ref=_get_ref(idx, 'milestone'),
+                    milestone_id=milestone.id
+                )
+
+                model.db.session.add(node_milestone)
+                model.db.session.commit()
+
+                graph_data.at[idx, 'DbNodeId'] = node_milestone.id
+            else:
+                conditional = model.Conditional(
+                    title=graph_data.loc[idx, DATA_COLUMNS['TITLE']],
+                    function=graph_data.loc[idx, DATA_COLUMNS['FUNCTION']]
+                )
+                model.db.session.add(conditional)
+                model.db.session.commit()
+
+                node_conditional = model.Node(
+                    ref=_get_ref(idx, 'conditional'),
+                    conditional_id=conditional.id
+                )
+
+                model.db.session.add(node_conditional)
+                model.db.session.commit()
+
+                graph_data.at[idx, 'DbNodeId'] = node_conditional.id
+
+                # If Conditional is False, add an action node if no skip destination is given
+                if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
+
+                    if 'check_not_skipped' in conditional.function:
+                        graph_data.loc[[idx]] = _create_check_skips_action(conditional, graph_data.loc[[idx]])
+
+                    skippable = not _map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['UNSKIPPABLE']])
+
+                    action_html = _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
+                    action = model.Action(
+                        title=graph_data.at[idx, DATA_COLUMNS['ACTION']],
+                        html=action_html,
+                        skippable=skippable,
+                        complete=False
                     )
-                    model.db.session.add(resource)
+                    model.db.session.add(action)
                     model.db.session.commit()
 
-                # Add node to action
-                node_action = model.Node(
-                    ref=_get_ref(idx, 'action'),
-                    action_id=action.id
-                )
-                model.db.session.add(node_action)
-                model.db.session.commit()
+                    # Parse action's resource urls and add them to database
+                    resources = _parse_resources(graph_data.at[idx, DATA_COLUMNS['ACTION_RESOURCES']])
+                    for resource_row in resources:
+                        resource = model.Resource(
+                            title=resource_row['title'],
+                            url=resource_row['url'],
+                            action=action
+                        )
+                        model.db.session.add(resource)
+                        model.db.session.commit()
 
-                graph_data.at[idx, 'DbNodeActionId'] = node_action.id
-                model.db.session.add(node_action)
-                model.db.session.commit()
+                    # Add node to action
+                    node_action = model.Node(
+                        ref=_get_ref(idx, 'action'),
+                        action_id=action.id
+                    )
+                    model.db.session.add(node_action)
+                    model.db.session.commit()
+
+                    graph_data.at[idx, 'DbNodeActionId'] = node_action.id
+                    model.db.session.add(node_action)
+                    model.db.session.commit()
+        except Exception as e:
+            logger.error(f"Error reading row: {idx}")
+            raise e
 
     # Add a completion action
     message = graph_header.get(
@@ -189,44 +193,48 @@ def import_data(sheet_name, graphs):
 
     # Loop through the graph dataframe to create edges
     for idx in graph_data.index:
+        try:
+            if graph_data.iloc[-1, :].equals(graph_data.loc[idx, :]):
+                logging.info('End node reached')
+                edge_true_to_id = complete_node.id
+            else:
+                edge_true_to_id = graph_data.iloc[graph_data.index.get_loc(graph_data.loc[idx].name) + 1].loc['DbNodeId']
 
-        if graph_data.iloc[-1, :].equals(graph_data.loc[idx, :]):
-            logging.info('End node reached')
-            edge_true_to_id = complete_node.id
-        else:
-            edge_true_to_id = graph_data.iloc[graph_data.index.get_loc(graph_data.loc[idx].name) + 1].loc['DbNodeId']
-        edge_true = model.Edge(
-            graph_id=graph.id,
-            from_id=graph_data.at[idx, 'DbNodeId'],
-            to_id=edge_true_to_id,
-            type=True
-        )
-
-        model.db.session.add(edge_true)
-        model.db.session.commit()
-
-        false_edge_to_id = None
-        is_milestone = re.compile(r'[\d]{2,2}-').match(graph_data.loc[idx, DATA_COLUMNS['TITLE']])
-
-        # Add a "False" edge from conditional to the relevant action if no skip destination is given
-        if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx] and not is_milestone:
-            false_edge_to_id = graph_data.at[idx, 'DbNodeActionId']
-        # if skip destination is "complete", create an edge to the complete action
-        elif graph_data.loc[idx, DATA_COLUMNS['SKIP_TO']] == 'complete':
-            false_edge_to_id = complete_node.id
-        # if skip destination is given, add an edge to its node
-        elif not pd.isnull(graph_data.loc[idx, DATA_COLUMNS['SKIP_TO']]):
-            false_edge_to_id = graph_data.at[graph_data.at[idx, DATA_COLUMNS['SKIP_TO']], 'DbNodeId']
-
-        if false_edge_to_id:
-            edge_false = model.Edge(
+            edge_true = model.Edge(
                 graph_id=graph.id,
                 from_id=graph_data.at[idx, 'DbNodeId'],
-                to_id=false_edge_to_id,
-                type=False
+                to_id=edge_true_to_id,
+                type=True
             )
-            model.db.session.add(edge_false)
+
+            model.db.session.add(edge_true)
             model.db.session.commit()
+
+            false_edge_to_id = None
+            is_milestone = re.compile(r'[\d]{2,2}-').match(graph_data.loc[idx, DATA_COLUMNS['TITLE']])
+
+            # Add a "False" edge from conditional to the relevant action if no skip destination is given
+            if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx] and not is_milestone:
+                false_edge_to_id = graph_data.at[idx, 'DbNodeActionId']
+            # if skip destination is "complete", create an edge to the complete action
+            elif graph_data.loc[idx, DATA_COLUMNS['SKIP_TO']] == 'complete':
+                false_edge_to_id = complete_node.id
+            # if skip destination is given, add an edge to its node
+            elif not pd.isnull(graph_data.loc[idx, DATA_COLUMNS['SKIP_TO']]):
+                false_edge_to_id = graph_data.at[graph_data.at[idx, DATA_COLUMNS['SKIP_TO']], 'DbNodeId']
+
+            if false_edge_to_id:
+                edge_false = model.Edge(
+                    graph_id=graph.id,
+                    from_id=graph_data.at[idx, 'DbNodeId'],
+                    to_id=false_edge_to_id,
+                    type=False
+                )
+                model.db.session.add(edge_false)
+                model.db.session.commit()
+        except Exception as e:
+            logger.error(f"Error creating edges for {idx}")
+            raise e
 
 
 def _map_excel_boolean(boolean):
@@ -274,7 +282,7 @@ def _parse_resources(resource_cell):
 
 def _get_ref(ref, node_type):
     if node_type == 'complete':
-        ref = '-'.join(ref.split('-')[:-1] + ['C'])
+        ref = '-'.join(ref.split('-')[:-2] + ['COM'])
         node_type = 'action'
     return f'EST-{ref}-{node_type[0].upper()}'
 
