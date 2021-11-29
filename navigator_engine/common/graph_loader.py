@@ -341,8 +341,10 @@ def validate_pluggable_logic(node, network):
 
     elif function_name.startswith('check_resource_key'):
         resource_types = function_args[0]
-        for type in resource_types:
-            assert type in VALID_RESOURCE_TYPES, f"{node.ref} function references invalid resource_type {type}"
+        if type(resource_types) is str:
+            resource_types = [resource_types]
+        for resource_type in resource_types:
+            assert resource_type in VALID_RESOURCE_TYPES, f"{node.ref} function references invalid resource_type {resource_type}"
 
 
 def validate_graph(graph_id):
