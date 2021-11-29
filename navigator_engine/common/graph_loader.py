@@ -282,7 +282,7 @@ def _parse_resources(resource_cell):
 
 def _get_ref(ref, node_type):
     if node_type == 'complete':
-        ref = '-'.join(ref.split('-')[:-2] + ['COM'])
+        ref = '-'.join(ref.split('-')[:-2] + ['CPLT'])
         node_type = 'action'
     return f'EST-{ref}-{node_type[0].upper()}'
 
