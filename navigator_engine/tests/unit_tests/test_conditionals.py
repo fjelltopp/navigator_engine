@@ -1,5 +1,9 @@
+import pandas as pd
+
 import navigator_engine.pluggable_logic.conditional_functions as conditionals
+from navigator_engine.common import DecisionError
 import pytest
+from contextlib import nullcontext as does_not_raise
 
 
 @pytest.mark.parametrize("actions,expected,remove_skips", [
@@ -91,3 +95,27 @@ def test_check_resource_key(mock_engine, resource_type, key, value, expected):
 def test_check_dataset_valid(resources, expected, mock_engine):
     with pytest.raises(TypeError, match='123'):
         conditionals.check_not_skipped(123, mock_engine)
+
+
+@pytest.mark.parametrize("checklist, dataframe, expected, raises_error", [
+    (['Adult male ART has 2020 data', 'Ped VS as 2020 data', 'Adult ART coverage never exceeds 100%'],
+     pd.read_csv('navigator_engine/tests/test_data/test_spectrum_check.csv'), True, does_not_raise()),
+    (['Uncertainty analysis is valid', 'Adult off ART mortality is default'],
+     pd.read_csv('navigator_engine/tests/test_data/test_spectrum_check.csv'), False, does_not_raise()),
+    (['Adult male ART has 2020 data', 'Ped VS as 2020 data', 'Adult ART coverage never exceeds 100%'],
+     None, False, does_not_raise()),
+    (['Adult male ART has 2020 data', 'Adult progression is default', 'Shiny90 is valid'],
+     pd.read_csv('navigator_engine/tests/test_data/test_spectrum_check.csv'), True, does_not_raise()),
+    (['Adult male ART has 2020 data', 'Ped VS as 2020 data', 'This indicator does not exist'],
+     pd.read_csv('navigator_engine/tests/test_data/test_spectrum_check.csv'), None, pytest.raises(DecisionError))
+])
+def test_check_spectrum_file(checklist, dataframe, expected, raises_error, mock_engine):
+
+    mock_engine.data = {
+        'spectrum-checker': {
+            'data': dataframe
+        }
+    }
+    with raises_error:
+        check_result = conditionals.check_spectrum_file(checklist, mock_engine)
+        assert check_result == expected

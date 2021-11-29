@@ -1,3 +1,4 @@
+import navigator_engine.common
 from navigator_engine.common import register_conditional, get_resource_from_dataset
 from navigator_engine.common.decision_engine import DecisionEngine
 from typing import Hashable, Union
@@ -67,3 +68,19 @@ def check_dataset_valid(engine: DecisionEngine) -> bool:
         if resource.get('validation_status', 'success') != 'success':
             return False
     return True
+
+
+@register_conditional
+def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
+    checklist = engine.data['spectrum-checker']['data']
+
+    if checklist is None:
+        return False
+    for indicator in indicators:
+        if indicator not in checklist['Condition checked'].values:
+            raise navigator_engine.common.DecisionError(
+                f'Indicator "{indicator}" not found in Spectrum checklist'
+            )
+    indicator_checks = checklist[checklist['Condition checked'].isin(indicators)]
+    indicator_checks['Status'] = indicator_checks['Status'].fillna(True)
+    return indicator_checks['Status'].eq(True).all()
