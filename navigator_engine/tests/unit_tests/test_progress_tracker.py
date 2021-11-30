@@ -199,7 +199,7 @@ def test_drop_action_breadcrumb(mock_tracker, function_name, manual):
 
 
 def test_drop_action_breadcrumb_after_milestone(mock_tracker):
-    # The terminus node maybe an action node immediately following a milestone
+    # The terminus node may be an action node immediately following a milestone
     # This regression test checks that the node is properly added to the breadcrumbs
     nodes = [
         factories.NodeFactory(id=1, milestone=factories.MilestoneFactory()),
