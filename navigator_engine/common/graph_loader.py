@@ -24,6 +24,21 @@ DATA_COLUMNS = {
     'FUNCTION': 'Test function'
 }
 
+VALID_RESOURCE_TYPES = [
+    "inputs-unaids-geographic",
+    "inputs-unaids-anc",
+    "inputs-unaids-art",
+    "inputs-unaids-survey",
+    "inputs-unaids-population",
+    "inputs-unaids-hiv-testing",
+    "inputs-unaids-spectrum-file",
+    "inputs-unaids-shiny90-survey",
+    "inputs-unaids-shiny90-output-zip",
+    "inputs-unaids-naomi-output-zip"
+    "inputs-unaids-naomi-report"
+]
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -320,6 +335,17 @@ def validate_pluggable_logic(node, network):
                 arg_action_is_child = True
 
         assert arg_action_is_child, f"{node.ref} has bad function {function_string}"
+
+    elif function_name.startswith('check_not_skipped'):
+        ...  # We already validate args in _create_check_skips_action()
+
+    elif function_name.startswith('check_resource_key'):
+        resource_types = function_args[0]
+        if type(resource_types) is str:
+            resource_types = [resource_types]
+        for resource_type in resource_types:
+            assert resource_type in VALID_RESOURCE_TYPES, \
+                f"{node.ref} function references invalid resource_type {resource_type}"
 
 
 def validate_graph(graph_id):
