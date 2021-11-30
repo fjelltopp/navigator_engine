@@ -323,6 +323,11 @@ def _create_check_skips_action(conditional, graph_data):
     return graph_data
 
 
+def require(constraint, message):
+    if not constraint:
+        raise ValueError(message)
+
+
 def validate_pluggable_logic(node, network):
 
     function_string = node.conditional.function
@@ -334,7 +339,7 @@ def validate_pluggable_logic(node, network):
             if child_node.ref == function_args[0]:
                 arg_action_is_child = True
 
-        assert arg_action_is_child, f"{node.ref} has bad function {function_string}"
+        require(arg_action_is_child, f"{node.ref} has bad function {function_string}")
 
     elif function_name.startswith('check_not_skipped'):
         ...  # We already validate args in _create_check_skips_action()
@@ -344,8 +349,10 @@ def validate_pluggable_logic(node, network):
         if type(resource_types) is str:
             resource_types = [resource_types]
         for resource_type in resource_types:
-            assert resource_type in VALID_RESOURCE_TYPES, \
+            require(
+                resource_type in VALID_RESOURCE_TYPES,
                 f"{node.ref} function references invalid resource_type {resource_type}"
+            )
 
 
 def validate_graph(graph_id):
@@ -357,26 +364,26 @@ def validate_graph(graph_id):
     for node, out_degree in network.out_degree():
 
         if getattr(node, 'action_id'):
-            assert out_degree == 0, f"{node.ref} has wrong out_degree"
-            assert node.action.title, f"{node.ref} has no title specified"
-            assert node.action.html, f"{node.ref} has no content specified"
+            require(out_degree == 0, f"{node.ref} has wrong out_degree")
+            require(node.action.title, f"{node.ref} has no title specified")
+            require(node.action.html, f"{node.ref} has no content specified")
         elif getattr(node, 'conditional_id'):
-            assert out_degree == 2, f"{node.ref} has wrong out_degree"
-            assert node.conditional.function, f"{node.ref} has no test function"
+            require(out_degree == 2, f"{node.ref} has wrong out_degree")
+            require(node.conditional.function, f"{node.ref} has no test function")
             edge_types = [edge[2] for edge in network.out_edges([node], 'type')]
-            assert set(edge_types) == {True, False}, f"{node.ref} has wrong out edges"
+            require(set(edge_types) == {True, False}, f"{node.ref} has wrong out edges")
             validate_pluggable_logic(node, network)
         elif getattr(node, 'milestone_id'):
-            assert out_degree == 1, f"{node.ref} has wrong out_degree"
-            assert node.milestone.graph_id, f"{node.ref} has no graph ID"
+            require(out_degree == 1, f"{node.ref} has wrong out_degree")
+            require(node.milestone.graph_id, f"{node.ref} has no graph ID")
             edge_types = [edge[2] for edge in network.out_edges([node], 'type')]
-            assert edge_types == [True], f"{node.ref} has wrong out edges"
+            require(edge_types == [True], f"{node.ref} has wrong out edges")
             milestones.append(node.milestone.graph_id)
 
         if getattr(node, 'action') and node.action.complete:
             complete_node = node
 
-    assert complete_node, "Graph {graph_id} has no complete node"
+    require(complete_node, f"Graph {graph_id} has no complete node")
 
     for milestone in milestones:
         validate_graph(milestone)
