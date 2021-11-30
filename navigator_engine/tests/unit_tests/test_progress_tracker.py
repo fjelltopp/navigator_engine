@@ -175,7 +175,7 @@ def test_milestones_to_complete(mock_tracker, simple_network, route, expected_re
     ('check_other_confirmation("test")', False),
     ('check_manual_confirmation("test")', True)
 ])
-def test_drop_action_breadcrumb(mock_tracker, simple_network, function_name, manual):
+def test_drop_action_breadcrumb(mock_tracker, function_name, manual):
     conditional = factories.ConditionalFactory(id=1, function=function_name)
     nodes = [
         factories.NodeFactory(id=1, conditional=conditional, conditional_id=1),
@@ -195,6 +195,27 @@ def test_drop_action_breadcrumb(mock_tracker, simple_network, function_name, man
         'milestoneID': None,
         'skipped': True,
         'manualConfirmationRequired': manual
+    }]
+
+
+def test_drop_action_breadcrumb_after_milestone(mock_tracker):
+    # The terminus node maybe an action node immediately following a milestone
+    # This regression test checks that the node is properly added to the breadcrumbs
+    nodes = [
+        factories.NodeFactory(id=1, milestone=factories.MilestoneFactory()),
+        factories.NodeFactory(id=2, action=factories.ActionFactory(id=2, complete=True), action_id=2)
+    ]
+    mock_tracker.network = networkx.DiGraph()
+    mock_tracker.network.add_edges_from([
+        (nodes[0], nodes[1], {'type': True}),
+    ])
+    mock_tracker.route = nodes
+    ProgressTracker.drop_action_breadcrumb(mock_tracker)
+    assert mock_tracker.action_breadcrumbs == [{
+        'id': nodes[1].ref,
+        'milestoneID': None,
+        'skipped': False,
+        'manualConfirmationRequired': False
     }]
 
 

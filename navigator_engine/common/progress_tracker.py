@@ -81,6 +81,7 @@ class ProgressTracker():
         parent_node = self.route[-2]
         current_node = self.route[-1]
 
+        manual_confirmation = False
         if getattr(parent_node, 'conditional_id'):
             function = parent_node.conditional.function
             manual_confirmation = function.startswith("check_manual_confirmation")
