@@ -21,5 +21,5 @@ def test_end_to_end(client):
         'skipActions': ['EST-OVV-01-10-A']
     }))
     assert response.status_code == 200
-    assert response.json['decision']['id'] == 'EST-OVV-01-10-A'
+    assert response.json['decision']['id'] == 'EST-OVV-00-01-A'
     assert 'EST-OVV-01-10-A' in response.json['removeSkipActions']
