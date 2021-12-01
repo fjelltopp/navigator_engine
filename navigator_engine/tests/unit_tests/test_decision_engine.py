@@ -147,9 +147,11 @@ def test_process_milestone_incomplete(mocker, mock_engine):
 
     mock_engine.run_pluggable_logic.return_value = True
     mock_engine.process_action.return_value = "processed_action"
+    mock_engine.remove_skip_requests = [2]
     mocker.patch('navigator_engine.model.load_graph', return_value=milestone_graph)
 
     milestone_engine = mocker.Mock(spec=DecisionEngine)
+    milestone_engine.remove_skip_requests = [3]
     milestone_engine.progress = mocker.patch(
         'navigator_engine.common.progress_tracker.ProgressTracker',
         auto_spec=True
@@ -164,6 +166,7 @@ def test_process_milestone_incomplete(mocker, mock_engine):
     result = DecisionEngine.process_milestone(mock_engine, node1)
     mock_engine.progress.add_milestone.assert_called_once_with(node1, milestone_engine.progress)
     assert result == node2
+    assert mock_engine.remove_skip_requests == [2, 3]
 
 
 def test_process_milestone_complete(mocker, mock_engine):
@@ -178,9 +181,11 @@ def test_process_milestone_complete(mocker, mock_engine):
     mock_engine.run_pluggable_logic.return_value = {}
     mock_engine.get_next_node.return_value = node3
     mock_engine.process_node.return_value = "processed_action"
+    mock_engine.remove_skip_requests = [2]
     mocker.patch('navigator_engine.model.load_graph')
 
     milestone_engine = mocker.Mock(spec=DecisionEngine)
+    milestone_engine.remove_skip_requests = [3]
     milestone_engine.progress = mocker.patch(
         'navigator_engine.common.progress_tracker.ProgressTracker',
         auto_spec=True
@@ -194,6 +199,7 @@ def test_process_milestone_complete(mocker, mock_engine):
     result = DecisionEngine.process_milestone(mock_engine, node1)
 
     assert result == "processed_action"
+    assert mock_engine.remove_skip_requests == [2, 3]
     mock_engine.progress.add_milestone.assert_called_once_with(
         node1,
         milestone_engine.progress,

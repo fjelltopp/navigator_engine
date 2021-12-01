@@ -94,7 +94,7 @@ def create_demo_data():
     model.db.session.add(graph)
     model.db.session.commit()
 
-    graph_with_milestone = model.Graph(title="Demo Graph", version="0.1", description="Demo")
+    graph_with_milestones = model.Graph(title="Demo Graph", version="0.1", description="Demo")
     nodes = [
         model.Node(conditional=model.Conditional(
             title="Conditional 1",
@@ -105,6 +105,11 @@ def create_demo_data():
             data_loader="load_dict_value('data')",
             graph_id=1
         ), ref='tst-2-1-m'),  # id=12
+        model.Node(milestone=model.Milestone(
+            title="Naomi Data Review",
+            data_loader="load_dict_value('naomi')",
+            graph_id=3
+        ), ref='tst-2-6-m'),  # id=14
         model.Node(conditional=model.Conditional(
             title="Conditional 2",
             function="dict_value('2')"
@@ -117,21 +122,46 @@ def create_demo_data():
             title="Action 2",
             html="Action 2 HTML",
             resources=[model.Resource(title="Naomi", url="https://naomi.unaids.org")]
-        ), ref='tst-2-4-a'),  # id=14
+        ), ref='tst-2-4-a'),  # id=15
         model.Node(action=model.Action(
             title="Complete",
-            html="Action Complete",
+            html="Milestone Complete",
             complete=True
-        ), ref='tst-2-5-a'),  # id=15
+        ), ref='tst-2-5-a'),  # id=16
     ]
-    graph_with_milestone.edges = [
-        model.Edge(from_node=nodes[0], to_node=nodes[3], type=False),
+    graph_with_milestones.edges = [
+        model.Edge(from_node=nodes[0], to_node=nodes[4], type=False),
         model.Edge(from_node=nodes[0], to_node=nodes[1], type=True),
         model.Edge(from_node=nodes[1], to_node=nodes[2], type=True),
-        model.Edge(from_node=nodes[2], to_node=nodes[4], type=False),
-        model.Edge(from_node=nodes[2], to_node=nodes[5], type=True)
+        model.Edge(from_node=nodes[2], to_node=nodes[3], type=True),
+        model.Edge(from_node=nodes[3], to_node=nodes[5], type=False),
+        model.Edge(from_node=nodes[3], to_node=nodes[6], type=True)
     ]
-    model.db.session.add(graph_with_milestone)
+    model.db.session.add(graph_with_milestones)
+    model.db.session.commit()
+
+    graph_naomi = model.Graph(title="Naomi Data Review", version="0.1", description="Demo")
+    nodes = [
+        model.Node(conditional=model.Conditional(
+            title="Conditional 1",
+            function="dict_value('1')"
+        ), ref='tst-3-0-c'),  # id=17
+        model.Node(action=model.Action(
+            title="Naomi Action 1",
+            html="Naomi Action 1 HTML",
+            skippable=False
+        ), ref='tst-3-1-a'),  # id=18
+        model.Node(action=model.Action(
+            title="Complete",
+            html="Milestone Complete",
+            complete=True
+        ), ref='tst-3-2-a'),  # id=19
+    ]
+    graph_naomi.edges = [
+        model.Edge(from_node=nodes[0], to_node=nodes[1], type=False),
+        model.Edge(from_node=nodes[0], to_node=nodes[2], type=True)
+    ]
+    model.db.session.add(graph_naomi)
     model.db.session.commit()
 
 

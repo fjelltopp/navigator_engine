@@ -16,24 +16,25 @@ logger = logging.getLogger(__name__)
 class DecisionEngine():
 
     def __init__(self, graph: model.Graph, source_data: object, data_loader: str = None,
-                 stop: str = "", skip_requests: list[str] = [], route: list[model.Node] = []) -> None:
+                 stop: str = "", skip_requests: list[str] = [], route: list[model.Node] = [],
+                 skipped_actions: list[str] = []) -> None:
         self.graph: model.Graph = graph
         self.network: networkx.DigGraph = self.graph.to_networkx()
         self.data: Any = source_data
         self.skip_requests: list[str] = skip_requests
         self.remove_skip_requests: list[str] = []
-        self.progress: ProgressTracker = ProgressTracker(self.network, route=route)
+        self.progress: ProgressTracker = ProgressTracker(self.network, route=route, skipped_actions=skipped_actions)
         self.decision: dict[str, Any] = {}
         self.stop_action: str = stop
         if data_loader:
             self.data = self.run_pluggable_logic(data_loader, DATA_LOADERS)
 
     def decide(self, data: object = None, skip_requests: list[str] = None, stop=None) -> dict:
-        if data:
+        if data is not None:
             self.data = data
-        if skip_requests:
+        if skip_requests is not None:
             self.skip_requests = skip_requests
-        if stop:
+        if stop is not None:
             self.stop_action = stop
         self.progress.reset()
         next_action = self.process_node(self.progress.root_node)
@@ -79,9 +80,11 @@ class DecisionEngine():
             self.data.copy(),
             data_loader=node.milestone.data_loader,
             skip_requests=self.skip_requests,
+            skipped_actions=self.progress.skipped_actions,
             stop=self.stop_action
         )
         milestone_result = milestone_engine.decide()
+        self.remove_skip_requests += milestone_engine.remove_skip_requests
         if milestone_result['node'].action.complete:
             self.progress.add_milestone(node, milestone_engine.progress, complete=True)
             next_node = self.get_next_node(node, True)
@@ -102,7 +105,7 @@ class DecisionEngine():
         return new_node
 
     def run_pluggable_logic(self, function_string: str,
-                            functions: dict[str, Callable] = CONDITIONAL_FUNCTIONS):
+                            functions: dict[str, Callable] = CONDITIONAL_FUNCTIONS) -> Any:
         function_name, function_args = get_pluggable_function_and_args(function_string)
         try:
             function = functions[function_name]
@@ -125,19 +128,21 @@ class DecisionEngine():
                 return self.process_node(new_node)
         raise DecisionError(f"Only one outgoing edge for node: {previous_node}")
 
-    def remove_skip_requests_not_needed(self):
+    def remove_skip_requests_not_needed(self) -> None:
         action_breadcrumbs_ref = [a['id'] for a in self.progress.action_breadcrumbs]
         ignored_skips = [ref for ref in self.skip_requests if ref not in self.progress.skipped_actions]
         ignored_skips_in_path = [ref for ref in ignored_skips if ref in action_breadcrumbs_ref]
         self.remove_skip_requests.extend(ref for ref in ignored_skips_in_path if ref not in self.remove_skip_requests)
 
 
-def engine_factory(graph, data, data_loader=None, skip_requests=[], stop=None) -> DecisionEngine:
+def engine_factory(graph, data, data_loader=None, skip_requests=[],
+                   stop=None, skipped_actions=[]) -> DecisionEngine:
     # Used to mock out engine creation in tests
     return DecisionEngine(
         graph,
         data,
         skip_requests=skip_requests,
         data_loader=data_loader,
-        stop=stop
+        stop=stop,
+        skipped_actions=skipped_actions
     )

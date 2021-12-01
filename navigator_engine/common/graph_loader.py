@@ -312,12 +312,13 @@ def _create_check_skips_action(conditional, graph_data):
         tasks.append(node.action.title)
     tasks_list = "\n - ".join(tasks)
 
-    graph_data[DATA_COLUMNS['ACTION']] = "You have skipped some essential tasks"
+    graph_data[DATA_COLUMNS['ACTION']] = "You must complete some previous tasks"
     graph_data[DATA_COLUMNS['ACTION_CONTENT']] = (
-        f"You have skipped some of following essential tasks:\n\n - {tasks_list}\n\n"
+        f"One or more of the following essential tasks remains incomplete:\n\n - {tasks_list}\n\n"
         "You must ensure you complete all these tasks in order to proceed any further.\n\n"
+        "Navigator will now take you back to ensure you complete these tasks.\n\n"
         "If you have understood this message, mark this task as complete and click *What's"
-        "Next* to be taken to the first of your incomplete essential tasks."
+        "Next?* to see the first of your essential incomplete tasks."
     )
 
     return graph_data

@@ -50,9 +50,9 @@ def test_skipping_unskippable_step_raises_error(data, skip_steps):
 
 
 @pytest.mark.parametrize("data, expected_node_id", [
-    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': False, '4': True}}, 'tst-1-6-a'),
-    ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}}, 'tst-1-4-a'),
-    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}}, 'tst-2-5-a')
+    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': False, '4': True}, 'naomi': {'1': True}}, 'tst-1-6-a'),
+    ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}, 'naomi': {'1': True}}, 'tst-1-4-a'),
+    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}, 'naomi': {'1': True}}, 'tst-2-5-a')
 ])
 @pytest.mark.usefixtures('with_app_context')
 def test_graph_processing_with_milestones(data, expected_node_id):
@@ -64,20 +64,21 @@ def test_graph_processing_with_milestones(data, expected_node_id):
 
 
 @pytest.mark.parametrize("data, expected_breadcrumbs", [
-    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': False, '4': True}},
+    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': False, '4': True}, 'naomi': {'1': True}},
      [{'id': 'tst-2-3-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
       {'id': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
       {'id': 'tst-1-5-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
       {'id': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False}]),
-    ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}},
+    ({'1': True, '2': True, 'data': {'1': False, '2': True, '3': True, '4': True}, 'naomi': {'1': True}},
      [{'id': 'tst-2-3-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
       {'id': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False}]),
-    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}},
+    ({'1': True, '2': True, 'data': {'1': True, '2': True, '3': True, '4': True}, 'naomi': {'1': True}},
      [{'id': 'tst-2-3-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
       {'id': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
       {'id': 'tst-1-5-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
       {'id': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
       {'id': 'tst-1-7-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+      {'id': 'tst-3-1-a', 'milestoneID': 'tst-2-6-m', 'skipped': False, 'manualConfirmationRequired': False},
       {'id': 'tst-2-4-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
       {'id': 'tst-2-5-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}])
 ])
@@ -144,7 +145,7 @@ def test_progress_during_milestone():
     engine.decide()
     progress = engine.progress.report_progress()
     assert progress == {
-        'progress': 33,
+        'progress': 25,
         'milestoneListFullyResolved': True,
         'currentMilestoneID': 'tst-2-1-m',
         'milestones': [{
@@ -152,6 +153,11 @@ def test_progress_during_milestone():
             'title': 'ADR Data',
             'progress': 50,
             'completed': False
+        }, {
+            'completed': False,
+            'id': 'tst-2-6-m',
+            'progress': 0,
+            'title': 'Naomi Data Review'
         }]
     }
 
@@ -177,6 +183,11 @@ def test_progress_prior_milestone():
             'title': 'ADR Data',
             'progress': 0,
             'completed': False
+        }, {
+            'completed': False,
+            'id': 'tst-2-6-m',
+            'progress': 0,
+            'title': 'Naomi Data Review'
         }]
     }
 
@@ -188,13 +199,14 @@ def test_progress_after_milestone():
     data = {
         '1': True,
         '2': False,
-        'data': {'1': True, '2': True, '3': True, '4': True}
+        'data': {'1': True, '2': True, '3': True, '4': True},
+        'naomi': {'1': True}
     }
     engine = DecisionEngine(graph, data)
     engine.decide()
     progress = engine.progress.report_progress()
     assert progress == {
-        'progress': 67,
+        'progress': 75,
         'milestoneListFullyResolved': True,
         'currentMilestoneID': None,
         'milestones': [{
@@ -202,5 +214,30 @@ def test_progress_after_milestone():
             'title': 'ADR Data',
             'progress': 100,
             'completed': True
+        }, {
+            'completed': True,
+            'id': 'tst-2-6-m',
+            'progress': 100,
+            'title': 'Naomi Data Review'
         }]
     }
+
+
+@pytest.mark.usefixtures('with_app_context')
+def test_skip_check_logic():
+    test_util.create_demo_data()
+    node = model.load_node(node_ref='tst-3-0-c')
+    node.conditional.function = "check_not_skipped(['tst-1-5-a'])"
+    model.db.session.add(node)
+    model.db.session.commit()
+    graph = model.load_graph(2)
+    data = {
+        '1': True,
+        '2': True,
+        'data': {'1': True, '2': False, '3': True, '4': True},
+        'naomi': {}
+    }
+    engine = DecisionEngine(graph, data, skip_requests=['tst-1-5-a'])
+    engine.decide()
+    assert engine.decision['id'] == 'tst-3-1-a'
+    assert engine.remove_skip_requests == ['tst-1-5-a']

@@ -18,7 +18,8 @@ def test_decide_complete(client, mocker):
     data = {
         '1': True,
         '2': True,
-        'data': {'1': True, '2': True, '3': False, '4': True}
+        'data': {'1': True, '2': True, '3': False, '4': True},
+        'naomi': {'1': True}
     }
     setup_endpoint_test(mocker, data)
     response = client.post("/api/decide", data=json.dumps({
@@ -33,7 +34,7 @@ def test_decide_complete(client, mocker):
             'id': 'tst-2-5-a',
             'content': {
                 'title': 'Complete',
-                'displayHTML': 'Action Complete',
+                'displayHTML': 'Milestone Complete',
                 'skippable': False,
                 'terminus': True,
                 'helpURLs': []
@@ -45,6 +46,7 @@ def test_decide_complete(client, mocker):
             {'id': 'tst-1-5-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
             {'id': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': True, 'manualConfirmationRequired': False},
             {'id': 'tst-1-7-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
+            {'id': 'tst-3-1-a', 'milestoneID': 'tst-2-6-m', 'skipped': False, 'manualConfirmationRequired': False},
             {'id': 'tst-2-4-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
             {'id': 'tst-2-5-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}
         ],
@@ -53,7 +55,10 @@ def test_decide_complete(client, mocker):
             'progress': 100,
             'currentMilestoneID': None,
             'milestoneListFullyResolved': True,
-            'milestones': [{'id': 'tst-2-1-m', 'title': 'ADR Data', 'progress': 100, 'completed': True}]
+            'milestones': [
+                {'id': 'tst-2-1-m', 'title': 'ADR Data', 'progress': 100, 'completed': True},
+                {'id': 'tst-2-6-m', 'title': 'Naomi Data Review', 'progress': 100, 'completed': True}
+            ]
         }
     }
 
@@ -97,8 +102,11 @@ def test_decide_incomplete(client, mocker):
         'progress': {
             'currentMilestoneID': 'tst-2-1-m',
             'milestoneListFullyResolved': True,
-            'progress': 33,
-            'milestones': [{'completed': False, 'id': 'tst-2-1-m', 'progress': 50, 'title': 'ADR Data'}]
+            'progress': 25,
+            'milestones': [
+                {'id': 'tst-2-1-m', 'title': 'ADR Data', 'progress': 50, 'completed': False},
+                {'id': 'tst-2-6-m', 'title': 'Naomi Data Review', 'progress': 0, 'completed': False}
+            ]
         }
     }
 
@@ -144,7 +152,7 @@ def test_decide_without_url_raises_bad_request(client, mocker):
     ('tst-2-5-a', {
         'id': 'tst-2-5-a',
         'content': {
-            'displayHTML': 'Action Complete',
+            'displayHTML': 'Milestone Complete',
             'helpURLs': [],
             'skippable': False,
             'terminus': True,
@@ -190,7 +198,8 @@ def test_action_list(client, mocker):
     data = {
         '1': True,
         '2': True,
-        'data': {'1': True, '2': True, '3': False, '4': True}
+        'data': {'1': True, '2': True, '3': False, '4': True},
+        'naomi': {'1': True}
     }
     setup_endpoint_test(mocker, data)
     response = client.post("/api/decide/list", data=json.dumps({
@@ -240,6 +249,13 @@ def test_action_list(client, mocker):
             'skipped': False,
             'title': 'Validate your survey data'
         }, {
+            'id': 'tst-3-1-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': 'tst-2-6-m',
+            'reached': True,
+            'skipped': False,
+            'title': 'Naomi Action 1'
+        }, {
             'id': 'tst-2-4-a',
             'manualConfirmationRequired': False,
             'milestoneID': None,
@@ -259,5 +275,10 @@ def test_action_list(client, mocker):
             'id': 'tst-2-1-m',
             'progress': 100,
             'title': 'ADR Data'
+        }, {
+            'completed': True,
+            'id': 'tst-2-6-m',
+            'progress': 100,
+            'title': 'Naomi Data Review'
         }],
     }
