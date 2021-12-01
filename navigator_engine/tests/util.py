@@ -147,8 +147,9 @@ def create_demo_data():
             function="dict_value('1')"
         ), ref='tst-3-0-c'),  # id=17
         model.Node(action=model.Action(
-            title="Action 1",
-            html="Action 1 HTML"
+            title="Naomi Action 1",
+            html="Naomi Action 1 HTML",
+            skippable=False
         ), ref='tst-3-1-a'),  # id=18
         model.Node(action=model.Action(
             title="Complete",

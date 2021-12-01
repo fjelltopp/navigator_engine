@@ -254,7 +254,7 @@ def test_action_list(client, mocker):
             'milestoneID': 'tst-2-6-m',
             'reached': True,
             'skipped': False,
-            'title': 'Action 1'
+            'title': 'Naomi Action 1'
         }, {
             'id': 'tst-2-4-a',
             'manualConfirmationRequired': False,
