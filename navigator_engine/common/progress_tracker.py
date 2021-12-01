@@ -7,13 +7,15 @@ import copy
 
 class ProgressTracker():
 
-    def __init__(self, network: networkx.DiGraph, route: list[model.Node] = []) -> None:
+    def __init__(self, network: networkx.DiGraph,
+                 route: list[model.Node] = [], skipped_actions: list[str] = []) -> None:
         self.network: networkx.DiGraph = network
         self.previous_route: list[model.Node] = route.copy()
         self.entire_route: list[model.Node] = route.copy()
         self.route: list[model.Node] = []
         self.milestones: list[dict] = []
-        self.skipped_actions: list[str] = []
+        self.previously_skipped_actions: list[str] = skipped_actions.copy()
+        self.skipped_actions: list[str] = skipped_actions.copy()
         self.action_breadcrumbs: list[dict[str, Any]] = []
         self.complete_node: model.Node = self.get_complete_node()
         self.root_node: model.Node = self.get_root_node()
@@ -45,12 +47,12 @@ class ProgressTracker():
     def reset(self) -> None:
         self.entire_route = self.previous_route
         self.route = []
-        self.skipped_actions = []
+        self.skipped_actions = self.previously_skipped_actions
 
     def add_milestone(self, milestone_node: model.Node,
                       milestone_progress, complete: bool = False) -> None:
-        self.entire_route += milestone_progress.entire_route
-        self.skipped_actions += milestone_progress.skipped_actions
+        self.entire_route = milestone_progress.entire_route
+        self.skipped_actions = milestone_progress.skipped_actions
         self.milestones.append({
             'id': milestone_node.ref,
             'title': milestone_node.milestone.title,
