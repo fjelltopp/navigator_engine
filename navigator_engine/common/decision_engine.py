@@ -30,11 +30,11 @@ class DecisionEngine():
             self.data = self.run_pluggable_logic(data_loader, DATA_LOADERS)
 
     def decide(self, data: object = None, skip_requests: list[str] = None, stop=None) -> dict:
-        if data:
+        if data is not None:
             self.data = data
-        if skip_requests:
+        if skip_requests is not None:
             self.skip_requests = skip_requests
-        if stop:
+        if stop is not None:
             self.stop_action = stop
         self.progress.reset()
         next_action = self.process_node(self.progress.root_node)
