@@ -221,3 +221,23 @@ def test_progress_after_milestone():
             'title': 'Naomi Data Review'
         }]
     }
+
+
+@pytest.mark.usefixtures('with_app_context')
+def test_skip_check_logic():
+    test_util.create_demo_data()
+    node = model.load_node(node_ref='tst-3-0-c')
+    node.conditional.function = "check_not_skipped(['tst-1-5-a'])"
+    model.db.session.add(node)
+    model.db.session.commit()
+    graph = model.load_graph(2)
+    data = {
+        '1': True,
+        '2': True,
+        'data': {'1': True, '2': False, '3': True, '4': True},
+        'naomi': {}
+    }
+    engine = DecisionEngine(graph, data, skip_requests=['tst-1-5-a'])
+    engine.decide()
+    assert engine.decision['id'] == 'tst-3-1-a'
+    assert engine.remove_skip_requests == ['tst-1-5-a']
