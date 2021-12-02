@@ -82,5 +82,12 @@ def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
                 f'Indicator "{indicator}" not found in Spectrum checklist'
             )
     indicator_checks = checklist[checklist['Condition checked'].isin(indicators)]
-    indicator_checks['Status'] = indicator_checks['Status'].fillna(True)
+    indicator_checks['Status'].replace(to_replace=[1, 'TRUE', 'T', 'true', 't', 'NA', 'na', 'N/A', 'n/a'],
+                                       value=True,
+                                       inplace=True)
+    indicator_checks['Status'].replace([0, 'FALSE', 'F', 'false', 'f'],
+                                       value=False,
+                                       inplace=True)
+
+    #indicator_checks['Status'] = indicator_checks['Status'].fillna(True)
     return indicator_checks['Status'].eq(True).all()
