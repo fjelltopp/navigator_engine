@@ -34,7 +34,7 @@ def load_url(url: str, auth_header: str, name: str, engine: DecisionEngine) -> d
     headers = {"Authorization": auth_header}
     response = requests.get(url, headers=headers)
     response.raise_for_status()
-    data[name] = {'source_url': url, 'auth_header': auth_header, 'data': response.content}
+    data[name] = {'url': url, 'auth_header': auth_header, 'data': response.content}
     return data
 
 
@@ -92,7 +92,6 @@ def load_csv_from_zipped_resource(resource_type: str, csv_filename_regex: str,
                                   name: str, engine: DecisionEngine) -> dict:
     data = load_dataset_resource(resource_type, engine)
     auth_header = data[resource_type]['auth_header']
-
     if not data[resource_type]['data']:
         data[name] = {
             'data': None,

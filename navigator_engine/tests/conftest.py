@@ -6,6 +6,8 @@ import unittest.mock as mock
 from navigator_engine.common.progress_tracker import ProgressTracker
 from navigator_engine.common.decision_engine import DecisionEngine
 import navigator_engine.tests.factories as factories
+from navigator_engine.common.graph_loader import graph_loader, validate_graph
+import os
 
 
 @pytest.fixture(scope='package')
@@ -58,6 +60,19 @@ def mock_engine():
 @pytest.fixture
 def simple_network():
     return get_simple_network()
+
+
+@pytest.fixture(scope="module")
+def test_production_client():
+    with app.test_client() as client:
+        with app.app_context():
+            db.drop_all()
+            db.session.close()
+            db.create_all()
+            base_directory = os.path.abspath(os.path.dirname(__file__))
+            graph_loader(f'{base_directory}/../../Estimates 22 BDG [Final].xlsx')
+            validate_graph(1)
+        yield client
 
 
 def get_mock_engine():

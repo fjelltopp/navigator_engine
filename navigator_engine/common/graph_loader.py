@@ -11,7 +11,8 @@ MILESTONE_COLUMNS = {
     'TITLE': 'Milestone Title (Visible to User):',
     'VERSION': 'Version:',
     'DESCRIPTION': 'Milestone Description (Visible to User):',
-    'COMPLETE_MESSAGE': 'Complete Message'
+    'COMPLETE_MESSAGE': 'Complete Message',
+    'DATA_LOADER': 'Data Loader:'
 }
 
 DATA_COLUMNS = {
@@ -111,9 +112,13 @@ def import_data(sheet_name, graphs):
             is_milestone = p.match(graph_data.loc[idx, DATA_COLUMNS['TITLE']])
             if is_milestone:
                 milestone_sheet_name = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
+                data_loader = graphs[milestone_sheet_name]['graph_header'].get(
+                    MILESTONE_COLUMNS['DATA_LOADER']
+                )
                 milestone = model.Milestone(
                     title=graphs[milestone_sheet_name]['title'],
-                    graph_id=graphs[milestone_sheet_name]['graph_id']
+                    graph_id=graphs[milestone_sheet_name]['graph_id'],
+                    data_loader=data_loader
                 )
                 model.db.session.add(milestone)
                 model.db.session.commit()
