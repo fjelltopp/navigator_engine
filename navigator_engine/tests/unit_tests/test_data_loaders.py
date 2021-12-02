@@ -40,7 +40,7 @@ def test_load_url(mock_engine, mocker):
     mock_requests_get.assert_called_once_with(args[0], headers={'Authorization': args[1]})
     assert result == {
         args[2]: {
-            'source_url': args[0],
+            'url': args[0],
             'auth_header': args[1],
             'data': mock_response.content
         }
