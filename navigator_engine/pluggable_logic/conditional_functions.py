@@ -72,15 +72,21 @@ def check_dataset_valid(engine: DecisionEngine) -> bool:
 
 @register_conditional
 def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
-    checklist = engine.data['spectrum-checker']['data']
+    checklist = engine.data['spectrum-validation-file']['data']
 
     if checklist is None:
         return False
+
     for indicator in indicators:
-        if indicator not in checklist['Condition checked'].values:
+        if indicator not in checklist['ID'].values:
             raise navigator_engine.common.DecisionError(
                 f'Indicator "{indicator}" not found in Spectrum checklist'
             )
-    indicator_checks = checklist[checklist['Condition checked'].isin(indicators)]
-    indicator_checks['Status'] = indicator_checks['Status'].fillna(True)
+    indicator_checks = checklist[checklist['ID'].isin(indicators)]
+    indicator_checks['Status'].replace([0, 'FALSE', 'F', 'false', 'f'],
+                                       value=False,
+                                       inplace=True)
+
+    indicator_checks['Status'][indicator_checks['Status'].ne(False)] = True
+
     return indicator_checks['Status'].eq(True).all()

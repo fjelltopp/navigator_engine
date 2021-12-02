@@ -38,7 +38,6 @@ VALID_RESOURCE_TYPES = [
     "inputs-unaids-naomi-report"
 ]
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -356,6 +355,17 @@ def validate_pluggable_logic(node, network):
             require(
                 resource_type in VALID_RESOURCE_TYPES,
                 f"{node.ref} function references invalid resource_type {resource_type}"
+            )
+
+    elif function_name.startswith('check_spectrum'):
+        spectrum_checks = function_args[0]
+        valid_spectrum_checks = pd.read_csv('spectrum_check_list.csv')['ID']
+        if type(spectrum_checks) is str:
+            spectrum_checks = [spectrum_checks]
+        for check in spectrum_checks:
+            require(
+                check in valid_spectrum_checks.values,
+                f"{node.ref} function references spectrum check {check}"
             )
 
 
