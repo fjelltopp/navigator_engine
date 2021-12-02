@@ -25,6 +25,7 @@ class Testing(Config):
 class Development(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/../app.db'
+    DEFAULT_DECISION_GRAPH = f'{base_directory}/tests/test_data/Simple Development BDG.xlsx'
 
 
 class Production(Config):
