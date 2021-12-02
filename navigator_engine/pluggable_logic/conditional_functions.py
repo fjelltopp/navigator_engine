@@ -72,7 +72,7 @@ def check_dataset_valid(engine: DecisionEngine) -> bool:
 
 @register_conditional
 def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
-    checklist = engine.data['spectrum-checker']['data']
+    checklist = engine.data['spectrum-validation-file']['data']
 
     if checklist is None:
         return False

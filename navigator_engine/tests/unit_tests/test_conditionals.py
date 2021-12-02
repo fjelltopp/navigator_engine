@@ -112,7 +112,7 @@ def test_check_dataset_valid(resources, expected, mock_engine):
 def test_check_spectrum_file(checklist, dataframe, expected, raises_error, mock_engine):
 
     mock_engine.data = {
-        'spectrum-checker': {
+        'spectrum-validation-file': {
             'data': dataframe
         }
     }
