@@ -99,15 +99,15 @@ def test_check_dataset_valid(resources, expected, mock_engine):
 
 @pytest.mark.parametrize("checklist, dataframe, expected, raises_error", [
     (['MaleART_current', 'AdultARTcovLT100'],
-     pd.read_csv('navigator_engine/tests/test_data/test_spectrum_check.csv'), True, does_not_raise()),
+     pd.read_csv('spectrum_check_list.csv'), True, does_not_raise()),
     (['UAvalid', 'ARTMortNoART_default'],
-     pd.read_csv('navigator_engine/tests/test_data/test_spectrum_check.csv'), False, does_not_raise()),
+     pd.read_csv('spectrum_check_list.csv'), False, does_not_raise()),
     (['MaleART_current', 'AdultARTcovLT100'],
      None, False, does_not_raise()),
     (['MaleART_current', 'CurrentYear'],
-     pd.read_csv('navigator_engine/tests/test_data/test_spectrum_check.csv'), True, does_not_raise()),
+     pd.read_csv('spectrum_check_list.csv'), True, does_not_raise()),
     (['MaleART_current', 'AdultARTcovLT100', 'This indicator does not exist'],
-     pd.read_csv('navigator_engine/tests/test_data/test_spectrum_check.csv'), None, pytest.raises(DecisionError))
+     pd.read_csv('spectrum_check_list.csv'), None, pytest.raises(DecisionError))
 ])
 def test_check_spectrum_file(checklist, dataframe, expected, raises_error, mock_engine):
 
