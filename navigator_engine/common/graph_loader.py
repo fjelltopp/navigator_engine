@@ -373,6 +373,17 @@ def validate_pluggable_logic(node, network):
                 f"{node.ref} function references spectrum check {check}"
             )
 
+    elif function_name.startswith('check_naomi'):
+        naomi_checks = function_args[0]
+        valid_naomi_checks = pd.read_csv('naomi_check_list.csv')['NaomiCheckPermPrimKey']
+        if type(naomi_checks) is str:
+            naomi_checks = [naomi_checks]
+        for check in naomi_checks:
+            require(
+                check in valid_naomi_checks.values,
+                f"{node.ref} function references Naomi check {check}"
+            )
+
 
 def validate_graph(graph_id):
     graph = model.load_graph(graph_id)
