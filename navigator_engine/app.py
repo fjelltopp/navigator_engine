@@ -9,6 +9,7 @@ from navigator_engine.model import db
 from navigator_engine.common import dash_app
 import importlib
 import json
+import json_logging
 
 
 def create_app(config_object=None):
@@ -24,7 +25,9 @@ def create_app(config_object=None):
     app.config.from_object(config_object)
     app.url_map.strict_slashes = False
     app.logger.setLevel(app.config.get('LOGGING_LEVEL'))
-
+    if app.config['JSON_LOGGING']:
+        json_logging.init_flask(enable_json=app.config['JSON_LOGGING'])
+        json_logging.init_request_instrument(app)
     if app.config.get("SENTRY_DSN"):
         sentry_sdk.init(
             dsn=app.config["SENTRY_DSN"],
