@@ -1,29 +1,30 @@
-﻿Condition checked,Status
-PMTCT has 2020 data,True
-Ped ART has 2020 data,True
-Adult male ART has 2020 data,True
-Adult female ART has 2020 data,True
-Ped KOS as 2020 data,True
-Adult male KOS has 2020 data,True
-Adult female KOS has 2020 data,True
-Ped VS as 2020 data,True
-Adult male VS has 2020 data,True
-Adult female VS has 2020 data,True
-Child progression is default,True
-Child distribution of new infections is default,True
-Child mortality off ART is default,True
-Child mortality on ART is default,True
-Adult progression is default,NA
-Adult distribution of new infections by CD4 count is default,True
-Adult off ART mortality is default,True
-Adult ART mortality is default,True
-FRR by CD4 is default,True
-FRR by age off ART is default,True
-FRR by age on ART is default,True
-MTCT transmission probabilities are default,True
-ART allocation method is default,True
-Shiny90 is valid,NA
-Uncertainty analysis is valid,False
-Adult ART coverage never exceeds 100%,True
-Pediatric ART coverage never exceed 100%,True
-PMTCT coverage never exceeds 100%,False
+ID,Condition checked,Status
+PMTCT_current,PMTCT has 2020 data,TRUE
+PedART_current,Ped ART has 2020 data,TRUE
+MaleART_current,Adult male ART has 2020 data,TRUE
+FemaleART_current,Adult female ART has 2020 data,TRUE
+PedKOS_current,Ped KOS as 2020 data,TRUE
+MaleKOS_current,Adult male KOS has 2020 data,TRUE
+FemaleKOS_current,Adult female KOS has 2020 data,TRUE
+PedVS_current,Ped VS as 2020 data,FALSE
+MaleVS_current,Adult male VS has 2020 data,FALSE
+FemaleVS_current,Adult female VS has 2020 data,FALSE
+ChildProgression_default,Child progression is default,TRUE
+ChildDistNI_default,Child distribution of new infections is default,TRUE
+ChildMortNoART_default,Child mortality off ART is default,TRUE
+ChildMortART_default,Child mortality on ART is default,TRUE
+AdultProgression_default,Adult progression is default,TRUE
+AdultDistNI_default,Adult distribution of new infections is default,TRUE
+ARTMortNoART_default,Adult off ART mortality is default,TRUE
+ARTMortART_default,Adult ART mortality is default,TRUE
+FRRCD4_default,FRR by CD4 is default,TRUE
+FRRageNoART_default,FRR by age off ART is default,TRUE
+FRRageART_default,FRR by age on ART is default,TRUE
+MTCTtrans_default,MTCT transmission probabilities are default,TRUE
+ARTallocation_default,ART allocation method is default,TRUE
+Shiny90Valid,Shiny90 is valid,FALSE
+UAvalid,Uncertainty analysis is valid,FALSE
+AdultARTcovLT100,Adult ART coverage never exceeds 100%,TRUE
+PedARTcovLT100,Pediatric ART coverage never exceed 100%,TRUE
+PMTCTcovLT100,PMTCT coverage never exceeds 100%,FALSE
+CurrentYear,Current year,2021
