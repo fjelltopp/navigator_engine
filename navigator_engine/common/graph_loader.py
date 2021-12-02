@@ -304,22 +304,25 @@ def _get_ref(ref, node_type):
 
 def _create_check_skips_action(conditional, graph_data):
 
-    function_name, function_args = common.get_pluggable_function_and_args(conditional.function)
+    if graph_data[DATA_COLUMNS['ACTION']].isna().values.any():
+        graph_data[DATA_COLUMNS['ACTION']] = "You have skipped some essential tasks"
 
-    tasks = []
-    for node_ref in function_args[0]:
-        node = model.load_node(node_ref=node_ref)
-        tasks.append(node.action.title)
-    tasks_list = "\n - ".join(tasks)
+    if graph_data[DATA_COLUMNS['ACTION_CONTENT']].isna().values.any():
+        function_name, function_args = common.get_pluggable_function_and_args(conditional.function)
 
-    graph_data[DATA_COLUMNS['ACTION']] = "You must complete some previous tasks"
-    graph_data[DATA_COLUMNS['ACTION_CONTENT']] = (
-        f"One or more of the following essential tasks remains incomplete:\n\n - {tasks_list}\n\n"
-        "You must ensure you complete all these tasks in order to proceed any further.\n\n"
-        "Navigator will now take you back to ensure you complete these tasks.\n\n"
-        "If you have understood this message, mark this task as complete and click *What's"
-        "Next?* to see the first of your essential incomplete tasks."
-    )
+        tasks = []
+        for node_ref in function_args[0]:
+            node = model.load_node(node_ref=node_ref)
+            tasks.append(node.action.title)
+        tasks_list = "\n - ".join(tasks)
+
+        graph_data[DATA_COLUMNS['ACTION_CONTENT']] = (
+            f"One or more of the following essential tasks remains incomplete:\n\n - {tasks_list}\n\n"
+            "You must ensure you complete all these tasks in order to proceed any further.\n\n"
+            "Navigator will now take you back to ensure you complete these tasks.\n\n"
+            "If you have understood this message, mark this task as complete and click *What's"
+            "Next?* to see your first incomplete task."
+        )
 
     return graph_data
 
