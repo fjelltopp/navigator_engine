@@ -358,6 +358,16 @@ def validate_pluggable_logic(node, network):
                 f"{node.ref} function references invalid resource_type {resource_type}"
             )
 
+    elif function_name.startswith('check_spectrum'):
+        spectrum_checks = function_args[0]
+        if type(spectrum_checks) is str:
+            spectrum_checks = [spectrum_checks]
+        for check in spectrum_checks:
+            require(
+                check in VALID_RESOURCE_TYPES,
+                f"{node.ref} function references invalid resource_type {check}"
+            )
+
 
 def validate_graph(graph_id):
     graph = model.load_graph(graph_id)
