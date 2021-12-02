@@ -76,6 +76,28 @@ def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
     if checklist is None:
         return False
     for indicator in indicators:
+        if indicator not in checklist['NaomiCheckPermPrimKey'].values:
+            raise navigator_engine.common.DecisionError(
+                f'Indicator "{indicator}" not found in Naomi checklist'
+            )
+    indicator_checks = checklist[checklist['NaomiCheckPermPrimKey'].isin(indicators)]
+    indicator_checks['TrueFalse'].replace([0, 'FALSE', 'F', 'false', 'f'],
+                                          value=False,
+                                          inplace=True)
+
+    indicator_checks['TrueFalse'][indicator_checks['TrueFalse'].ne(False)] = True
+
+    return indicator_checks['Status'].eq(True).all()
+
+
+@register_conditional
+def check_naomi_file(indicators: list[str], engine: DecisionEngine) -> bool:
+    checklist = engine.data['naomi-validation-file']['data']
+
+    if checklist is None:
+        return False
+
+    for indicator in indicators:
         if indicator not in checklist['ID'].values:
             raise navigator_engine.common.DecisionError(
                 f'Indicator "{indicator}" not found in Spectrum checklist'
