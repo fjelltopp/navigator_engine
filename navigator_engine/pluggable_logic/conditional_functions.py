@@ -112,7 +112,8 @@ def _check_validation_file(
     indicator_checks = checklist[checklist[id_column].str.lower().isin(indicators)]
     indicator_checks[result_column] = indicator_checks[result_column].replace(
         [0, 'FALSE', 'F', 'false', 'f'],
-        value=False)
+        value=False
+    )
 
     indicator_checks[result_column][indicator_checks[result_column].ne(False)] = True
 
