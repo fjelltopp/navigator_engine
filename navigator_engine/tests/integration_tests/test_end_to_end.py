@@ -30,3 +30,16 @@ def test_spectrum_file_check(test_production_client):
 
     assert response.status_code == 200
     assert response.json['decision']['id'] == 'EST-SPF-16-01-A'
+
+
+@pytest.mark.vcr()
+def test_estimates_complete(test_production_client):
+    response = test_production_client.post("/api/decide", data=json.dumps({
+        'data': {
+            'url': 'https://dev.adr.fjelltopp.org/api/3/action/package_show'
+                   '?id=vanuatu-country-estimates-2022',
+            'authorization_header': os.getenv('ADR_SYSADMIN_KEY')
+        }
+    }))
+    assert response.status_code == 200
+    assert response.json['decision']['id'] == 'EST-OVV-CPLT-A'
