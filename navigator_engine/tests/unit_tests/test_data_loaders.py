@@ -224,7 +224,7 @@ def test_load_naomi_csv_from_zipped_resource(mock_engine, mocker):
     )
     result = data_loaders.load_csv_from_zipped_resource(
         "naomi-file",
-        "(.*)_check.csv",
+        ".*unaids_navigator_checklist.csv",
         "naomi-file-check",
         mock_engine
     )
