@@ -151,7 +151,7 @@ def test_load_estimates_dataset(mock_engine, mocker):
     assert result == mock_load_dataset_resource.return_value
 
 
-def test_load_csv_from_zipped_resource(mock_engine, mocker):
+def test_load_spectrum_csv_from_zipped_resource(mock_engine, mocker):
 
     with open('navigator_engine/tests/test_data/test_spectrum_file.pjnz', 'rb') as f:
         spectrum_file = f.read()
@@ -205,3 +205,34 @@ def test_load_csv_from_zipped_resource_returns_empty_on_http_error(mock_engine, 
         'auth_header': None,
         'url': None
     }
+
+
+def test_load_naomi_csv_from_zipped_resource(mock_engine, mocker):
+
+    with open('navigator_engine/tests/test_data/test_naomi_file.zip', 'rb') as f:
+        naomi_file = f.read()
+
+    mock_load_dataset_resource = mocker.patch(
+        'navigator_engine.pluggable_logic.data_loaders.load_dataset_resource',
+        return_value={
+            'naomi-file': {
+                'data': naomi_file,
+                'auth_header': 'test-auth-header',
+                'url': 'https://example.com/test-data'
+            }
+        }
+    )
+    result = data_loaders.load_csv_from_zipped_resource(
+        "naomi-file",
+        "(.*)_check.csv",
+        "naomi-file-check",
+        mock_engine
+    )
+    mock_load_dataset_resource.assert_called_once_with(
+        'naomi-file',
+        mock_engine
+    )
+    data = result['naomi-file-check']['data']
+    assert all(i for i in data.columns == ['NaomiCheckPermPrimKey', 'NaomiCheckDes', 'TrueFalse']), \
+        "Unexpected column names in Naomi check file"
+    assert data.shape == (19, 3), "Unexpected shape of Naomi check file"
