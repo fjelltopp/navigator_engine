@@ -4,12 +4,14 @@ base_directory = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
+    ENV_TYPE = os.getenv("ENV_TYPE")
     DEBUG = False
     TESTING = False
     PRODUCTION = False
     SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:1234567890@db/navigator_engine'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LOGGING_LEVEL = logging.INFO
+    SENTRY_DSN = os.getenv("SENTRY_DSN")
     DASH_REROUTE_PREFIX = '/engine'
     DEFAULT_DECISION_GRAPH = f'{base_directory}/../Estimates 22 BDG [Final].xlsx'
 
