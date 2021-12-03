@@ -28,7 +28,7 @@ def create_app(config_object=None):
     if app.config.get("SENTRY_DSN"):
         sentry_sdk.init(
             dsn=app.config["SENTRY_DSN"],
-            environment=os.getenv("ENV_TYPE"),
+            environment=app.config["ENV_TYPE"],
             integrations=[FlaskIntegration()],
             traces_sample_rate=1.0
         )
