@@ -4,6 +4,7 @@ base_directory = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
+    ENV_TYPE = os.getenv("ENV_TYPE")
     DEBUG = False
     TESTING = False
     PRODUCTION = False
