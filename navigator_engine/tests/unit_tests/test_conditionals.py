@@ -119,3 +119,27 @@ def test_check_spectrum_file(checklist, dataframe, expected, raises_error, mock_
     with raises_error:
         check_result = conditionals.check_spectrum_file(checklist, mock_engine)
         assert check_result == expected
+
+
+@pytest.mark.parametrize("checklist, dataframe, expected, raises_error", [
+    (['Package_created', 'Package_has_all_data'],
+     pd.read_csv('naomi_check_list.csv'), True, does_not_raise()),
+    (['Package_created', 'Opt_ANC_data'],
+     pd.read_csv('naomi_check_list.csv'), False, does_not_raise()),
+    (['Package_created', 'Package_has_all_data'],
+     None, False, does_not_raise()),
+    (['Package_created', 'Opt_ART_data'],
+     pd.read_csv('naomi_check_list.csv'), True, does_not_raise()),
+    (['Package_created', 'Package_has_all_data', 'This indicator does not exist'],
+     pd.read_csv('naomi_check_list.csv'), None, pytest.raises(DecisionError))
+])
+def test_check_naomi_file(checklist, dataframe, expected, raises_error, mock_engine):
+
+    mock_engine.data = {
+        'naomi-validation-file': {
+            'data': dataframe
+        }
+    }
+    with raises_error:
+        check_result = conditionals.check_naomi_file(checklist, mock_engine)
+        assert check_result == expected

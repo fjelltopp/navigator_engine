@@ -1,0 +1,20 @@
+"NaomiCheckPermPrimKey","NaomiCheckDes","TrueFalse"
+"ART_is_Spectrum","Naomi number on ART 2015 to present is Spectrum national total on ART",NA
+"ANC_is_Spectrum","Naomi num ANC clients 2015 to present is Spectrum ANC testing cascade",NA
+"Package_created","Naomi package created",TRUE
+"Package_has_all_data","Naomi package has all data from upload or ADR",TRUE
+"Opt_recent_qtr","Model Options - Most recent calendar quarter selected",NA
+"Opt_future_proj_qtr","Model Options - Future projection quarter selected",NA
+"Opt_area_ID_selected","Model Options - National area_id selected",NA
+"Opt_calendar_survey_match","Model Options - T1 calendar quarter matches one survey",NA
+"Opt_recent_survey_only","Model Options - Only most recent survey included (also TRUE for known special cases)",NA
+"Opt_ART_coverage","Model Options - ART coverage included if availble ",NA
+"Opt_ANC_data","Model Options - ANC data included if avaialble",FALSE
+"Opt_ART_data","Model Options - ART data included if available",NA
+"Opt_ART_attendance_yes","Model Options - ART attendance = Yes",NA
+"Model_fit","Naomi output returned (model was fit)",TRUE
+"Cal_PLHIV","Calibration - Spectrum PLHIV national (subnational if Spectrum subnational)",NA
+"Cal_ART","Calibration - Spectrum ART national (subnational if Spectrum subnational)",NA
+"Cal_KOS","Calibration - Spectrum KOS national (subnational if Spectrum subnational)",NA
+"Cal_new_infections","Calibration - Spectrum new infections national (subnational if Spectrum subnational)",NA
+"Cal_method","Calibration - method is logistic",NA

@@ -72,18 +72,48 @@ def check_dataset_valid(engine: DecisionEngine) -> bool:
 
 @register_conditional
 def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
-    checklist = engine.data['spectrum-validation-file']['data']
+    return _check_validation_file(
+        indicators,
+        'spectrum-validation-file',
+        'ID',
+        'Status',
+        engine
+    )
+
+
+@register_conditional
+def check_naomi_file(indicators: list[str], engine: DecisionEngine) -> bool:
+    return _check_validation_file(
+        indicators,
+        'naomi-validation-file',
+        'NaomiCheckPermPrimKey',
+        'TrueFalse',
+        engine
+    )
+
+
+def _check_validation_file(
+        indicators: list[str],
+        data_source: str,
+        id_column: str,
+        result_column: str,
+        engine: DecisionEngine) -> bool:
+    checklist = engine.data[data_source]['data']
+
     if checklist is None:
         return False
+    indicators = [indicator.lower() for indicator in indicators]
     for indicator in indicators:
-        if indicator not in checklist['ID'].values:
+        if indicator not in checklist[id_column].str.lower().values:
             raise navigator_engine.common.DecisionError(
-                f'Indicator "{indicator}" not found in Spectrum checklist'
+                f'Indicator "{indicator}" not found in {data_source}'
             )
-    indicator_checks = checklist[checklist['ID'].isin(indicators)]
-    indicator_checks['Status'] = indicator_checks['Status'].replace(
+
+    indicator_checks = checklist[checklist[id_column].str.lower().isin(indicators)]
+    indicator_checks[result_column] = indicator_checks[result_column].replace(
         [0, 'FALSE', 'F', 'false', 'f'],
-        value=False,
-    )
-    indicator_checks['Status'][indicator_checks['Status'].ne(False)] = True
-    return indicator_checks['Status'].eq(True).all()
+        value=False)
+
+    indicator_checks[result_column][indicator_checks[result_column].ne(False)] = True
+
+    return indicator_checks[result_column].eq(True).all()
