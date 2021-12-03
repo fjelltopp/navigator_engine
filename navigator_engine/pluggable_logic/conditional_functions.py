@@ -96,9 +96,9 @@ def check_naomi_file(indicators: list[str], engine: DecisionEngine) -> bool:
 
     if checklist is None:
         return False
-
+    indicators = [indicator.lower() for indicator in indicators]
     for indicator in indicators:
-        if indicator not in checklist['NaomiCheckPermPrimKey'].values:
+        if indicator not in checklist['NaomiCheckPermPrimKey'].str.lower().values:
             raise navigator_engine.common.DecisionError(
                 f'Indicator "{indicator}" not found in Naomi checklist'
             )
