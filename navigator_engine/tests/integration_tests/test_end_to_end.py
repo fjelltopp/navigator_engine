@@ -29,4 +29,4 @@ def test_spectrum_file_check(test_production_client):
     }))
 
     assert response.status_code == 200
-    assert response.json['decision']['id'] == 'EST-NAO-01-10-A'
+    assert response.json['decision']['id'] == 'EST-SPF-16-01-A'
