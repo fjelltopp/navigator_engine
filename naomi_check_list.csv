@@ -9,7 +9,7 @@
 "Opt_calendar_survey_match","Model Options - T1 calendar quarter matches one survey",NA
 "Opt_recent_survey_only","Model Options - Only most recent survey included (also TRUE for known special cases)",NA
 "Opt_ART_coverage","Model Options - ART coverage included if availble ",NA
-"Opt_ANC_data","Model Options - ANC data included if avaialble",NA
+"Opt_ANC_data","Model Options - ANC data included if avaialble",FALSE
 "Opt_ART_data","Model Options - ART data included if available",NA
 "Opt_ART_attendance_yes","Model Options - ART attendance = Yes",NA
 "Model_fit","Naomi output returned (model was fit)",TRUE
