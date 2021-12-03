@@ -103,7 +103,7 @@ def check_naomi_file(indicators: list[str], engine: DecisionEngine) -> bool:
                 f'Indicator "{indicator}" not found in Naomi checklist'
             )
 
-    indicator_checks = checklist[checklist['NaomiCheckPermPrimKey'].isin(indicators)]
+    indicator_checks = checklist[checklist['NaomiCheckPermPrimKey'].str.lower().isin(indicators)]
     indicator_checks['TrueFalse'].replace([0, 'FALSE', 'F', 'false', 'f'],
                                           value=False,
                                           inplace=True)
