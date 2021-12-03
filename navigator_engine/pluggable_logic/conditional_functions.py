@@ -104,11 +104,10 @@ def check_naomi_file(indicators: list[str], engine: DecisionEngine) -> bool:
             )
 
     indicator_checks = checklist[checklist['NaomiCheckPermPrimKey'].str.lower().isin(indicators)]
-    indicator_checks['TrueFalse'].replace([0, 'FALSE', 'F', 'false', 'f'],
-                                          value=False,
-                                          inplace=True)
+    indicator_checks['TrueFalse'] = indicator_checks['TrueFalse'].replace(
+        [0, 'FALSE', 'F', 'false', 'f'],
+        value=False)
 
     indicator_checks['TrueFalse'][indicator_checks['TrueFalse'].ne(False)] = True
 
     return indicator_checks['TrueFalse'].eq(True).all()
-
