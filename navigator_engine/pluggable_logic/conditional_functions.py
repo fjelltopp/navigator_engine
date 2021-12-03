@@ -82,8 +82,8 @@ def check_spectrum_file(indicators: list[str], engine: DecisionEngine) -> bool:
             )
     indicator_checks = checklist[checklist['ID'].isin(indicators)]
     indicator_checks['Status'].replace([0, 'FALSE', 'F', 'false', 'f'],
-                                          value=False,
-                                          inplace=True)
+                                       value=False,
+                                       inplace=True)
 
     indicator_checks['Status'][indicator_checks['Status'].ne(False)] = True
 
