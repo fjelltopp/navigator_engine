@@ -124,9 +124,9 @@ def test_check_spectrum_file(checklist, dataframe, expected, raises_error, mock_
 @pytest.mark.parametrize("checklist, dataframe, expected, raises_error", [
     (['Package_created', 'Package_has_all_data'],
      pd.read_csv('naomi_check_list.csv'), True, does_not_raise()),
-    (['UAvalid', 'ARTMortNoART_default'],
+    (['Package_created', 'Opt_ANC_data'],
      pd.read_csv('naomi_check_list.csv'), False, does_not_raise()),
-    (['MaleART_current', 'AdultARTcovLT100'],
+    (['Package_created', 'Package_has_all_data'],
      None, False, does_not_raise()),
     (['Package_created', 'Opt_ART_data'],
      pd.read_csv('naomi_check_list.csv'), True, does_not_raise()),
