@@ -17,6 +17,7 @@ requests = "*"
 markdown = "*"
 dash = "*"
 dash-cytoscape = '*'
+json-logging = "*"
 
 [dev-packages]
 flake8 = "*"
