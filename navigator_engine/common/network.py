@@ -51,8 +51,8 @@ class Network():
             target=target
         ))
 
-    def common_path(self, source):
-        all_possible_paths = self.all_possible_paths(source)
+    def common_path(self, source=None, target=None):
+        all_possible_paths = self.all_possible_paths(source, target)
         if not all_possible_paths:
             return []
         longest_path = max(all_possible_paths, key=len)
