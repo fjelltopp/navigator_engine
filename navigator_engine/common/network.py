@@ -53,6 +53,8 @@ class Network():
 
     def common_path(self, source):
         all_possible_paths = self.all_possible_paths(source)
+        if not all_possible_paths:
+            return []
         longest_path = max(all_possible_paths, key=len)
         nodes_common_to_all_paths = set.intersection(*map(set, all_possible_paths))
         common_path = list(filter(
