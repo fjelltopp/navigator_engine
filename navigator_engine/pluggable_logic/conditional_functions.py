@@ -92,14 +92,9 @@ def check_naomi_file(indicators: list[str], engine: DecisionEngine) -> bool:
     )
 
 
-def _check_validation_file(
-        indicators: list[str],
-        data_source: str,
-        id_column: str,
-        result_column: str,
-        engine: DecisionEngine) -> bool:
+def _check_validation_file(indicators: list[str], data_source: str, id_column: str,
+                           result_column: str, engine: DecisionEngine) -> bool:
     checklist = engine.data[data_source]['data']
-
     if checklist is None:
         return False
     indicators = [indicator.lower() for indicator in indicators]
@@ -108,13 +103,10 @@ def _check_validation_file(
             raise navigator_engine.common.DecisionError(
                 f'Indicator "{indicator}" not found in {data_source}'
             )
-
     indicator_checks = checklist[checklist[id_column].str.lower().isin(indicators)]
-    indicator_checks[result_column] = indicator_checks[result_column].replace(
+    indicator_results = indicator_checks[result_column].replace(
         [0, 'FALSE', 'F', 'false', 'f'],
         value=False
     )
-
-    indicator_checks[result_column][indicator_checks[result_column].ne(False)] = True
-
-    return indicator_checks[result_column].eq(True).all()
+    indicator_results[indicator_results.ne(False)] = True
+    return indicator_results.eq(True).all()

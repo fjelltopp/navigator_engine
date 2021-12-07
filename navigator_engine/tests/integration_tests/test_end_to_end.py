@@ -42,4 +42,4 @@ def test_estimates_complete(test_production_client):
         }
     }))
     assert response.status_code == 200
-    assert response.json['decision']['id'] == 'EST-OVV-CPLT-A'
+    assert response.json['decision']['id'] == 'EST-MIL-CPLT-A'
