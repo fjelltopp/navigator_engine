@@ -59,6 +59,11 @@ def mock_engine():
 
 
 @pytest.fixture
+def mock_network():
+    return get_mock_network()
+
+
+@pytest.fixture
 def simple_network():
     return get_simple_network()
 
