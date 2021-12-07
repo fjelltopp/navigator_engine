@@ -31,7 +31,7 @@ class Network():
                 raise DecisionError("Network has no root node")
         return self.root_node
 
-    def get_milestones(self) -> None:
+    def get_milestones(self) -> list[model.Node]:
         if not self.milestones:
             milestones = []
             for node in self.networkx.nodes():
@@ -40,7 +40,8 @@ class Network():
             self.milestones = milestones
         return self.milestones
 
-    def all_possible_paths(self, source=None, target=None):
+    def all_possible_paths(self, source: model.Node = None,
+                           target: model.Node = None) -> list[list[model.Node]]:
         if not target:
             target = self.get_complete_node()
         if not source:
@@ -51,19 +52,21 @@ class Network():
             target=target
         ))
 
-    def common_path(self, source=None, target=None):
-        all_possible_paths = self.all_possible_paths(source, target)
-        if not all_possible_paths:
+    def common_path(self, source: model.Node = None,
+                    target: model.Node = None) -> list[model.Node]:
+        all_paths = self.all_possible_paths(source, target)
+        if not all_paths:
             return []
-        longest_path = max(all_possible_paths, key=len)
-        nodes_common_to_all_paths = set.intersection(*map(set, all_possible_paths))
+        longest_path = max(all_paths, key=len)
+        all_paths_as_sets = [set(path) for path in all_paths]
+        nodes_common_to_all_paths = set.intersection(*all_paths_as_sets)
         common_path = list(filter(
             lambda node: node in nodes_common_to_all_paths,
             longest_path
         ))
         return common_path
 
-    def milestone_path(self, source):
+    def milestone_path(self, source: model.Node) -> list[model.Node]:
         common_path = self.common_path(source)[1:]
         milestone_path = [node for node in common_path if getattr(node, 'milestone_id')]
         return milestone_path
