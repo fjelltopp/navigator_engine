@@ -6,8 +6,8 @@ from navigator_engine.common import (
     get_pluggable_function_and_args
 )
 from navigator_engine.common.progress_tracker import ProgressTracker
+from navigator_engine.common.network import Network
 from typing import Callable, Any
-import networkx
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ class DecisionEngine():
                  stop: str = "", skip_requests: list[str] = [], route: list[model.Node] = [],
                  skipped_actions: list[str] = []) -> None:
         self.graph: model.Graph = graph
-        self.network: networkx.DigGraph = self.graph.to_networkx()
+        self.network: Network = Network(self.graph.to_networkx())
         self.data: Any = source_data
         self.skip_requests: list[str] = skip_requests
         self.remove_skip_requests: list[str] = []
@@ -37,7 +37,7 @@ class DecisionEngine():
         if stop is not None:
             self.stop_action = stop
         self.progress.reset()
-        next_action = self.process_node(self.progress.root_node)
+        next_action = self.process_node(self.network.get_root_node())
         self.decision = {
             "id": next_action.ref,
             "content": next_action.action.to_dict(),
@@ -95,7 +95,7 @@ class DecisionEngine():
 
     def get_next_node(self, node: model.Node, edge_type: bool) -> model.Node:
         new_node = None
-        for node, child_node, type in self.network.out_edges(node, data="type"):
+        for node, child_node, type in self.network.networkx.out_edges(node, data="type"):
             if type == edge_type:
                 new_node = child_node
             if child_node.ref == self.stop_action:
@@ -121,7 +121,7 @@ class DecisionEngine():
 
     def skip_action(self, node: model.Node) -> model.Node:
         previous_node = self.progress.entire_route[-2]
-        for previous_node, new_node in self.network.out_edges(previous_node):
+        for previous_node, new_node in self.network.networkx.out_edges(previous_node):
             if node != new_node:
                 self.progress.skipped_actions.append(node.ref)
                 self.progress.pop_node()
