@@ -48,8 +48,15 @@ def test_get_complete_node_raises_error(mock_network):
     (1, [9]),
     (3, [11])
 ])
-def test_milestone_path(mock_network, simple_network, current_node, expected_result):
+def test_milestone_path(simple_network, current_node, expected_result):
     network = Network(simple_network['network'])
     result = network.milestone_path(simple_network['nodes'][current_node])
     expected_milestones = [simple_network['nodes'][i] for i in expected_result]
     assert result == expected_milestones
+
+
+def test_get_milestones(simple_network):
+    network = Network(simple_network['network'])
+    result = network.get_milestones()
+    result_refs = {node.ref for node in result}
+    assert result_refs == {'tst-0-8-m', 'tst-0-9-m', 'tst-0-10-m'}

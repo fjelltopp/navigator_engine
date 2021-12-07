@@ -36,7 +36,7 @@ class Network():
             milestones = []
             for node in self.networkx.nodes():
                 if getattr(node, 'milestone_id'):
-                    milestones.append(node.milestone)
+                    milestones.append(node)
             self.milestones = milestones
         return self.milestones
 
