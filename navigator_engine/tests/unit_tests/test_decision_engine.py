@@ -35,7 +35,7 @@ def test_run_pluggable_logic(mocker):
 
 
 @pytest.mark.parametrize("edge_type,node", [(True, 1), (False, 2)])
-def test_get_next_node(mocker, edge_type, node):
+def test_get_next_node(mock_engine, edge_type, node):
     nodes = [
         factories.NodeFactory(conditional=factories.ConditionalFactory(id=1), conditional_id=1),
         factories.NodeFactory(action=factories.ActionFactory(id=1), action_id=1),
@@ -46,14 +46,13 @@ def test_get_next_node(mocker, edge_type, node):
         (nodes[0], nodes[1], {'type': True}),
         (nodes[0], nodes[2], {'type': False})
     ])
-    engine = mocker.Mock(spec=DecisionEngine)
-    engine.network = network
-    engine.stop_action = None
-    result = DecisionEngine.get_next_node(engine, nodes[0], edge_type)
+    mock_engine.network.networkx = network
+    mock_engine.stop_action = None
+    result = DecisionEngine.get_next_node(mock_engine, nodes[0], edge_type)
     assert result == nodes[node]
 
 
-def test_get_next_node_stop(mocker):
+def test_get_next_node_stop(mock_engine):
     nodes = [
         factories.NodeFactory(id=0, conditional=factories.ConditionalFactory(id=1), conditional_id=1),
         factories.NodeFactory(id=1, action=factories.ActionFactory(id=1), action_id=1),
@@ -64,23 +63,21 @@ def test_get_next_node_stop(mocker):
         (nodes[0], nodes[1], {'type': True}),
         (nodes[0], nodes[2], {'type': False})
     ])
-    engine = mocker.Mock(spec=DecisionEngine)
-    engine.network = network
-    engine.stop_action = nodes[1].ref
-    result = DecisionEngine.get_next_node(engine, nodes[0], False)
+    mock_engine.network.networkx = network
+    mock_engine.stop_action = nodes[1].ref
+    result = DecisionEngine.get_next_node(mock_engine, nodes[0], False)
     assert result == nodes[1]
 
 
-def test_get_next_node_raises_error(mocker):
+def test_get_next_node_raises_error(mock_engine):
     conditional = factories.ConditionalFactory(id=1, function="function")
     node = factories.NodeFactory(conditional=conditional, conditional_id=1)
     network = networkx.DiGraph()
     network.add_node(node)
-    engine = mocker.Mock(spec=DecisionEngine)
-    engine.network = network
+    mock_engine.network.networkx = network
 
     with pytest.raises(common.DecisionError, match=f"node {node.ref}"):
-        DecisionEngine.get_next_node(engine, node, True)
+        DecisionEngine.get_next_node(mock_engine, node, True)
 
 
 def test_process_conditional(mocker):
@@ -100,7 +97,7 @@ def test_process_conditional(mocker):
     engine.process_node.assert_called_once_with(next_node)
 
 
-def test_skip_action(mocker):
+def test_skip_action(mock_engine, mocker):
     nodes = [
         factories.NodeFactory(id=56, conditional=factories.ConditionalFactory(id=1), conditional_id=1),
         factories.NodeFactory(id=57, action=factories.ActionFactory(id=1, skippable=True), action_id=1),
@@ -111,20 +108,17 @@ def test_skip_action(mocker):
         (nodes[0], nodes[1], {'type': True}),
         (nodes[0], nodes[2], {'type': False})
     ])
-    engine = mocker.Mock(spec=DecisionEngine)
-    engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
-    engine.network = network
-    engine.progress.route = [nodes[0], nodes[1]]
-    engine.progress.entire_route = [nodes[0], nodes[1]]
-    engine.progress.skipped_actions = []
-    engine.process_node.return_value = 'processed_action'
+    mock_engine.network.networkx = network
+    mock_engine.progress.route = [nodes[0], nodes[1]]
+    mock_engine.progress.entire_route = [nodes[0], nodes[1]]
+    mock_engine.process_node.return_value = 'processed_action'
 
-    result = DecisionEngine.skip_action(engine, nodes[1])
+    result = DecisionEngine.skip_action(mock_engine, nodes[1])
 
     assert result == 'processed_action'
-    assert engine.progress.skipped_actions == [nodes[1].ref]
-    engine.progress.pop_node.assert_called_once()
-    engine.process_node.assert_called_once_with(nodes[2])
+    assert mock_engine.progress.skipped_actions == [nodes[1].ref]
+    mock_engine.progress.pop_node.assert_called_once()
+    mock_engine.process_node.assert_called_once_with(nodes[2])
 
 
 def test_process_action_skip_unskippable(mocker, mock_engine):
@@ -209,27 +203,23 @@ def test_process_milestone_complete(mocker, mock_engine):
     mock_engine.process_node.assert_called_once_with(node3)
 
 
-def test_decide(mocker):
+def test_decide(mock_engine, mocker):
     root_node = factories.NodeFactory(id=1)
     action_node = factories.NodeFactory(id=2, action=factories.ActionFactory())
-    engine = mocker.Mock(spec=DecisionEngine)
-    engine.data = {}
-    engine.skip_requests = []
-    engine.progress = mocker.patch('navigator_engine.common.progress_tracker.ProgressTracker', auto_spec=True)
-    engine.progress.root_node = root_node
-    engine.progress.skipped_actions = ['1', '2', '3']
-    engine.process_node.return_value = action_node
-    result = DecisionEngine.decide(engine, data={'test': 'data'}, skip_requests=['4', '5'])
-    engine.process_node.assert_called_once_with(root_node)
-    engine.progress.reset.assert_called_once()
-    engine.remove_skip_requests_not_needed.assert_called_once()
+    mock_engine.network.get_root_node.return_value = root_node
+    mock_engine.progress.skipped_actions = ['1', '2', '3']
+    mock_engine.process_node.return_value = action_node
+    result = DecisionEngine.decide(mock_engine, data={'test': 'data'}, skip_requests=['4', '5'])
+    mock_engine.process_node.assert_called_once_with(root_node)
+    mock_engine.progress.reset.assert_called_once()
+    mock_engine.remove_skip_requests_not_needed.assert_called_once()
     assert result == {
         'id': action_node.ref,
         'content': model.Action.to_dict(action_node.action),
         'node': action_node
     }
-    assert engine.data == {'test': 'data'}
-    assert engine.skip_requests == ['4', '5']
+    assert mock_engine.data == {'test': 'data'}
+    assert mock_engine.skip_requests == ['4', '5']
 
 
 def test_process_action_unskipped(mock_engine):

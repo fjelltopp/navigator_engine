@@ -5,6 +5,7 @@ from networkx import DiGraph
 import unittest.mock as mock
 from navigator_engine.common.progress_tracker import ProgressTracker
 from navigator_engine.common.decision_engine import DecisionEngine
+from navigator_engine.common.network import Network
 import navigator_engine.tests.factories as factories
 from navigator_engine.common.graph_loader import graph_loader, validate_graph
 import os
@@ -58,6 +59,11 @@ def mock_engine():
 
 
 @pytest.fixture
+def mock_network():
+    return get_mock_network()
+
+
+@pytest.fixture
 def simple_network():
     return get_simple_network()
 
@@ -78,7 +84,7 @@ def test_production_client():
 def get_mock_engine():
     engine = mock.Mock(spec=DecisionEngine)
     engine.data = {}
-    engine.network = mock.Mock(spec=DiGraph)
+    engine.network = get_mock_network()
     engine.remove_skip_requests = []
     engine.skip_requests = []
     engine.progress = get_mock_tracker()
@@ -88,7 +94,7 @@ def get_mock_engine():
 
 def get_mock_tracker():
     tracker = mock.Mock(spec=ProgressTracker)
-    tracker.network = mock.Mock(spec=DiGraph)
+    tracker.network = get_mock_network()
     tracker.route = []
     tracker.entire_route = []
     tracker.previous_route = []
@@ -98,6 +104,15 @@ def get_mock_tracker():
     tracker.complete_node = factories.NodeFactory()
     tracker.action_breadcrumbs = []
     return tracker
+
+
+def get_mock_network():
+    network = mock.Mock(spec=Network)
+    network.milestones = None
+    network.root_node = None
+    network.complete_node = None
+    network.networkx = mock.Mock(spec=DiGraph)
+    return network
 
 
 def get_simple_network():

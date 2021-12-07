@@ -1,5 +1,5 @@
 from navigator_engine.common.progress_tracker import ProgressTracker
-from navigator_engine.common import DecisionError
+from navigator_engine.common.network import Network
 import navigator_engine.tests.factories as factories
 import networkx
 import pytest
@@ -100,45 +100,6 @@ def test_reset(mock_tracker):
     assert mock_tracker.route == []
 
 
-def test_get_root_node(mock_tracker):
-    nodes = [
-        factories.NodeFactory(conditional=factories.ConditionalFactory(id=1), conditional_id=1),
-        factories.NodeFactory(action=factories.ActionFactory(id=1), action_id=1),
-        factories.NodeFactory(action=factories.ActionFactory(id=2), action_id=2)
-    ]
-    mock_tracker.network = networkx.DiGraph()
-    mock_tracker.network.add_edges_from([
-        (nodes[0], nodes[1], {'type': True}),
-        (nodes[0], nodes[2], {'type': False})
-    ])
-    result = ProgressTracker.get_root_node(mock_tracker)
-    assert result == nodes[0]
-
-
-def test_get_complete_node(mock_tracker):
-    nodes = [
-        factories.NodeFactory(id=2, action_id=1, action=factories.ActionFactory(id=1)),
-        factories.NodeFactory(id=3, action_id=2, action=factories.ActionFactory(id=2)),
-        factories.NodeFactory(id=4, action_id=3, action=factories.ActionFactory(id=3, complete=True))
-    ]
-    mock_tracker.network = networkx.DiGraph()
-    mock_tracker.network.add_nodes_from(nodes)
-    result = ProgressTracker.get_complete_node(mock_tracker)
-    assert result == nodes[2]
-
-
-def test_get_complete_node_raises_error(mock_tracker):
-    nodes = [
-        factories.NodeFactory(id=2, action_id=1, action=factories.ActionFactory(id=1)),
-        factories.NodeFactory(id=3, action_id=2, action=factories.ActionFactory(id=2)),
-        factories.NodeFactory(id=4, action_id=3, action=factories.ActionFactory(id=3))
-    ]
-    mock_tracker.network = networkx.DiGraph()
-    mock_tracker.network.add_nodes_from(nodes)
-    with pytest.raises(DecisionError, match="has no complete node"):
-        ProgressTracker.get_complete_node(mock_tracker)
-
-
 @pytest.mark.parametrize("route,expected_result", [
     ([1, 5], 0),
     ([1, 9, 12, 13], 25),
@@ -149,7 +110,7 @@ def test_get_complete_node_raises_error(mock_tracker):
     ([1, 9, 12, 2, 10, 14, 16, 18, 8], 100)
 ])
 def test_percentage_progress(mock_tracker, simple_network, route, expected_result):
-    mock_tracker.network = simple_network['network']
+    mock_tracker.network = Network(simple_network['network'])
     mock_tracker.entire_route = [simple_network['nodes'][i] for i in route]
     mock_tracker.route = [simple_network['nodes'][i] for i in route]
     mock_tracker.complete_node = simple_network['nodes'][8]
@@ -157,18 +118,15 @@ def test_percentage_progress(mock_tracker, simple_network, route, expected_resul
     assert result == expected_result
 
 
-@pytest.mark.parametrize("route,expected_result", [
-    ([1, 5], ([9], False)),
-    ([1, 9, 12, 2, 3, 6], ([11], True))
+@pytest.mark.parametrize("route,expected_arg", [
+    ([1, 5], 1),
+    ([1, 9, 12], 12),
+    ([1, 9, 12, 2, 3, 6], 3)
 ])
-def test_milestones_to_complete(mock_tracker, simple_network, route, expected_result):
-    mock_tracker.network = simple_network['network']
-    mock_tracker.entire_route = [simple_network['nodes'][i] for i in route]
+def test_milestones_to_complete(mock_tracker, simple_network, route, expected_arg):
     mock_tracker.route = [simple_network['nodes'][i] for i in route]
-    mock_tracker.complete_node = simple_network['nodes'][8]
-    result = ProgressTracker.milestones_to_complete(mock_tracker)
-    expected_milestones = [simple_network['nodes'][i] for i in expected_result[0]]
-    assert result == (expected_milestones, expected_result[1])
+    ProgressTracker.milestones_to_complete(mock_tracker)
+    assert mock_tracker.network.milestone_path.called_once_with(expected_arg)
 
 
 @pytest.mark.parametrize('function_name, manual', [
@@ -182,8 +140,8 @@ def test_drop_action_breadcrumb(mock_tracker, function_name, manual):
         factories.NodeFactory(id=2, conditional=factories.ConditionalFactory(id=2), conditional_id=2),
         factories.NodeFactory(id=3, action=factories.ActionFactory(id=2), action_id=2)
     ]
-    mock_tracker.network = networkx.DiGraph()
-    mock_tracker.network.add_edges_from([
+    mock_tracker.network.networkx = networkx.DiGraph()
+    mock_tracker.network.networkx.add_edges_from([
         (nodes[0], nodes[1], {'type': True}),
         (nodes[0], nodes[2], {'type': False})
     ])
@@ -205,8 +163,8 @@ def test_drop_action_breadcrumb_after_milestone(mock_tracker):
         factories.NodeFactory(id=1, milestone=factories.MilestoneFactory()),
         factories.NodeFactory(id=2, action=factories.ActionFactory(id=2, complete=True), action_id=2)
     ]
-    mock_tracker.network = networkx.DiGraph()
-    mock_tracker.network.add_edges_from([
+    mock_tracker.network.networkx = networkx.DiGraph()
+    mock_tracker.network.networkx.add_edges_from([
         (nodes[0], nodes[1], {'type': True}),
     ])
     mock_tracker.route = nodes
@@ -227,7 +185,8 @@ def test_report_progress(mocker, mock_tracker):
         {'id': '2-m', 'title': 'Mock', 'completed': False, 'progress': milestone_tracker}
     ]
     mock_tracker.percentage_progress.return_value = 50
-    mock_tracker.milestones_to_complete.return_value = [node], False
+    mock_tracker.network.get_milestones.return_value = [..., ..., node]
+    mock_tracker.milestones_to_complete.return_value = [node]
 
     result = ProgressTracker.report_progress(mock_tracker)
     assert result == {
