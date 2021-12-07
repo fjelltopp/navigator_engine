@@ -60,3 +60,19 @@ def test_get_milestones(simple_network):
     result = network.get_milestones()
     result_refs = {node.ref for node in result}
     assert result_refs == {'tst-0-8-m', 'tst-0-9-m', 'tst-0-10-m'}
+
+
+@pytest.mark.parametrize("source, target, expected_paths", [
+    (None, None, [[1, 9, 12, 2, 3, 11, 4, 8], [1, 9, 12, 2, 10, 14, 16, 18, 8]]),
+    (3, None, [[3, 11, 4, 8]]),
+    (None, 17, [[1, 9, 12, 2, 10, 14, 16, 17]]),
+    (9, 15, [[9, 12, 2, 10, 14, 15]])
+])
+def test_all_possible_paths(simple_network, source, target, expected_paths):
+    network = Network(simple_network['network'])
+    result = network.all_possible_paths(
+        source=simple_network['nodes'].get(source),
+        target=simple_network['nodes'].get(target)
+    )
+    expected_paths = [[simple_network['nodes'][i] for i in nodes] for nodes in expected_paths]
+    assert result == expected_paths
