@@ -37,7 +37,7 @@ class TestGraphLoader:
         edges = model.Edge.query.all()
         assert edges
 
-    def test_network_isomorphism(self):
+    def test_graph_isomorphism(self):
         graphs = model.Graph.query.all()
 
         with open(f'{app.config.get("DECISION_GRAPH_FOLDER")}/graph_test_data.p', 'rb') as test_data_file:
