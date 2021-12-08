@@ -1,4 +1,7 @@
 import ast
+from navigator_engine import model
+from navigator_common.progress_tracker import ProgressTracker
+from navigator_common.network import Network
 
 CONDITIONAL_FUNCTIONS = {}
 DATA_LOADERS = {}
@@ -49,6 +52,20 @@ def get_pluggable_function_and_args(function_string: str) -> tuple[str, tuple]:
     if type(eval_function_args) is not tuple:
         eval_function_args = (eval_function_args,)
     return function_name, eval_function_args
+
+
+def step_through_common_path(network, sources=[]):
+    source = None if not sources else sources.pop(0)
+    progress = ProgressTracker(network)
+    for node in network.common_path(source):
+        if getattr(node, 'milestone_id'):
+            milestone_graph = model.load_graph(node.milestone.graph_id)
+            milestone_network = Network(milestone_graph.to_networkx())
+            milestone_progress = step_through_common_path(milestone_network, sources)
+            progress.add_milestone(node, milestone_progress)
+        else:
+            progress.add_node(node)
+    return progress
 
 
 class DecisionError(Exception):
