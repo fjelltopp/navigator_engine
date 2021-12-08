@@ -48,7 +48,7 @@ def decide():
 
 
 @api_blueprint.route('/decide/list', methods=['POST'])
-def action_list():
+def decide_list():
     """
     Get a list of actions that need to be completed.
 
@@ -66,11 +66,12 @@ def action_list():
     input_data = json.loads(request.data)
 
     engine = _get_engine(input_data)
+    action_list = create_action_list(engine)
 
     return jsonify({
         'milestones': engine.progress.report['milestones'],
         'progress': engine.progress.report['progress'],
-        'actionList': create_action_list(engine),
+        'actionList': action_list,
         'fullyResolved': False,
         'removeSkipActions': engine.remove_skip_requests,
     })

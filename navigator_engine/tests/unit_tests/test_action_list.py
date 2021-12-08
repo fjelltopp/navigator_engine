@@ -78,7 +78,10 @@ def test_create_action_list(mock_engine, mock_tracker, mocker, milestone_id):
         {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
     ]
     mock_engine.progress.report = {'currentMilestoneID': milestone_id}
-    mock_engine.route = [factories.NodeFactory(), factories.NodeFactory()]
+    mock_engine.progress.entire_route = [
+        factories.NodeFactory(),
+        factories.NodeFactory(action=factories.ActionFactory())
+    ]
     mock_tracker.action_breadcrumbs = [
         {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
         {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}
@@ -129,9 +132,9 @@ def test_create_action_list(mock_engine, mock_tracker, mocker, milestone_id):
         'title': 'TST-0-7-A',
         'reached': False
     }]
-    expected_sources = [mock_engine.route[-2]]
+    expected_sources = [mock_engine.progress.entire_route[-2]]
     if milestone_id:
-        expected_sources = [milestone_node, mock_engine.route[-2]]
+        expected_sources = [milestone_node, mock_engine.progress.entire_route[-2]]
         mock_load_node.assert_any_call(node_ref=milestone_id)
     mock_step_through_common_path.assert_called_once_with(
         mock_engine.network,

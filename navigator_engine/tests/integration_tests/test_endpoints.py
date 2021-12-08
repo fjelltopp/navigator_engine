@@ -194,7 +194,7 @@ def setup_endpoint_test(mocker, data=None):
 
 
 @pytest.mark.usefixtures('with_app_context')
-def test_action_list(client, mocker):
+def test_decide_list_complete(client, mocker):
     data = {
         '1': True,
         '2': True,
@@ -279,6 +279,96 @@ def test_action_list(client, mocker):
             'completed': True,
             'id': 'tst-2-6-m',
             'progress': 100,
+            'title': 'Naomi Data Review'
+        }],
+    }
+
+
+@pytest.mark.usefixtures('with_app_context')
+def test_decide_list_incomplete(client, mocker):
+    data = {
+        '1': True,
+        '2': True,
+        'data': {'1': True, '2': False, '3': False, '4': True},
+        'naomi': {'1': True}
+    }
+    setup_endpoint_test(mocker, data)
+    response = client.post("/api/decide/list", data=json.dumps({
+        'data': {
+            'url': 'https://example.ckan/api/3/action/package_show?id=example',
+            'authorization_header': "example-api-key"
+        }
+    }))
+    assert response.json == {
+        'progress': 25,
+        'fullyResolved': False,
+        'removeSkipActions': [],
+        'actionList': [{
+            'id': 'tst-2-3-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': None,
+            'reached': True,
+            'skipped': False,
+            'title': 'Action 1'
+        }, {
+            'id': 'tst-1-4-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': 'tst-2-1-m',
+            'reached': True,
+            'skipped': False,
+            'title': 'Upload your geographic data'
+        }, {
+            'id': 'tst-1-5-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': 'tst-2-1-m',
+            'reached': True,
+            'skipped': False,
+            'title': 'Validate your geographic data'
+        }, {
+            'id': 'tst-1-6-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': 'tst-2-1-m',
+            'reached': False,
+            'skipped': False,
+            'title': 'Upload your survey data'
+        }, {
+            'id': 'tst-1-7-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': 'tst-2-1-m',
+            'reached': False,
+            'skipped': False,
+            'title': 'Validate your survey data'
+        }, {
+            'id': 'tst-3-1-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': 'tst-2-6-m',
+            'reached': False,
+            'skipped': False,
+            'title': 'Naomi Action 1'
+        }, {
+            'id': 'tst-2-4-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': None,
+            'reached': False,
+            'skipped': False,
+            'title': 'Action 2'
+        }, {
+            'id': 'tst-2-5-a',
+            'manualConfirmationRequired': False,
+            'milestoneID': None,
+            'reached': False,
+            'skipped': False,
+            'title': 'Complete'
+        }],
+        'milestones': [{
+            'completed': False,
+            'id': 'tst-2-1-m',
+            'progress': 25,
+            'title': 'ADR Data'
+        }, {
+            'completed': False,
+            'id': 'tst-2-6-m',
+            'progress': 0,
             'title': 'Naomi Data Review'
         }],
     }
