@@ -1,11 +1,12 @@
 import ast
 from navigator_engine import model
-from navigator_common.progress_tracker import ProgressTracker
-from navigator_common.network import Network
-from navigator_common.decision_engine import DecisionEngine
+from navigator_engine.common.progress_tracker import ProgressTracker
+from navigator_engine.common.network import Network
+from navigator_engine.common.decision_engine import DecisionEngine
+from typing import Any, Callable
 
-CONDITIONAL_FUNCTIONS = {}
-DATA_LOADERS = {}
+CONDITIONAL_FUNCTIONS: dict[str, Callable] = {}
+DATA_LOADERS: dict[str, Callable] = {}
 
 
 def choose_graph(file_url):
@@ -55,7 +56,7 @@ def get_pluggable_function_and_args(function_string: str) -> tuple[str, tuple]:
     return function_name, eval_function_args
 
 
-def step_through_common_path(network, sources=[]):
+def step_through_common_path(network: Network, sources: list[model.Node] = []) -> ProgressTracker:
     source = None if not sources else sources.pop(0)
     progress = ProgressTracker(network)
     for node in network.common_path(source):
@@ -69,7 +70,7 @@ def step_through_common_path(network, sources=[]):
     return progress
 
 
-def create_action_list(engine: DecisionEngine):
+def create_action_list(engine: DecisionEngine) -> list[dict[str, Any]]:
     engine.decide()
 
     reached_actions = engine.progress.action_breadcrumbs
