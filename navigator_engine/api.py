@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, abort
 from navigator_engine.common.decision_engine import DecisionEngine
 from navigator_engine.model import load_graph
-from navigator_engine.common import choose_graph, choose_data_loader
+from navigator_engine.common import choose_graph, choose_data_loader, create_action_list
 from navigator_engine import model
 import json
 
@@ -25,28 +25,12 @@ def decide():
     ```
     """
     input_data = json.loads(request.data)
-
-    if not input_data.get('data'):
-        abort(400, "No data specified in request")
-    if not input_data['data'].get('url'):
-        abort(400, "No url to data specified in request")
-
-    graph = load_graph(choose_graph(input_data['data']['url']))
-    data_loader = choose_data_loader(input_data['data']['url'])
-    source_data = input_data['data']
-    skip_requests = input_data.get('skipActions', [])
-    stop_action = input_data.get('actionID')
-
-    engine = DecisionEngine(
-        graph,
-        source_data,
-        data_loader=data_loader,
-        skip_requests=skip_requests,
-        stop=stop_action
-    )
+    engine = _get_engine(input_data)
     engine.decide()
+
     del engine.decision['node']
 
+    stop_action = input_data.get('actionID')
     if stop_action and stop_action != engine.decision['id']:
         abort(
             400,
@@ -78,18 +62,16 @@ def action_list():
         }
     ```
     """
-    decide_response = decide().json
-    reached_actions = decide_response['actions']
-    for action in reached_actions:
-        action['title'] = model.load_node(node_ref=action['id']).action.title
-        action['reached'] = True
+    input_data = json.loads(request.data)
+
+    engine = _get_engine(input_data)
 
     return jsonify({
-        'milestones': decide_response['progress']['milestones'],
-        'progress': decide_response['progress']['progress'],
-        'actionList': reached_actions,
+        'milestones': engine.progress.report['milestones'],
+        'progress': engine.progress.report['progress'],
+        'actionList': create_action_list(engine),
         'fullyResolved': False,
-        'removeSkipActions': decide_response['removeSkipActions']
+        'removeSkipActions': engine.remove_skip_requests,
     })
 
 
@@ -108,3 +90,25 @@ def action(action_id):
         'id': action_id,
         'content': action.to_dict()
     })
+
+
+def _get_engine(input_data):
+
+    if not input_data.get('data'):
+        abort(400, "No data specified in request")
+    if not input_data['data'].get('url'):
+        abort(400, "No url to data specified in request")
+
+    graph = load_graph(choose_graph(input_data['data']['url']))
+    data_loader = choose_data_loader(input_data['data']['url'])
+    source_data = input_data['data']
+    skip_requests = input_data.get('skipActions', [])
+    stop_action = input_data.get('actionID')
+
+    return DecisionEngine(
+        graph,
+        source_data,
+        data_loader=data_loader,
+        skip_requests=skip_requests,
+        stop=stop_action
+    )
