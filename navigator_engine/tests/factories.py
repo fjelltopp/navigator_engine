@@ -33,6 +33,7 @@ class MilestoneFactory(factory.Factory):
     id: int = factory.Sequence(lambda n: int(n))
     title: str = "Test Milestone"
     data_loader: str = "return_empty()"
+    graph_id: int = 1
 
 
 class GraphFactory(factory.Factory):

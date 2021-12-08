@@ -9,13 +9,13 @@ def step_through_common_path(network: Network, sources: list[model.Node] = []) -
     source = None if not sources else sources.pop(0)
     progress = ProgressTracker(network)
     for node in network.common_path(source):
+        progress.add_node(node)
         if getattr(node, 'milestone_id'):
             milestone_graph = model.load_graph(node.milestone.graph_id)
             milestone_network = Network(milestone_graph.to_networkx())
             milestone_progress = step_through_common_path(milestone_network, sources)
-            progress.add_milestone(node, milestone_progress)
-        else:
-            progress.add_node(node)
+            complete = milestone_progress.route[-1].action.complete
+            progress.add_milestone(node, milestone_progress, complete)
     return progress
 
 
