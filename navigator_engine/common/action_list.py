@@ -29,12 +29,12 @@ def create_action_list(engine: DecisionEngine) -> list[dict[str, Any]]:
     ongoing_milestone_id = engine.progress.report.get('currentMilestoneID')
     if ongoing_milestone_id:
         ongoing_milestone_node = model.load_node(node_ref=ongoing_milestone_id)
-        sources = [ongoing_milestone_node, engine.decision['node']]
+        sources = [ongoing_milestone_node, engine.route[-2]]
     else:
-        sources = [engine.decision['node']]
+        sources = [engine.route[-2]]
     progress = step_through_common_path(engine.network, sources=sources)
 
-    unreached_actions = progress.action_breadcrumbs
+    unreached_actions = progress.action_breadcrumbs[1:]
     for action in unreached_actions:
         action['title'] = model.load_node(node_ref=action['id']).action.title
         action['reached'] = False

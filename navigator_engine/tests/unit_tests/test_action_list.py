@@ -68,3 +68,75 @@ def test_step_through_common_path(mocker, simple_network, sources, expected_brea
 
     assert mock_load_graph.called_once_with(1)
     assert result.action_breadcrumbs == expected_breadcrumbs
+
+
+@pytest.mark.parametrize('milestone_id', [(None), ('milestone-id')])
+def test_create_action_list(mock_engine, mock_tracker, mocker, milestone_id):
+    mock_engine.progress.action_breadcrumbs = [
+        {'id': 'tst-0-14-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+        {'id': 'tst-0-16-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+        {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+    ]
+    mock_engine.progress.report = {'currentMilestoneID': milestone_id}
+    mock_engine.route = [factories.NodeFactory(), factories.NodeFactory()]
+    mock_tracker.action_breadcrumbs = [
+        {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+        {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}
+    ]
+    milestone_node = factories.NodeFactory(ref=milestone_id, milestone=factories.MilestoneFactory())
+
+    def side_effect(node_ref=""):
+        if node_ref == milestone_id:
+            return milestone_node
+        else:
+            action = factories.ActionFactory(title=node_ref.upper())
+            return factories.NodeFactory(action=action)
+    mock_load_node = mocker.patch(
+        'navigator_engine.common.action_list.model.load_node',
+        side_effect=side_effect
+    )
+    mock_step_through_common_path = mocker.patch(
+        'navigator_engine.common.action_list.step_through_common_path',
+        return_value=mock_tracker
+    )
+    result = action_list.create_action_list(mock_engine)
+    expected_result = [{
+        'id': 'tst-0-14-a',
+        'milestoneID': None,
+        'skipped': False,
+        'manualConfirmationRequired': False,
+        'title': 'TST-0-14-A',
+        'reached': True
+    }, {
+        'id': 'tst-0-16-a',
+        'milestoneID': None,
+        'skipped': False,
+        'manualConfirmationRequired': False,
+        'title': 'TST-0-16-A',
+        'reached': True
+    }, {
+        'id': 'tst-0-18-a',
+        'milestoneID': None,
+        'skipped': False,
+        'manualConfirmationRequired': False,
+        'title': 'TST-0-18-A',
+        'reached': True
+    }, {
+        'id': 'tst-0-7-a',
+        'milestoneID': None,
+        'skipped': False,
+        'manualConfirmationRequired': False,
+        'title': 'TST-0-7-A',
+        'reached': False
+    }]
+    expected_sources = [mock_engine.route[-2]]
+    if milestone_id:
+        expected_sources = [milestone_node, mock_engine.route[-2]]
+        mock_load_node.assert_any_call(node_ref=milestone_id)
+    mock_step_through_common_path.assert_called_once_with(
+        mock_engine.network,
+        sources=expected_sources
+    )
+    for breadcrumb in expected_result:
+        mock_load_node.assert_any_call(node_ref=breadcrumb['id'])
+    assert result == expected_result
