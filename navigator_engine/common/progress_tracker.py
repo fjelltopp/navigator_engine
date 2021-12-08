@@ -46,15 +46,15 @@ class ProgressTracker():
         self.route = []
         self.skipped_actions = self.previously_skipped_actions
 
-    def add_milestone(self, milestone_node: model.Node,
-                      milestone_progress, complete: bool = False) -> None:
+    def add_milestone(self, milestone_node: model.Node, milestone_progress) -> None:
         self.entire_route = milestone_progress.entire_route
         self.skipped_actions = milestone_progress.skipped_actions
+        milestone_complete = self.entire_route[-1].action.complete
         self.milestones.append({
             'id': milestone_node.ref,
             'title': milestone_node.milestone.title,
-            'progress': 100 if complete else milestone_progress,
-            'completed': complete
+            'progress': 100 if milestone_complete else milestone_progress,
+            'completed': milestone_complete
         })
 
         def add_milestone_id(breadcrumb):
@@ -65,7 +65,7 @@ class ProgressTracker():
             milestone_progress.action_breadcrumbs
         ))
 
-        if complete:
+        if milestone_complete:
             # Don't include the complete action in the action_breadcrumbs
             self.action_breadcrumbs.pop()
 

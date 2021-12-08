@@ -196,8 +196,7 @@ def test_process_milestone_complete(mocker, mock_engine):
     assert mock_engine.remove_skip_requests == [2, 3]
     mock_engine.progress.add_milestone.assert_called_once_with(
         node1,
-        milestone_engine.progress,
-        complete=True
+        milestone_engine.progress
     )
     mock_engine.get_next_node.assert_called_once_with(node1, True)
     mock_engine.process_node.assert_called_once_with(node3)

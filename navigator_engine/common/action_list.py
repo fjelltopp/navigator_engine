@@ -14,8 +14,7 @@ def step_through_common_path(network: Network, sources: list[model.Node] = []) -
             milestone_graph = model.load_graph(node.milestone.graph_id)
             milestone_network = Network(milestone_graph.to_networkx())
             milestone_progress = step_through_common_path(milestone_network, sources)
-            complete = milestone_progress.route[-1].action.complete
-            progress.add_milestone(node, milestone_progress, complete)
+            progress.add_milestone(node, milestone_progress)
     return progress
 
 
