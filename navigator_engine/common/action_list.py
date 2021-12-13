@@ -18,7 +18,10 @@ def step_through_common_path(network: Network,
         if getattr(node, 'milestone_id'):
             milestone_graph = model.load_graph(node.milestone.graph_id)
             milestone_network = Network(milestone_graph.to_networkx())
-            milestone_progress, milestone_path_fully_resolved = step_through_common_path(milestone_network, sources)
+            milestone_progress, milestone_path_fully_resolved = step_through_common_path(
+                milestone_network,
+                sources
+            )
             progress.add_milestone(node, milestone_progress)
 
             if not milestone_path_fully_resolved:
@@ -48,7 +51,10 @@ def create_action_list(engine: DecisionEngine) -> tuple[list[dict[str, Any]], bo
     else:
         sources = [engine.progress.entire_route[-2]]
 
-    progress, path_fully_resolved = step_through_common_path(engine.network, sources=sources)
+    progress, path_fully_resolved = step_through_common_path(
+        engine.network,
+        sources=sources
+    )
     unreached_actions = progress.action_breadcrumbs[1:]
 
     for action in unreached_actions:
