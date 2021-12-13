@@ -53,8 +53,9 @@ class Network():
         ))
 
     def common_path(self, source: model.Node = None,
-                    target: model.Node = None) -> list[model.Node]:
-        all_paths = self.all_possible_paths(source, target)
+                    target: model.Node = None, all_paths=None) -> list[model.Node]:
+        if not all_paths:
+            all_paths = self.all_possible_paths(source, target)
         if not all_paths:
             return [], True
         path_fully_resolved = len(all_paths) == 1
@@ -68,7 +69,9 @@ class Network():
         return common_path, path_fully_resolved
 
     def milestone_path(self, source: model.Node) -> list[model.Node]:
-        common_path, path_fully_resolved = self.common_path(source)
-        common_path = common_path[1:]
-        milestone_path = [node for node in common_path if getattr(node, 'milestone_id')]
-        return milestone_path, path_fully_resolved
+        milestone_paths = []
+        for path in self.all_possible_paths(source=source):
+            path = path[1:]
+            milestone_path = [node for node in path if getattr(node, 'milestone_id')]
+            milestone_paths.append(milestone_path)
+        return self.common_path(all_paths=milestone_paths)

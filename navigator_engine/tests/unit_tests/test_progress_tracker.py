@@ -186,8 +186,7 @@ def test_report_progress(mocker, mock_tracker):
         {'id': '2-m', 'title': 'Mock', 'completed': False, 'progress': milestone_tracker}
     ]
     mock_tracker.percentage_progress.return_value = 50
-    mock_tracker.network.get_milestones.return_value = [..., ..., node]
-    mock_tracker.milestones_to_complete.return_value = [node]
+    mock_tracker.milestones_to_complete.return_value = [node], False
 
     result = ProgressTracker.report_progress(mock_tracker)
     assert result == {

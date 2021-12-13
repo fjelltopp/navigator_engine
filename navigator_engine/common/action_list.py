@@ -30,7 +30,7 @@ def create_action_list(engine: DecisionEngine) -> list[dict[str, Any]]:
         action['reached'] = True
 
     if engine.progress.entire_route[-1].action.complete:
-        return reached_actions
+        return reached_actions, True
 
     ongoing_milestone_id = engine.progress.report.get('currentMilestoneID')
     if ongoing_milestone_id:
@@ -46,4 +46,5 @@ def create_action_list(engine: DecisionEngine) -> list[dict[str, Any]]:
         action['reached'] = False
 
     action_list = reached_actions + unreached_actions
+
     return action_list, path_fully_resolved

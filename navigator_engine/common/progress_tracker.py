@@ -25,14 +25,14 @@ class ProgressTracker():
             # Calculate percentage progress for current milestone
             milestones[-1]['progress'] = milestones[-1]['progress'].percentage_progress()
             current_milestone = milestones[-1]['id']
-        for node in self.milestones_to_complete():
+        milestones_to_complete, milestone_list_resolved = self.milestones_to_complete()
+        for node in milestones_to_complete:
             milestones.append({
                 'id': node.ref,
                 'title': node.milestone.title,
                 'progress': 0,
                 'completed': False
             })
-        milestone_list_resolved = len(milestones) == len(self.network.get_milestones())
         self.report = {
             'progress': self.percentage_progress(),
             'currentMilestoneID': current_milestone,

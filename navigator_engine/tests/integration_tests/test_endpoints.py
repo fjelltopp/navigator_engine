@@ -211,7 +211,7 @@ def test_decide_list_complete(client, mocker):
     }))
     assert response.json == {
         'progress': 100,
-        'fullyResolved': False,
+        'fullyResolved': True,
         'removeSkipActions': ['tst-1-5-a'],
         'actionList': [{
             'id': 'tst-2-3-a',
@@ -301,7 +301,7 @@ def test_decide_list_incomplete(client, mocker):
     }))
     assert response.json == {
         'progress': 25,
-        'fullyResolved': False,
+        'fullyResolved': True,
         'removeSkipActions': [],
         'actionList': [{
             'id': 'tst-2-3-a',
