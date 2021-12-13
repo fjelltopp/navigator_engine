@@ -45,14 +45,15 @@ def test_get_complete_node_raises_error(mock_network):
 
 
 @pytest.mark.parametrize("current_node,expected_result", [
-    (1, [9]),
-    (3, [11])
+    (1, ([9], False)),
+    (3, ([11], True))
 ])
 def test_milestone_path(simple_network, current_node, expected_result):
     network = Network(simple_network['network'])
     result = network.milestone_path(simple_network['nodes'][current_node])
-    expected_milestones = [simple_network['nodes'][i] for i in expected_result]
-    assert result == expected_milestones
+    expected_milestones = [simple_network['nodes'][i] for i in expected_result[0]]
+    assert result[0] == expected_milestones
+    assert result[1] == expected_result[1]
 
 
 def test_get_milestones(simple_network):
@@ -79,10 +80,10 @@ def test_all_possible_paths(simple_network, source, target, expected_paths):
 
 
 @pytest.mark.parametrize("source, target, expected_result", [
-    (None, None, [1, 9, 12, 2, 8]),
-    (3, None, [3, 11, 4, 8]),
-    (None, 17, [1, 9, 12, 2, 10, 14, 16, 17]),
-    (9, 15, [9, 12, 2, 10, 14, 15])
+    (None, None, ([1, 9, 12, 2, 8], False)),
+    (3, None, ([3, 11, 4, 8], True)),
+    (None, 17, ([1, 9, 12, 2, 10, 14, 16, 17], True)),
+    (9, 15, ([9, 12, 2, 10, 14, 15], True))
 ])
 def test_common_path(simple_network, source, target, expected_result):
     network = Network(simple_network['network'])
@@ -90,5 +91,6 @@ def test_common_path(simple_network, source, target, expected_result):
         source=simple_network['nodes'].get(source),
         target=simple_network['nodes'].get(target)
     )
-    expected_result = [simple_network['nodes'][i] for i in expected_result]
-    assert result == expected_result
+    expected_path = [simple_network['nodes'][i] for i in expected_result[0]]
+    assert result[0] == expected_path
+    assert result[1] == expected_result[1]

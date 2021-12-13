@@ -5,41 +5,51 @@ import networkx
 import pytest
 
 
-@pytest.mark.parametrize('sources, expected_breadcrumbs', [
+@pytest.mark.parametrize('sources, expected_result', [
     (
-        [],
-        [{'id': 'tst-0-4-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'mini-2', 'milestoneID': 'tst-0-8-m', 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}]
+        [], (
+            [{'id': 'tst-0-4-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'mini-2', 'milestoneID': 'tst-0-8-m', 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}],
+            False
+        )
     ),
     (
-        [12],
-        [{'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}]
+        [12], (
+            [{'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}],
+            False
+        )
     ),
     (
-        [14],
-        [{'id': 'tst-0-14-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'tst-0-16-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}]
+        [14], (
+            [{'id': 'tst-0-14-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'tst-0-16-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}],
+            True
+        )
     ),
     (
-        [3],
-        [{'id': 'tst-0-5-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'mini-2', 'milestoneID': 'tst-0-10-m', 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'tst-0-6-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}]
+        [3], (
+            [{'id': 'tst-0-5-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'mini-2', 'milestoneID': 'tst-0-10-m', 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'tst-0-6-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}],
+            True
+        )
     ),
     (
-        [9, 20],
-        [{'id': 'mini-2', 'milestoneID': 'tst-0-8-m', 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-         {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}]
+        [9, 20], (
+            [{'id': 'mini-2', 'milestoneID': 'tst-0-8-m', 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}],
+            False
+        )
     )
 ])
-def test_step_through_common_path(mocker, simple_network, sources, expected_breadcrumbs):
+def test_step_through_common_path(mocker, simple_network, sources, expected_result):
     mini_network = networkx.DiGraph()
     nodes = [
         factories.NodeFactory(id=20, conditional=factories.ConditionalFactory(id=1), conditional_id=1),
@@ -67,7 +77,8 @@ def test_step_through_common_path(mocker, simple_network, sources, expected_brea
     result = action_list.step_through_common_path(network, sources=sources)
 
     assert mock_load_graph.called_once_with(1)
-    assert result.action_breadcrumbs == expected_breadcrumbs
+    assert result[0].action_breadcrumbs == expected_result[0]
+    assert result[1] == expected_result[1]
 
 
 @pytest.mark.parametrize('milestone_id', [(None), ('milestone-id')])
@@ -100,7 +111,7 @@ def test_create_action_list(mock_engine, mock_tracker, mocker, milestone_id):
     )
     mock_step_through_common_path = mocker.patch(
         'navigator_engine.common.action_list.step_through_common_path',
-        return_value=mock_tracker
+        return_value=(mock_tracker, False)
     )
     result = action_list.create_action_list(mock_engine)
     expected_result = [{
@@ -142,4 +153,5 @@ def test_create_action_list(mock_engine, mock_tracker, mocker, milestone_id):
     )
     for breadcrumb in expected_result:
         mock_load_node.assert_any_call(node_ref=breadcrumb['id'])
-    assert result == expected_result
+    assert result[0] == expected_result
+    assert not result[1]
