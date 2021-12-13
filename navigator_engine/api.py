@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, abort, Response
 from navigator_engine.common.decision_engine import DecisionEngine
-from navigator_engine.model import load_graph, Graph
+from navigator_engine.model import load_graph
 from navigator_engine.common import choose_graph, choose_data_loader
 from navigator_engine.common.action_list import create_action_list
 from navigator_engine import model
