@@ -86,7 +86,7 @@ class DecisionEngine():
         milestone_result = milestone_engine.decide()
         self.remove_skip_requests += milestone_engine.remove_skip_requests
         if milestone_result['node'].action.complete:
-            self.progress.add_milestone(node, milestone_engine.progress, complete=True)
+            self.progress.add_milestone(node, milestone_engine.progress)
             next_node = self.get_next_node(node, True)
             return self.process_node(next_node)
         else:

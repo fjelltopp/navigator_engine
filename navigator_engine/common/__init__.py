@@ -1,7 +1,8 @@
 import ast
+from typing import Callable
 
-CONDITIONAL_FUNCTIONS = {}
-DATA_LOADERS = {}
+CONDITIONAL_FUNCTIONS: dict[str, Callable] = {}
+DATA_LOADERS: dict[str, Callable] = {}
 
 
 def choose_graph(file_url):

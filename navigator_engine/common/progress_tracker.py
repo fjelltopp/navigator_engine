@@ -25,14 +25,14 @@ class ProgressTracker():
             # Calculate percentage progress for current milestone
             milestones[-1]['progress'] = milestones[-1]['progress'].percentage_progress()
             current_milestone = milestones[-1]['id']
-        for node in self.milestones_to_complete():
+        milestones_to_complete, milestone_list_resolved = self.milestones_to_complete()
+        for node in milestones_to_complete:
             milestones.append({
                 'id': node.ref,
                 'title': node.milestone.title,
                 'progress': 0,
                 'completed': False
             })
-        milestone_list_resolved = len(milestones) == len(self.network.get_milestones())
         self.report = {
             'progress': self.percentage_progress(),
             'currentMilestoneID': current_milestone,
@@ -46,15 +46,15 @@ class ProgressTracker():
         self.route = []
         self.skipped_actions = self.previously_skipped_actions
 
-    def add_milestone(self, milestone_node: model.Node,
-                      milestone_progress, complete: bool = False) -> None:
+    def add_milestone(self, milestone_node: model.Node, milestone_progress) -> None:
         self.entire_route = milestone_progress.entire_route
         self.skipped_actions = milestone_progress.skipped_actions
+        milestone_complete = self.entire_route[-1].action.complete
         self.milestones.append({
             'id': milestone_node.ref,
             'title': milestone_node.milestone.title,
-            'progress': 100 if complete else milestone_progress,
-            'completed': complete
+            'progress': 100 if milestone_complete else milestone_progress,
+            'completed': milestone_complete
         })
 
         def add_milestone_id(breadcrumb):
@@ -65,7 +65,7 @@ class ProgressTracker():
             milestone_progress.action_breadcrumbs
         ))
 
-        if complete:
+        if milestone_complete:
             # Don't include the complete action in the action_breadcrumbs
             self.action_breadcrumbs.pop()
 
