@@ -31,6 +31,8 @@ pytest-vcr = "*"
 mypy = "*"
 types-markdown = "*"
 types-requests = "*"
+types-python-dateutil = "*"
+types-pytz = "*"
 
 [requires]
 python_version = "3.9"
