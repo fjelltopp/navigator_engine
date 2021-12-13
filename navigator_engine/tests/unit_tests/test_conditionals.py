@@ -32,9 +32,9 @@ def test_check_manual_confirmation(mock_engine, action_id, expected):
         'navigator-workflow-state': {
             'data': {
                 'completedTasks': [
-                    "task1",
-                    "task2",
-                    "task3"
+                    {"id": "task1", "completedAt": "2021-12-10 15:22:12.640480"},
+                    {"id": "task1", "completedAt": "2021-12-10 15:22:12.640480"},
+                    {"id": "task1", "completedAt": "2021-12-10 15:22:12.640480"}
                 ]
             }
         }
