@@ -56,7 +56,8 @@ class Network():
                     target: model.Node = None) -> list[model.Node]:
         all_paths = self.all_possible_paths(source, target)
         if not all_paths:
-            return []
+            return [], True
+        path_fully_resolved = len(all_paths) == 1
         longest_path = max(all_paths, key=len)
         all_paths_as_sets = [set(path) for path in all_paths]
         nodes_common_to_all_paths = set.intersection(*all_paths_as_sets)
@@ -64,9 +65,10 @@ class Network():
             lambda node: node in nodes_common_to_all_paths,
             longest_path
         ))
-        return common_path
+        return common_path, path_fully_resolved
 
     def milestone_path(self, source: model.Node) -> list[model.Node]:
-        common_path = self.common_path(source)[1:]
+        common_path, path_fully_resolved = self.common_path(source)
+        common_path = common_path[1:]
         milestone_path = [node for node in common_path if getattr(node, 'milestone_id')]
-        return milestone_path
+        return milestone_path, path_fully_resolved

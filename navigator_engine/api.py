@@ -66,13 +66,13 @@ def decide_list():
     input_data = json.loads(request.data)
 
     engine = _get_engine(input_data)
-    action_list = create_action_list(engine)
+    action_list, path_fully_resolved = create_action_list(engine)
 
     return jsonify({
         'milestones': engine.progress.report['milestones'],
         'progress': engine.progress.report['progress'],
         'actionList': action_list,
-        'fullyResolved': False,
+        'fullyResolved': path_fully_resolved,
         'removeSkipActions': engine.remove_skip_requests,
     })
 
