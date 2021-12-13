@@ -50,6 +50,7 @@ import pytest
     )
 ])
 def test_step_through_common_path(mocker, simple_network, sources, expected_result):
+
     mini_network = networkx.DiGraph()
     nodes = [
         factories.NodeFactory(id=20, conditional=factories.ConditionalFactory(id=1), conditional_id=1),
@@ -69,6 +70,7 @@ def test_step_through_common_path(mocker, simple_network, sources, expected_resu
     )
 
     all_nodes = simple_network['nodes']
+
     for node in nodes:
         all_nodes[node.id] = node
 
@@ -83,6 +85,7 @@ def test_step_through_common_path(mocker, simple_network, sources, expected_resu
 
 @pytest.mark.parametrize('milestone_id', [(None), ('milestone-id')])
 def test_create_action_list(mock_engine, mock_tracker, mocker, milestone_id):
+
     mock_engine.progress.action_breadcrumbs = [
         {'id': 'tst-0-14-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
         {'id': 'tst-0-16-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
@@ -100,11 +103,14 @@ def test_create_action_list(mock_engine, mock_tracker, mocker, milestone_id):
     milestone_node = factories.NodeFactory(ref=milestone_id, milestone=factories.MilestoneFactory())
 
     def side_effect(node_ref=""):
+
         if node_ref == milestone_id:
             return milestone_node
+
         else:
             action = factories.ActionFactory(title=node_ref.upper())
             return factories.NodeFactory(action=action)
+
     mock_load_node = mocker.patch(
         'navigator_engine.common.action_list.model.load_node',
         side_effect=side_effect
@@ -144,14 +150,17 @@ def test_create_action_list(mock_engine, mock_tracker, mocker, milestone_id):
         'reached': False
     }]
     expected_sources = [mock_engine.progress.entire_route[-2]]
+
     if milestone_id:
         expected_sources = [milestone_node, mock_engine.progress.entire_route[-2]]
         mock_load_node.assert_any_call(node_ref=milestone_id)
+
+    for breadcrumb in expected_result:
+        mock_load_node.assert_any_call(node_ref=breadcrumb['id'])
+
     mock_step_through_common_path.assert_called_once_with(
         mock_engine.network,
         sources=expected_sources
     )
-    for breadcrumb in expected_result:
-        mock_load_node.assert_any_call(node_ref=breadcrumb['id'])
     assert result[0] == expected_result
     assert not result[1]
