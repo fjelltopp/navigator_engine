@@ -28,7 +28,7 @@ def decide() -> Response:
     """
 
     input_data = json.loads(request.data)
-    engine = _get_engine(input_data)
+    engine = _make_engine(input_data)
     engine.decide()
     del engine.decision['node']
     stop_action = input_data.get('actionID')
@@ -66,7 +66,7 @@ def decide_list() -> Response:
     """
     input_data = json.loads(request.data)
 
-    engine = _get_engine(input_data)
+    engine = _make_engine(input_data)
     action_list, path_fully_resolved = create_action_list(engine)
 
     return jsonify({
@@ -96,7 +96,7 @@ def action(action_id: str) -> Response:
     })
 
 
-def _get_engine(input_data: dict[str, Any]) -> DecisionEngine:
+def _make_engine(input_data: dict[str, Any]) -> DecisionEngine:
 
     if not input_data.get('data'):
         abort(400, "No data specified in request")
