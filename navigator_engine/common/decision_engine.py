@@ -23,6 +23,7 @@ class DecisionEngine():
         self.data: Any = source_data
         self.skip_requests: list[str] = skip_requests
         self.remove_skip_requests: list[str] = []
+        self.mark_as_incomplete: list[str] = []
         self.progress: ProgressTracker = ProgressTracker(self.network, route=route, skipped_actions=skipped_actions)
         self.decision: dict[str, Any] = {}
         self.stop_action: str = stop
@@ -85,6 +86,7 @@ class DecisionEngine():
         )
         milestone_result = milestone_engine.decide()
         self.remove_skip_requests += milestone_engine.remove_skip_requests
+        self.mark_as_incomplete += milestone_engine.mark_as_incomplete
         if milestone_result['node'].action.complete:
             self.progress.add_milestone(node, milestone_engine.progress)
             next_node = self.get_next_node(node, True)

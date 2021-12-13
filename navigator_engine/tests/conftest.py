@@ -86,6 +86,7 @@ def get_mock_engine():
     engine.data = {}
     engine.network = get_mock_network()
     engine.remove_skip_requests = []
+    engine.mark_as_incomplete = []
     engine.skip_requests = []
     engine.progress = get_mock_tracker()
     engine.stop_action = None
