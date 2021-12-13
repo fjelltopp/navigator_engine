@@ -104,7 +104,7 @@ def _get_engine(input_data: dict[str, Any]) -> DecisionEngine:
     if not input_data['data'].get('url'):
         abort(400, "No url to data specified in request")
 
-    graph: Graph = load_graph(choose_graph(input_data['data']['url']))
+    graph = load_graph(choose_graph(input_data['data']['url']))
     data_loader = choose_data_loader(input_data['data']['url'])
     source_data = input_data['data']
     skip_requests = input_data.get('skipActions', [])
