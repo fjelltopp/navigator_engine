@@ -3,9 +3,6 @@ from navigator_engine.common import register_conditional, get_resource_from_data
 from navigator_engine.common.decision_engine import DecisionEngine
 from typing import Hashable, Union, Any
 import re
-from dateutil.parser import parse
-import datetime
-import pytz
 
 
 @register_conditional
@@ -38,42 +35,6 @@ def check_not_skipped(actions: list[str], engine: DecisionEngine) -> bool:
     engine.remove_skip_requests += list(skipped_actions)
 
     return not bool(skipped_actions)
-
-
-@register_conditional
-def check_not_completed_before_resource_modified(actions: list[str],
-                                                 resource_types: Union[list[str], str],
-                                                 engine: DecisionEngine) -> bool:
-
-    if type(actions) is not list:
-        raise TypeError(f"Must specify an list of node IDs instead of {actions}")
-
-    if type(resource_types) is str:
-        resource_types = [resource_types]
-
-    dataset = engine.data['dataset']['data']['result']
-    resources_last_modified = datetime.datetime.now(pytz.UTC)
-
-    for resource_type in resource_types:
-
-        resource = get_resource_from_dataset(resource_type, dataset)
-        last_modified = pytz.utc.localize(parse(resource['last_modified']))
-
-        if last_modified < resources_last_modified:
-            resources_last_modified = last_modified
-
-    completed_actions = _get_completed_actions(engine)
-    actions_to_mark_as_incomplete = []
-
-    for action in actions:
-        action_dict = completed_actions.get(action, {})
-
-        if action_dict and parse(action_dict['completedAt']) < resources_last_modified:
-            actions_to_mark_as_incomplete.append(action)
-
-    engine.mark_as_incomplete += actions_to_mark_as_incomplete
-
-    return not bool(actions_to_mark_as_incomplete)
 
 
 @register_conditional

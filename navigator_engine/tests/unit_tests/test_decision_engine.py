@@ -145,7 +145,6 @@ def test_process_milestone_incomplete(mocker, mock_engine):
     mocker.patch('navigator_engine.model.load_graph', return_value=milestone_graph)
 
     milestone_engine = mocker.Mock(spec=DecisionEngine)
-    milestone_engine.mark_as_incomplete = []
     milestone_engine.remove_skip_requests = [3]
     milestone_engine.progress = mocker.patch(
         'navigator_engine.common.progress_tracker.ProgressTracker',
@@ -180,7 +179,6 @@ def test_process_milestone_complete(mocker, mock_engine):
     mocker.patch('navigator_engine.model.load_graph')
 
     milestone_engine = mocker.Mock(spec=DecisionEngine)
-    milestone_engine.mark_as_incomplete = []
     milestone_engine.remove_skip_requests = [3]
     milestone_engine.progress = mocker.patch(
         'navigator_engine.common.progress_tracker.ProgressTracker',

@@ -51,7 +51,6 @@ def test_decide_complete(client, mocker):
             {'id': 'tst-2-5-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}
         ],
         'removeSkipActions': ['tst-1-5-a'],
-        'markAsIncomplete': [],
         'progress': {
             'progress': 100,
             'currentMilestoneID': None,
@@ -87,7 +86,6 @@ def test_decide_incomplete(client, mocker):
             {'id': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False}
         ],
         'removeSkipActions': ['tst-1-5-a'],
-        'markAsIncomplete': [],
         'decision': {
             'id': 'tst-1-6-a',
             'content': {
@@ -215,7 +213,6 @@ def test_decide_list_complete(client, mocker):
         'progress': 100,
         'fullyResolved': True,
         'removeSkipActions': ['tst-1-5-a'],
-        'markAsIncomplete': [],
         'actionList': [{
             'id': 'tst-2-3-a',
             'manualConfirmationRequired': False,
@@ -306,7 +303,6 @@ def test_decide_list_incomplete(client, mocker):
         'progress': 25,
         'fullyResolved': True,
         'removeSkipActions': [],
-        'markAsIncomplete': [],
         'actionList': [{
             'id': 'tst-2-3-a',
             'manualConfirmationRequired': False,
