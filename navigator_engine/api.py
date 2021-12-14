@@ -44,7 +44,6 @@ def decide() -> Response:
         "decision": engine.decision,
         "actions": engine.progress.action_breadcrumbs,
         "removeSkipActions": engine.remove_skip_requests,
-        "markAsIncomplete": engine.mark_as_incomplete,
         "progress": engine.progress.report
     })
 
@@ -76,7 +75,6 @@ def decide_list() -> Response:
         'actionList': action_list,
         'fullyResolved': path_fully_resolved,
         'removeSkipActions': engine.remove_skip_requests,
-        "markAsIncomplete": engine.mark_as_incomplete
     })
 
 

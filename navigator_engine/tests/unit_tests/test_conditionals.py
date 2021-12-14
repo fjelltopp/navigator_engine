@@ -23,52 +23,6 @@ def test_check_not_skipped_raises_error(mock_engine):
         conditionals.check_not_skipped(123, mock_engine)
 
 
-@pytest.mark.parametrize("actions, resources, expected_result", [
-    (['task1'], ['anc-data'], ['task1']),
-    (['task1', 'task2'], ['anc-data'], ['task1']),
-    (['task1', 'task2', 'task3'], ['anc-data'], ['task1']),
-    (['task1'], ['art-data'], ['task1']),
-    (['task1', 'task2'], ['art-data'], ['task1', 'task2']),
-    (['task1', 'task2', 'task3'], ['art-data'], ['task1', 'task2']),
-    (['task1'], ['art-data', 'anc-data'], ['task1']),
-    (['task1', 'task2'], ['art-data', 'anc-data'], ['task1']),
-    (['task1', 'task2', 'task3'], ['art-data', 'anc-data'], ['task1'])
-])
-def test_check_not_completed_before_resource_modified(mock_engine, actions, resources, expected_result):
-    mock_engine.data = {
-        'dataset': {
-            'data': {
-                'result': {
-                    'name': 'test-dataset',
-                    'resources': [{
-                        'resource_type': 'anc-data',
-                        'last_modified': '2021-11-29T13:06:08.314615'
-                    }, {
-                        'resource_type': 'art-data',
-                        'last_modified': '2021-12-09T13:06:08.314615'
-                    }]
-                }
-            }
-        },
-        'navigator-workflow-state': {
-            'data': {
-                'completedTasks': [
-                    {"id": "task1", "completedAt": "Sun, 28 Nov 2021 16:42:47 GMT"},
-                    {"id": "task2", "completedAt": "Wed, 01 Dec 2021 09:38:50 GMT"},
-                    {"id": "task3", "completedAt": "Mon, 13 Dec 2021 16:42:47 GMT"}
-                ]
-            }
-        }
-    }
-    result = conditionals.check_not_completed_before_resource_modified(
-        actions,
-        resources,
-        mock_engine
-    )
-    assert mock_engine.mark_as_incomplete == expected_result
-    assert result is not bool(expected_result)
-
-
 @pytest.mark.parametrize("action_id,expected", [
     ('task1', True),
     ('task5', False)
