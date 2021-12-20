@@ -1,4 +1,3 @@
-import navigator_engine.common
 from navigator_engine.common import register_conditional, get_resource_from_dataset
 from navigator_engine.common.decision_engine import DecisionEngine
 from typing import Hashable, Union, Any
@@ -109,13 +108,6 @@ def _check_validation_file(indicators: list[str], data_source: str,
         return False
 
     indicators = [indicator.lower() for indicator in indicators]
-
-    for indicator in indicators:
-
-        if indicator not in checklist[id_column].str.lower().values:
-            raise navigator_engine.common.DecisionError(
-                f'Indicator "{indicator}" not found in {data_source}'
-            )
 
     indicator_checks = checklist[checklist[id_column].str.lower().isin(indicators)]
     indicator_results = indicator_checks[result_column].replace(
