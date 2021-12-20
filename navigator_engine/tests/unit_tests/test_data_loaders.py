@@ -235,4 +235,4 @@ def test_load_naomi_csv_from_zipped_resource(mock_engine, mocker):
     data = result['naomi-file-check']['data']
     assert all(i for i in data.columns == ['NaomiCheckPermPrimKey', 'NaomiCheckDes', 'TrueFalse']), \
         "Unexpected column names in Naomi check file"
-    assert data.shape == (19, 3), "Unexpected shape of Naomi check file"
+    assert data.shape == (20, 3), "Unexpected shape of Naomi check file"
