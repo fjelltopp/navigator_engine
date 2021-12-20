@@ -110,13 +110,6 @@ def _check_validation_file(indicators: list[str], data_source: str,
 
     indicators = [indicator.lower() for indicator in indicators]
 
-    for indicator in indicators:
-
-        if indicator not in checklist[id_column].str.lower().values:
-            raise navigator_engine.common.DecisionError(
-                f'Indicator "{indicator}" not found in {data_source}'
-            )
-
     indicator_checks = checklist[checklist[id_column].str.lower().isin(indicators)]
     indicator_results = indicator_checks[result_column].replace(
         [0, 'FALSE', 'F', 'false', 'f'],
