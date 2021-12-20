@@ -97,49 +97,37 @@ def test_check_dataset_valid(resources, expected, mock_engine):
         conditionals.check_not_skipped(123, mock_engine)
 
 
-@pytest.mark.parametrize("checklist, dataframe, expected, raises_error", [
-    (['MaleART_current', 'AdultARTcovLT100'],
-     pd.read_csv('spectrum_check_list.csv'), True, does_not_raise()),
-    (['UAvalid', 'ARTMortNoART_default'],
-     pd.read_csv('spectrum_check_list.csv'), False, does_not_raise()),
-    (['MaleART_current', 'AdultARTcovLT100'],
-     None, False, does_not_raise()),
-    (['MaleART_current', 'CurrentYear'],
-     pd.read_csv('spectrum_check_list.csv'), True, does_not_raise()),
-    (['MaleART_current', 'AdultARTcovLT100', 'This indicator does not exist'],
-     pd.read_csv('spectrum_check_list.csv'), None, pytest.raises(DecisionError))
+@pytest.mark.parametrize("checklist, dataframe, expected", [
+    (['MaleART_current', 'AdultARTcovLT100'], pd.read_csv('spectrum_check_list.csv'), True),
+    (['UAvalid', 'ARTMortNoART_default'], pd.read_csv('spectrum_check_list.csv'), False),
+    (['MaleART_current', 'AdultARTcovLT100'], None, False),
+    (['MaleART_current', 'CurrentYear'], pd.read_csv('spectrum_check_list.csv'), True),
+    (['MaleART_current', 'This indicator does not exist'], pd.read_csv('spectrum_check_list.csv'), True)
 ])
-def test_check_spectrum_file(checklist, dataframe, expected, raises_error, mock_engine):
+def test_check_spectrum_file(checklist, dataframe, expected, mock_engine):
 
     mock_engine.data = {
         'spectrum-validation-file': {
             'data': dataframe
         }
     }
-    with raises_error:
-        check_result = conditionals.check_spectrum_file(checklist, mock_engine)
-        assert check_result == expected
+    check_result = conditionals.check_spectrum_file(checklist, mock_engine)
+    assert check_result == expected
 
 
-@pytest.mark.parametrize("checklist, dataframe, expected, raises_error", [
-    (['Package_created', 'Package_has_all_data'],
-     pd.read_csv('naomi_check_list.csv'), True, does_not_raise()),
-    (['Package_created', 'Opt_ANC_data'],
-     pd.read_csv('naomi_check_list.csv'), False, does_not_raise()),
-    (['Package_created', 'Package_has_all_data'],
-     None, False, does_not_raise()),
-    (['Package_created', 'Opt_ART_data'],
-     pd.read_csv('naomi_check_list.csv'), True, does_not_raise()),
-    (['Package_created', 'Package_has_all_data', 'This indicator does not exist'],
-     pd.read_csv('naomi_check_list.csv'), None, pytest.raises(DecisionError))
+@pytest.mark.parametrize("checklist, dataframe, expected", [
+    (['Package_created', 'Package_has_all_data'], pd.read_csv('naomi_check_list.csv'), True),
+    (['Package_created', 'Opt_ANC_data'], pd.read_csv('naomi_check_list.csv'), False),
+    (['Package_created', 'Package_has_all_data'], None, False),
+    (['Package_created', 'Opt_ART_data'], pd.read_csv('naomi_check_list.csv'), True),
+    (['Package_created', 'This indicator does not exist'], pd.read_csv('naomi_check_list.csv'), True)
 ])
-def test_check_naomi_file(checklist, dataframe, expected, raises_error, mock_engine):
+def test_check_naomi_file(checklist, dataframe, expected, mock_engine):
 
     mock_engine.data = {
         'naomi-validation-file': {
             'data': dataframe
         }
     }
-    with raises_error:
-        check_result = conditionals.check_naomi_file(checklist, mock_engine)
-        assert check_result == expected
+    check_result = conditionals.check_naomi_file(checklist, mock_engine)
+    assert check_result == expected
