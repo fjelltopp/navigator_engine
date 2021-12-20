@@ -1,4 +1,3 @@
-import navigator_engine.common
 from navigator_engine.common import register_conditional, get_resource_from_dataset
 from navigator_engine.common.decision_engine import DecisionEngine
 from typing import Hashable, Union, Any
