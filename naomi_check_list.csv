@@ -18,3 +18,4 @@
 "Cal_KOS","Calibration - Spectrum KOS national (subnational if Spectrum subnational)",NA
 "Cal_new_infections","Calibration - Spectrum new infections national (subnational if Spectrum subnational)",NA
 "Cal_method","Calibration - method is logistic",NA
+"Cal_Population", "Calibration - Population", NA
