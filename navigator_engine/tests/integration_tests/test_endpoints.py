@@ -1,6 +1,7 @@
 import json
 import pytest
 import navigator_engine.tests.util as test_util
+from unittest.mock import ANY
 """
 Endpoint tests use the client fixture, which requires the db, meaning they should
 be treated as integration tests.
@@ -41,14 +42,22 @@ def test_decide_complete(client, mocker):
             }
         },
         'actions': [
-            {'id': 'tst-2-3-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-            {'id': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
-            {'id': 'tst-1-5-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
-            {'id': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': True, 'manualConfirmationRequired': False},
-            {'id': 'tst-1-7-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
-            {'id': 'tst-3-1-a', 'milestoneID': 'tst-2-6-m', 'skipped': False, 'manualConfirmationRequired': False},
-            {'id': 'tst-2-4-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-            {'id': 'tst-2-5-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}
+            {'id': 'tst-2-3-a', 'milestoneID': None, 'skipped': False,
+             'manualConfirmationRequired': False, 'reached': True, 'terminus': False, 'title': ANY},
+            {'id': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False,
+             'manualConfirmationRequired': False, 'reached': True, 'terminus': False, 'title': ANY},
+            {'id': 'tst-1-5-a', 'milestoneID': 'tst-2-1-m', 'skipped': False,
+             'manualConfirmationRequired': False, 'reached': True, 'terminus': False, 'title': ANY},
+            {'id': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': True,
+             'manualConfirmationRequired': False, 'reached': True, 'terminus': False, 'title': ANY},
+            {'id': 'tst-1-7-a', 'milestoneID': 'tst-2-1-m', 'skipped': False,
+             'manualConfirmationRequired': False, 'reached': True, 'terminus': False, 'title': ANY},
+            {'id': 'tst-3-1-a', 'milestoneID': 'tst-2-6-m', 'skipped': False,
+             'manualConfirmationRequired': False, 'reached': True, 'terminus': False, 'title': ANY},
+            {'id': 'tst-2-4-a', 'milestoneID': None, 'skipped': False,
+             'manualConfirmationRequired': False, 'reached': True, 'terminus': False, 'title': ANY},
+            {'id': 'tst-2-5-a', 'milestoneID': None, 'skipped': False,
+             'manualConfirmationRequired': False, 'reached': True, 'terminus': True, 'title': ANY}
         ],
         'removeSkipActions': ['tst-1-5-a'],
         'progress': {
@@ -80,10 +89,14 @@ def test_decide_incomplete(client, mocker):
     }))
     assert response.json == {
         'actions': [
-            {'id': 'tst-2-3-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-            {'id': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
-            {'id': 'tst-1-5-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False},
-            {'id': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': False, 'manualConfirmationRequired': False}
+            {'id': 'tst-2-3-a', 'milestoneID': None, 'skipped': False,
+             'manualConfirmationRequired': False, 'terminus': False, 'reached': True, 'title': ANY},
+            {'id': 'tst-1-4-a', 'milestoneID': 'tst-2-1-m', 'skipped': False,
+             'manualConfirmationRequired': False, 'terminus': False, 'reached': True, 'title': ANY},
+            {'id': 'tst-1-5-a', 'milestoneID': 'tst-2-1-m', 'skipped': False,
+             'manualConfirmationRequired': False, 'terminus': False, 'reached': True, 'title': ANY},
+            {'id': 'tst-1-6-a', 'milestoneID': 'tst-2-1-m', 'skipped': False,
+             'manualConfirmationRequired': False, 'terminus': False, 'reached': True, 'title': ANY}
         ],
         'removeSkipActions': ['tst-1-5-a'],
         'decision': {
@@ -219,6 +232,7 @@ def test_decide_list_complete(client, mocker):
             'milestoneID': None,
             'reached': True,
             'skipped': False,
+            'terminus': False,
             'title': 'Action 1'
         }, {
             'id': 'tst-1-4-a',
@@ -226,6 +240,7 @@ def test_decide_list_complete(client, mocker):
             'milestoneID': 'tst-2-1-m',
             'reached': True,
             'skipped': False,
+            'terminus': False,
             'title': 'Upload your geographic data'
         }, {
             'id': 'tst-1-5-a',
@@ -233,6 +248,7 @@ def test_decide_list_complete(client, mocker):
             'milestoneID': 'tst-2-1-m',
             'reached': True,
             'skipped': False,
+            'terminus': False,
             'title': 'Validate your geographic data'
         }, {
             'id': 'tst-1-6-a',
@@ -240,6 +256,7 @@ def test_decide_list_complete(client, mocker):
             'milestoneID': 'tst-2-1-m',
             'reached': True,
             'skipped': True,
+            'terminus': False,
             'title': 'Upload your survey data'
         }, {
             'id': 'tst-1-7-a',
@@ -247,6 +264,7 @@ def test_decide_list_complete(client, mocker):
             'milestoneID': 'tst-2-1-m',
             'reached': True,
             'skipped': False,
+            'terminus': False,
             'title': 'Validate your survey data'
         }, {
             'id': 'tst-3-1-a',
@@ -254,6 +272,7 @@ def test_decide_list_complete(client, mocker):
             'milestoneID': 'tst-2-6-m',
             'reached': True,
             'skipped': False,
+            'terminus': False,
             'title': 'Naomi Action 1'
         }, {
             'id': 'tst-2-4-a',
@@ -261,6 +280,7 @@ def test_decide_list_complete(client, mocker):
             'milestoneID': None,
             'reached': True,
             'skipped': False,
+            'terminus': False,
             'title': 'Action 2'
         }, {
             'id': 'tst-2-5-a',
@@ -268,6 +288,7 @@ def test_decide_list_complete(client, mocker):
             'milestoneID': None,
             'reached': True,
             'skipped': False,
+            'terminus': True,
             'title': 'Complete'
         }],
         'milestones': [{
@@ -309,6 +330,7 @@ def test_decide_list_incomplete(client, mocker):
             'milestoneID': None,
             'reached': True,
             'skipped': False,
+            'terminus': False,
             'title': 'Action 1'
         }, {
             'id': 'tst-1-4-a',
@@ -316,6 +338,7 @@ def test_decide_list_incomplete(client, mocker):
             'milestoneID': 'tst-2-1-m',
             'reached': True,
             'skipped': False,
+            'terminus': False,
             'title': 'Upload your geographic data'
         }, {
             'id': 'tst-1-5-a',
@@ -323,6 +346,7 @@ def test_decide_list_incomplete(client, mocker):
             'milestoneID': 'tst-2-1-m',
             'reached': True,
             'skipped': False,
+            'terminus': False,
             'title': 'Validate your geographic data'
         }, {
             'id': 'tst-1-6-a',
@@ -330,6 +354,7 @@ def test_decide_list_incomplete(client, mocker):
             'milestoneID': 'tst-2-1-m',
             'reached': False,
             'skipped': False,
+            'terminus': False,
             'title': 'Upload your survey data'
         }, {
             'id': 'tst-1-7-a',
@@ -337,6 +362,7 @@ def test_decide_list_incomplete(client, mocker):
             'milestoneID': 'tst-2-1-m',
             'reached': False,
             'skipped': False,
+            'terminus': False,
             'title': 'Validate your survey data'
         }, {
             'id': 'tst-3-1-a',
@@ -344,6 +370,7 @@ def test_decide_list_incomplete(client, mocker):
             'milestoneID': 'tst-2-6-m',
             'reached': False,
             'skipped': False,
+            'terminus': False,
             'title': 'Naomi Action 1'
         }, {
             'id': 'tst-2-4-a',
@@ -351,6 +378,7 @@ def test_decide_list_incomplete(client, mocker):
             'milestoneID': None,
             'reached': False,
             'skipped': False,
+            'terminus': False,
             'title': 'Action 2'
         }, {
             'id': 'tst-2-5-a',
@@ -358,6 +386,7 @@ def test_decide_list_incomplete(client, mocker):
             'milestoneID': None,
             'reached': False,
             'skipped': False,
+            'terminus': True,
             'title': 'Complete'
         }],
         'milestones': [{
