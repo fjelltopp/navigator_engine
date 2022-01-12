@@ -8,43 +8,60 @@ import pytest
 @pytest.mark.parametrize('sources, expected_result', [
     (
         [], (
-            [{'id': 'tst-0-4-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'mini-2', 'milestoneID': 'tst-0-8-m', 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}],
+            [{'id': 'tst-0-4-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'mini-2', 'milestoneID': 'tst-0-8-m', 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': True, 'title': 'Test Action'}],
             False
         )
     ),
     (
         [12], (
-            [{'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}],
+            [{'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': True, 'title': 'Test Action'}],
             False
         )
     ),
     (
         [14], (
-            [{'id': 'tst-0-14-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'tst-0-16-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}],
+            [{'id': 'tst-0-14-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'tst-0-16-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': True, 'title': 'Test Action'}],
             True
         )
     ),
     (
         [3], (
-            [{'id': 'tst-0-5-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'mini-2', 'milestoneID': 'tst-0-10-m', 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'tst-0-6-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}],
+            [{'id': 'tst-0-5-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'mini-2', 'milestoneID': 'tst-0-10-m', 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'tst-0-6-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': True, 'title': 'Test Action'}],
             True
         )
     ),
     (
         [9, 20], (
-            [{'id': 'mini-2', 'milestoneID': 'tst-0-8-m', 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}],
+            [{'id': 'mini-2', 'milestoneID': 'tst-0-8-m', 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'tst-0-12-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': False, 'title': 'Test Action'},
+             {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+              'manualConfirmationRequired': False, 'terminus': True, 'title': 'Test Action'}],
             False
         )
     )
@@ -87,9 +104,12 @@ def test_step_through_common_path(mocker, simple_network, sources, expected_resu
 def test_create_action_list(mock_engine, mock_tracker, mocker, milestone_id):
 
     mock_engine.progress.action_breadcrumbs = [
-        {'id': 'tst-0-14-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-        {'id': 'tst-0-16-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-        {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
+        {'id': 'tst-0-14-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+         'manualConfirmationRequired': False, 'terminus': False, 'title': 'TST-0-14-A'},
+        {'id': 'tst-0-16-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+         'manualConfirmationRequired': False, 'terminus': False, 'title': 'TST-0-16-A'},
+        {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+         'manualConfirmationRequired': False, 'terminus': False, 'title': 'TST-0-18-A'},
     ]
     mock_engine.progress.report = {'currentMilestoneID': milestone_id}
     mock_engine.progress.entire_route = [
@@ -97,8 +117,10 @@ def test_create_action_list(mock_engine, mock_tracker, mocker, milestone_id):
         factories.NodeFactory(action=factories.ActionFactory())
     ]
     mock_tracker.action_breadcrumbs = [
-        {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False},
-        {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'manualConfirmationRequired': False}
+        {'id': 'tst-0-18-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+         'manualConfirmationRequired': False, 'terminus': False, 'title': 'TST-0-18-A'},
+        {'id': 'tst-0-7-a', 'milestoneID': None, 'skipped': False, 'reached': True,
+         'manualConfirmationRequired': False, 'terminus': True, 'title': 'TST-0-7-A'}
     ]
     milestone_node = factories.NodeFactory(ref=milestone_id, milestone=factories.MilestoneFactory())
 
@@ -126,37 +148,38 @@ def test_create_action_list(mock_engine, mock_tracker, mocker, milestone_id):
         'skipped': False,
         'manualConfirmationRequired': False,
         'title': 'TST-0-14-A',
-        'reached': True
+        'reached': True,
+        'terminus': False
     }, {
         'id': 'tst-0-16-a',
         'milestoneID': None,
         'skipped': False,
         'manualConfirmationRequired': False,
         'title': 'TST-0-16-A',
-        'reached': True
+        'reached': True,
+        'terminus': False
     }, {
         'id': 'tst-0-18-a',
         'milestoneID': None,
         'skipped': False,
         'manualConfirmationRequired': False,
         'title': 'TST-0-18-A',
-        'reached': True
+        'reached': True,
+        'terminus': False
     }, {
         'id': 'tst-0-7-a',
         'milestoneID': None,
         'skipped': False,
         'manualConfirmationRequired': False,
         'title': 'TST-0-7-A',
-        'reached': False
+        'reached': False,
+        'terminus': True
     }]
     expected_sources = [mock_engine.progress.entire_route[-2]]
 
     if milestone_id:
         expected_sources = [milestone_node, mock_engine.progress.entire_route[-2]]
         mock_load_node.assert_any_call(node_ref=milestone_id)
-
-    for breadcrumb in expected_result:
-        mock_load_node.assert_any_call(node_ref=breadcrumb['id'])
 
     mock_step_through_common_path.assert_called_once_with(
         mock_engine.network,
