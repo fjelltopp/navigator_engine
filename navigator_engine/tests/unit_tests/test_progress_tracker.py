@@ -152,8 +152,11 @@ def test_drop_action_breadcrumb(mock_tracker, function_name, manual):
     assert mock_tracker.action_breadcrumbs == [{
         'id': nodes[2].ref,
         'milestoneID': None,
+        'reached': True,
         'skipped': True,
-        'manualConfirmationRequired': manual
+        'terminus': False,
+        'manualConfirmationRequired': manual,
+        'title': 'Test Action'
     }]
 
 
@@ -174,7 +177,10 @@ def test_drop_action_breadcrumb_after_milestone(mock_tracker):
         'id': nodes[1].ref,
         'milestoneID': None,
         'skipped': False,
-        'manualConfirmationRequired': False
+        'manualConfirmationRequired': False,
+        'terminus': True,
+        'title': 'Test Action',
+        'reached': True
     }]
 
 
