@@ -18,6 +18,7 @@ class ActionFactory(factory.Factory):
         model = models.Action
     id: int = factory.Sequence(lambda n: int(n))
     title: str = 'Test Action'
+    complete: bool = False
 
 
 class NodeFactory(factory.Factory):
