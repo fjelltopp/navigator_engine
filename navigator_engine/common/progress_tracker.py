@@ -85,6 +85,7 @@ class ProgressTracker():
             function = parent_node.conditional.function
             manual_confirmation = function.startswith("check_manual_confirmation")
 
+        # If the current node is a conditional, add the child node that is an action
         for parent_node, child_node in self.network.networkx.out_edges(parent_node):
             if (child_node != current_node
                     and getattr(child_node, 'action_id')
@@ -93,15 +94,22 @@ class ProgressTracker():
                     'id': child_node.ref,
                     'milestoneID': None,  # Updated under self.add_milestone
                     'skipped': child_node.ref in self.skipped_actions,
-                    'manualConfirmationRequired': manual_confirmation
+                    'manualConfirmationRequired': manual_confirmation,
+                    'reached': True,
+                    'title': child_node.action.title,
+                    'terminus': child_node.action.complete
                 })
 
+        # If the current node is an action, add it to the breadcrumbs.
         if getattr(current_node, 'action_id'):
             self.action_breadcrumbs.append({
                 'id': current_node.ref,
                 'milestoneID': None,  # Updated under self.add_milestone
                 'skipped': False,
-                'manualConfirmationRequired': manual_confirmation
+                'manualConfirmationRequired': manual_confirmation,
+                'reached': True,
+                'terminus': current_node.action.complete,
+                'title': current_node.action.title
             })
 
     def pop_node(self) -> str:
