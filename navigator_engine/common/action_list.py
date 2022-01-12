@@ -13,6 +13,7 @@ def step_through_common_path(network: Network,
     common_path, path_fully_resolved = network.common_path(source)
 
     for node in common_path:
+
         progress.add_node(node)
 
         if getattr(node, 'milestone_id'):
@@ -35,10 +36,6 @@ def create_action_list(engine: DecisionEngine) -> tuple[list[dict[str, Any]], bo
     engine.decide()
     reached_actions = engine.progress.action_breadcrumbs
 
-    for action in reached_actions:
-        action['title'] = model.load_node(node_ref=action['id']).action.title
-        action['reached'] = True
-
     if engine.progress.entire_route[-1].action.complete:
         return reached_actions, True
 
@@ -58,7 +55,6 @@ def create_action_list(engine: DecisionEngine) -> tuple[list[dict[str, Any]], bo
     unreached_actions = progress.action_breadcrumbs[1:]
 
     for action in unreached_actions:
-        action['title'] = model.load_node(node_ref=action['id']).action.title
         action['reached'] = False
 
     action_list = reached_actions + unreached_actions
