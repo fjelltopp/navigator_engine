@@ -2,7 +2,7 @@ import requests
 from flask import Blueprint, current_app
 from healthcheck import HealthCheck
 
-import model
+from navigator_engine import model
 
 healthz_bp = Blueprint('healtz', __name__)
 
