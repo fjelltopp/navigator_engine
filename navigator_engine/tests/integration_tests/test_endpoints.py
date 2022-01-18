@@ -14,6 +14,12 @@ def test_index(client):
     assert response.json['status'] == 'Navigator Engine Running'
 
 
+def test_health_check(client):
+    response = client.get("/healthz")
+    assert response.status_code == 200
+    assert response.json['results'][0]['checker'] == 'db_available'
+    assert response.json['results'][0]['output'] == 'db ok'
+
 @pytest.mark.usefixtures('with_app_context')
 def test_decide_complete(client, mocker):
     data = {
