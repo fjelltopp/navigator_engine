@@ -18,6 +18,7 @@ markdown = "*"
 dash = "*"
 dash-cytoscape = '*'
 json-logging = "*"
+py-healthcheck = "*"
 
 [dev-packages]
 flake8 = "*"
