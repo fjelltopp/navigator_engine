@@ -20,6 +20,7 @@ def test_health_check(client):
     assert response.json['results'][0]['checker'] == 'db_available'
     assert response.json['results'][0]['output'] == 'db ok'
 
+
 @pytest.mark.usefixtures('with_app_context')
 def test_decide_complete(client, mocker):
     data = {

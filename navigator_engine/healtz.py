@@ -1,5 +1,4 @@
-import requests
-from flask import Blueprint, current_app
+from flask import Blueprint
 from healthcheck import HealthCheck
 
 from navigator_engine import model
