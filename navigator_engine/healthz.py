@@ -3,7 +3,7 @@ from healthcheck import HealthCheck
 
 from navigator_engine import model
 
-healthz_bp = Blueprint('healtz', __name__)
+healthz_bp = Blueprint('healthz', __name__)
 
 
 def db_available():

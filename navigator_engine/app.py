@@ -7,7 +7,7 @@ from navigator_engine import cli
 from navigator_engine.api import api_blueprint
 from navigator_engine.model import db
 from navigator_engine.common import dash_app
-from navigator_engine.healtz import healthz_bp
+from navigator_engine.healthz import healthz_bp
 import importlib
 import json
 import json_logging
