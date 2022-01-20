@@ -1,12 +1,13 @@
 from flask import Blueprint
 from healthcheck import HealthCheck
+from typing import Tuple
 
 from navigator_engine import model
 
 healthz_bp = Blueprint('healthz', __name__)
 
 
-def db_available():
+def db_available() -> Tuple[bool, str]:
     try:
         model.db.session.execute("SELECT 1")
     except Exception as e:
@@ -19,5 +20,5 @@ health.add_check(db_available)
 
 
 @healthz_bp.route('/healthz', methods=['GET'])
-def healthz():
+def healthz() -> Tuple[str, int, dict]:
     return health.run()
