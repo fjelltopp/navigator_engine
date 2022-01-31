@@ -1,6 +1,7 @@
 from navigator_engine.app import app
 import pandas as pd
 import re
+import polib
 
 MILESTONE_COLUMNS = {
     'TITLE': 'Milestone Title (Visible to User):',
@@ -10,11 +11,12 @@ MILESTONE_COLUMNS = {
 }
 
 DATA_COLUMNS = {
-    'TITLE': 'Task Test (if test passes, proceed to next test)',
     'ACTION': 'Task Title (Visible to User)',
     'ACTION_CONTENT': 'If test fails, present this to user:',
     'ACTION_RESOURCES': 'Resources / Links'
 }
+
+TRANSLATIONS = ['FR']
 
 
 def extract_bdg(fileobj, keywords=None, comment_tags=None, options=None):
@@ -32,21 +34,37 @@ def extract_bdg(fileobj, keywords=None, comment_tags=None, options=None):
     :rtype: ``iterator``"""
 
     xl = pd.ExcelFile(fileobj)
-    #xl = pd.ExcelFile(app.config.get('DEFAULT_DECISION_GRAPH'))
-    regex = re.compile(r'[\d]{2,2}-')
+    #regex = re.compile(r'[\d]{2,2}-')
+    regex = re.compile(r'[0]{2,2}-')
     graph_sheets = list(filter(lambda x: regex.match(x), xl.sheet_names))
-    messages = []
+
+    po = polib.POFile()
+    po.metadata = {
+        'Project-Id-Version': '1.0',
+        'Report-Msgid-Bugs-To': 'support@fjelltopp.org',
+        'POT-Creation-Date': '2020-01-18 14:00+0100',
+        'PO-Revision-Date': '2020-01-18 14:00+0100',
+        'Last-Translator': 'you <you@example.com>',
+        'Language-Team': 'French <yourteam@example.com>',
+        'MIME-Version': '1.0',
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Content-Transfer-Encoding': '8bit',
+    }
 
     for index, sheet_name in enumerate(graph_sheets):
-
         graph_header = pd.read_excel(
             fileobj,
             sheet_name=sheet_name,
             header=0
-        ).loc[0][0:7]
+        ).loc[0][0:13]
 
         for key in MILESTONE_COLUMNS:
-            messages.append([1, None, graph_header.loc[MILESTONE_COLUMNS[key]], None])
+            entry = polib.POEntry(
+                msgid=graph_header.get(MILESTONE_COLUMNS[key]),
+                msgstr=graph_header.get(TRANSLATIONS[0] + '::' + MILESTONE_COLUMNS[key]),
+                occurrences=[('welcome.py', '12')]
+            )
+            po.append(entry)
 
         graph_data = pd.read_excel(
             fileobj,
@@ -58,10 +76,16 @@ def extract_bdg(fileobj, keywords=None, comment_tags=None, options=None):
 
         for graph_data_index, row in graph_data.iterrows():
             for key in DATA_COLUMNS:
-                messages.append([1, None, row.loc[DATA_COLUMNS[key]], None])
+                if not row.isna().get(DATA_COLUMNS[key])\
+                        and not row.isna().get(TRANSLATIONS[0] + '::' + DATA_COLUMNS[key]):
+                    entry = polib.POEntry(
+                        msgid=row.get(DATA_COLUMNS[key]),
+                        msgstr=row.get(TRANSLATIONS[0] + '::' + DATA_COLUMNS[key]),
+                        occurrences=[('welcome.py', '12')]
+                    )
+                    po.append(entry)
 
-    for message in messages:
-        yield tuple(message)
+    po.save('./newfile.po')
 
 
 with open(app.config.get('DEFAULT_DECISION_GRAPH'), 'rb') as f:
