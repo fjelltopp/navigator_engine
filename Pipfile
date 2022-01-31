@@ -19,6 +19,9 @@ dash = "*"
 dash-cytoscape = '*'
 json-logging = "*"
 py-healthcheck = "*"
+Babel = "*"
+flask_babel = '*'
+polib = '*'
 
 [dev-packages]
 flake8 = "*"
