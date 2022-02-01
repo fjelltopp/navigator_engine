@@ -2,6 +2,7 @@ from navigator_engine.app import app
 import pandas as pd
 import re
 import polib
+from datetime import datetime, timezone
 
 MILESTONE_COLUMNS = {
     'TITLE': 'Milestone Title (Visible to User):',
@@ -38,14 +39,15 @@ def extract_bdg(fileobj, keywords=None, comment_tags=None, options=None):
     regex = re.compile(r'[0]{2,2}-')
     graph_sheets = list(filter(lambda x: regex.match(x), xl.sheet_names))
 
+    dt = datetime.now(tz=timezone.utc)
     po = polib.POFile()
     po.metadata = {
         'Project-Id-Version': '1.0',
         'Report-Msgid-Bugs-To': 'support@fjelltopp.org',
-        'POT-Creation-Date': '2020-01-18 14:00+0100',
-        'PO-Revision-Date': '2020-01-18 14:00+0100',
-        'Last-Translator': 'you <you@example.com>',
-        'Language-Team': 'French <yourteam@example.com>',
+        'POT-Creation-Date': dt.strftime('%Y-%m-%d %H:%M%z'),
+        'PO-Revision-Date': dt.strftime('%Y-%m-%d %H:%M%z'),
+        'Last-Translator': 'Fjelltopp Ltd <support@fjelltopp.org>',
+        'Language-Team': 'French <support@fjelltopp.org>',
         'MIME-Version': '1.0',
         'Content-Type': 'text/plain; charset=utf-8',
         'Content-Transfer-Encoding': '8bit',
