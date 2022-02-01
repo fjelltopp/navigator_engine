@@ -64,7 +64,7 @@ def extract_bdg(fileobj, keywords=None, comment_tags=None, options=None):
             entry = polib.POEntry(
                 msgid=graph_header.get(MILESTONE_COLUMNS[key]),
                 msgstr=graph_header.get(TRANSLATIONS[0] + '::' + MILESTONE_COLUMNS[key]),
-                occurrences=[('welcome.py', '12')]
+                occurrences=[(fileobj.name.split('/')[-1], sheet_name)]
             )
             po.append(entry)
 
@@ -83,7 +83,7 @@ def extract_bdg(fileobj, keywords=None, comment_tags=None, options=None):
                     entry = polib.POEntry(
                         msgid=row.get(DATA_COLUMNS[key]),
                         msgstr=row.get(TRANSLATIONS[0] + '::' + DATA_COLUMNS[key]),
-                        occurrences=[('welcome.py', '12')]
+                        occurrences=[(fileobj.name.split('/')[-1], sheet_name)]
                     )
                     po.append(entry)
 
