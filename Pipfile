@@ -22,6 +22,8 @@ py-healthcheck = "*"
 Babel = "*"
 flask_babel = '*'
 polib = '*'
+sqlalchemy-utils = '*'
+sqlalchemy-i18n = '*'
 
 [dev-packages]
 flake8 = "*"
