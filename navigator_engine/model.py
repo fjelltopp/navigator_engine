@@ -1,17 +1,32 @@
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, orm
 from flask_sqlalchemy.model import DefaultMeta
+import sqlalchemy_utils
+from flask_babel import get_locale
+from flask import current_app
+from sqlalchemy_i18n import (
+    make_translatable,
+    translation_base,
+    Translatable,
+)
+#from navigator_engine.app import app
+
 import networkx
 
 db = SQLAlchemy()
 
 BaseModel: DefaultMeta = db.Model
 
+sqlalchemy_utils.i18n.get_locale = get_locale
 
-class Graph(BaseModel):
+make_translatable(options={'locales': ['fr', 'en']})
+
+
+class Graph(Translatable, BaseModel):
+    __translatable__ = {'locales': ['fr', 'en']}
+    locale = 'en'
+
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, nullable=False)
     version = db.Column(db.String, nullable=False)
-    description = db.Column(db.String)
     edges = db.relationship("Edge", back_populates="graph")
 
     def to_networkx(self):
@@ -21,17 +36,27 @@ class Graph(BaseModel):
         return network
 
 
-class Conditional(BaseModel):
+class GraphTranslation(translation_base(Graph)):
+    title = db.Column(db.UnicodeText)
+    description = db.Column(db.UnicodeText)
+
+
+class Conditional(Translatable, BaseModel):
+    __translatable__ = {'locales': ['fr', 'en']}
+    locale = 'en'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String)
     function = db.Column(db.String)
     nodes = db.relationship("Node", back_populates="conditional")
 
 
-class Action(BaseModel):
+class ConditionalTranslation(translation_base(Conditional)):
+    title = db.Column(db.UnicodeText)
+
+
+class Action(Translatable, BaseModel):
+    __translatable__ = {'locales': ['fr', 'en']}
+    locale = 'en'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String)
-    html = db.Column(db.String)
     skippable = db.Column(db.Boolean, default=False)
     action_url = db.Column(db.String)
     complete = db.Column(db.Boolean, default=False)
@@ -48,12 +73,22 @@ class Action(BaseModel):
         }
 
 
-class Milestone(BaseModel):
+class ActionTranslation(translation_base(Action)):
+    title = db.Column(db.UnicodeText)
+    html = db.Column(db.UnicodeText)
+
+
+class Milestone(Translatable, BaseModel):
+    __translatable__ = {'locales': ['fr', 'en']}
+    locale = 'en'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String)
     graph_id = db.Column(db.Integer, db.ForeignKey('graph.id'))
     data_loader = db.Column(db.String)
     nodes = db.relationship("Node", back_populates="milestone")
+
+
+class MilestoneTranslation(translation_base(Milestone)):
+    title = db.Column(db.UnicodeText)
 
 
 class Node(BaseModel):
@@ -85,9 +120,10 @@ class Edge(BaseModel):
         return (self.from_node, self.to_node, {'type': self.type, 'object': self})
 
 
-class Resource(BaseModel):
+class Resource(Translatable, BaseModel):
+    __translatable__ = {'locales': ['fr', 'en']}
+    locale = 'en'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, nullable=False)
     url = db.Column(db.String, nullable=False)
     action_id = db.Column(db.Integer, db.ForeignKey('action.id'), nullable=False)
     action = db.relationship("Action", back_populates="resources")
@@ -96,8 +132,20 @@ class Resource(BaseModel):
         return {'label': self.title, 'url': self.url}
 
 
+class ResourceTranslation(translation_base(Resource)):
+    title = db.Column(db.UnicodeText, nullable=False)
+
+
+def load_all_graphs():
+    return Graph.query. \
+        options(orm.joinedload(Graph.translations[get_locale()]))
+
+
 def load_graph(graph_id: int) -> Graph:
-    return Graph.query.filter_by(id=graph_id).first()
+    return Graph.query.\
+        options(orm.joinedload(Graph.translations[get_locale()])).\
+        filter_by(id=graph_id).\
+        first()
 
 
 def load_node(node_id: int = None, node_ref: str = None) -> Node:
