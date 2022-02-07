@@ -63,7 +63,7 @@ def graph_loader(graph_config_file):
             graph_config_file,
             sheet_name=sheet_name,
             header=0
-        ).loc[0][0:7]
+        ).loc[0]
 
         graph_data = pd.read_excel(
             graph_config_file,
