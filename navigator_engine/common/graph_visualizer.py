@@ -118,8 +118,7 @@ def create_visualizer(flask_app, dash_app) -> None:
         Input(component_id='graph-dropdown', component_property='placeholder'))
     def load_dropdown_options(placeholder) -> list:
         with flask_app.app_context():
-            graphs = model.Graph.query.all()
-
+            graphs = model.load_all_graphs()
         dropdown_options = []
         for graph in graphs:
             dropdown_options.append({
