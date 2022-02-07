@@ -66,7 +66,10 @@ def create_app(config_object=None):
 
     @babel.localeselector
     def get_locale():
-        return request.accept_languages.best_match(app.config['LANGUAGES'])
+        if request:
+            return request.accept_languages.best_match(app.config['LANGUAGES'])
+        else:
+            return app.config['DEFAULT_LANGUAGE']
 
     return app
 
