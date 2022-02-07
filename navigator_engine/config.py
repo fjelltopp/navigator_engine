@@ -15,6 +15,8 @@ class Config(object):
     SENTRY_DSN = os.getenv("SENTRY_DSN")
     DASH_REROUTE_PREFIX = '/engine'
     DEFAULT_DECISION_GRAPH = f'{base_directory}/../Estimates 22 BDG [Final].xlsx'
+    LANGUAGES = ['en', 'fr']
+    DEFAULT_LANGUAGE = 'en'
 
 
 class Testing(Config):
