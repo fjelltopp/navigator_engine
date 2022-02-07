@@ -1,5 +1,6 @@
 import navigator_engine.model as model
 import navigator_engine.common as common
+from flask import current_app as app
 import logging
 import os
 import pandas as pd
@@ -52,6 +53,9 @@ def graph_loader(graph_config_file):
 
     assert file_extension == '.xlsx', 'File extension of Initial Graph Config must be XLSX'
 
+    default_lang = app.config['DEFAULT_LANGUAGE'].lower()
+    languages = app.config['LANGUAGES']
+
     xl = pd.ExcelFile(graph_config_file)
     regex = re.compile(r'[\d]{2,2}-')
     graph_sheets = list(filter(lambda x: regex.match(x), xl.sheet_names))
@@ -76,9 +80,9 @@ def graph_loader(graph_config_file):
         # Create graphs on first past through
         # So that they can be referenced by foreign keys on second pass
         graph = model.Graph()
-        graph.translations['en'].title = graph_header[MILESTONE_COLUMNS['TITLE']]
+        graph.translations[default_lang].title = graph_header[MILESTONE_COLUMNS['TITLE']]
         graph.version = graph_header[MILESTONE_COLUMNS['TITLE']]
-        graph.translations['en'].description = graph_header[MILESTONE_COLUMNS['DESCRIPTION']]
+        graph.translations[default_lang].description = graph_header[MILESTONE_COLUMNS['DESCRIPTION']]
 
         model.db.session.add(graph)
         model.db.session.commit()
@@ -96,6 +100,10 @@ def graph_loader(graph_config_file):
 
 
 def import_data(sheet_name, graphs):
+
+    default_lang = app.config['DEFAULT_LANGUAGE'].lower()
+    languages = app.config['LANGUAGES']
+
     graph_data = graphs[sheet_name]['graph_data']
     graph_header = graphs[sheet_name]['graph_header']
     graph = graphs[sheet_name]['graph']
@@ -116,7 +124,7 @@ def import_data(sheet_name, graphs):
                     MILESTONE_COLUMNS['DATA_LOADER']
                 )
                 milestone = model.Milestone()
-                milestone.translations['en'].title = graphs[milestone_sheet_name]['title']
+                milestone.translations[default_lang].title = graphs[milestone_sheet_name]['title']
                 milestone.graph_id = graphs[milestone_sheet_name]['graph_id']
                 milestone.data_loader = data_loader
                 model.db.session.add(milestone)
@@ -132,7 +140,7 @@ def import_data(sheet_name, graphs):
                 graph_data.at[idx, 'DbNodeId'] = node_milestone.id
             else:
                 conditional = model.Conditional()
-                conditional.translations['en'].title = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
+                conditional.translations[default_lang].title = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
                 conditional.function = graph_data.loc[idx, DATA_COLUMNS['FUNCTION']]
                 model.db.session.add(conditional)
                 model.db.session.commit()
@@ -156,8 +164,8 @@ def import_data(sheet_name, graphs):
 
                     action_html = _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
                     action = model.Action()
-                    action.translations['en'].title = graph_data.at[idx, DATA_COLUMNS['ACTION']]
-                    action.translations['en'].html = action_html
+                    action.translations[default_lang].title = graph_data.at[idx, DATA_COLUMNS['ACTION']]
+                    action.translations[default_lang].html = action_html
                     action.skippable = skippable
                     action.complete = False
                     model.db.session.add(action)
@@ -167,7 +175,7 @@ def import_data(sheet_name, graphs):
                     resources = _parse_resources(graph_data.at[idx, DATA_COLUMNS['ACTION_RESOURCES']])
                     for resource_row in resources:
                         resource = model.Resource()
-                        resource.translations['en'].title = resource_row['title']
+                        resource.translations[default_lang].title = resource_row['title']
                         resource.url = resource_row['url']
                         resource.action = action
 
@@ -197,8 +205,8 @@ def import_data(sheet_name, graphs):
         "Time to move on to the next one..."
     )
     complete_action = model.Action()
-    complete_action.translations['en'].title = f"{graph_header[MILESTONE_COLUMNS['TITLE']]} complete!"
-    complete_action.translations['en'].html = _markdown_to_html(message)
+    complete_action.translations[default_lang].title = f"{graph_header[MILESTONE_COLUMNS['TITLE']]} complete!"
+    complete_action.translations[default_lang].html = _markdown_to_html(message)
     complete_action.skippable = False
     complete_action.complete = True
 
