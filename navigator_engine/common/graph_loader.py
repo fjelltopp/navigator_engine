@@ -80,9 +80,17 @@ def graph_loader(graph_config_file):
         # Create graphs on first past through
         # So that they can be referenced by foreign keys on second pass
         graph = model.Graph()
-        graph.translations[default_lang].title = graph_header[MILESTONE_COLUMNS['TITLE']]
         graph.version = graph_header[MILESTONE_COLUMNS['TITLE']]
-        graph.translations[default_lang].description = graph_header[MILESTONE_COLUMNS['DESCRIPTION']]
+        graph.translations[default_lang].title = graph_header[MILESTONE_COLUMNS['TITLE']]
+
+        for lang in languages:
+            if lang == default_lang:
+                graph.translations[lang].title = graph_header[MILESTONE_COLUMNS['TITLE']]
+                graph.translations[lang].description = graph_header[MILESTONE_COLUMNS['DESCRIPTION']]
+            else:
+                graph.translations[lang].title = graph_header.get(MILESTONE_COLUMNS['TITLE'] + '::' + lang.upper())
+                graph.translations[lang].description = \
+                    graph_header.get(MILESTONE_COLUMNS['DESCRIPTION'] + '::' + lang.upper())
 
         model.db.session.add(graph)
         model.db.session.commit()
@@ -90,10 +98,16 @@ def graph_loader(graph_config_file):
         graphs[sheet_name] = {
             'graph_id': graph.id,
             "graph": graph,
-            'title': graph_header[MILESTONE_COLUMNS['TITLE']],
+            'title': {},
             'graph_header': graph_header,
             'graph_data': graph_data
         }
+
+        for lang in languages:
+            if lang == default_lang:
+                graphs[sheet_name]['title'][lang] = graph_header[MILESTONE_COLUMNS['TITLE']]
+            else:
+                graphs[sheet_name]['title'][lang] = graph_header.get(MILESTONE_COLUMNS['TITLE'] + '::' + lang.upper())
 
     for sheet_name in graph_sheets:
         import_data(sheet_name, graphs)
@@ -124,9 +138,10 @@ def import_data(sheet_name, graphs):
                     MILESTONE_COLUMNS['DATA_LOADER']
                 )
                 milestone = model.Milestone()
-                milestone.translations[default_lang].title = graphs[milestone_sheet_name]['title']
                 milestone.graph_id = graphs[milestone_sheet_name]['graph_id']
                 milestone.data_loader = data_loader
+                for lang in languages:
+                    milestone.translations[lang].title = graphs[milestone_sheet_name]['title'][lang]
                 model.db.session.add(milestone)
                 model.db.session.commit()
 
@@ -140,15 +155,19 @@ def import_data(sheet_name, graphs):
                 graph_data.at[idx, 'DbNodeId'] = node_milestone.id
             else:
                 conditional = model.Conditional()
-                conditional.translations[default_lang].title = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
                 conditional.function = graph_data.loc[idx, DATA_COLUMNS['FUNCTION']]
                 model.db.session.add(conditional)
                 model.db.session.commit()
+                for lang in languages:
+                    if lang == default_lang:
+                        conditional.translations[lang].title = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
+                    else:
+                        conditional.translations[lang].title = \
+                            graph_data.loc[idx].get(DATA_COLUMNS['TITLE'] + '::' + lang.upper())
 
                 node_conditional = model.Node()
                 node_conditional.ref = _get_ref(idx, 'conditional')
                 node_conditional.conditional_id = conditional.id
-
                 model.db.session.add(node_conditional)
                 model.db.session.commit()
 
@@ -162,12 +181,19 @@ def import_data(sheet_name, graphs):
 
                     skippable = not _map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['UNSKIPPABLE']])
 
-                    action_html = _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
                     action = model.Action()
-                    action.translations[default_lang].title = graph_data.at[idx, DATA_COLUMNS['ACTION']]
-                    action.translations[default_lang].html = action_html
                     action.skippable = skippable
                     action.complete = False
+
+                    for lang in languages:
+                        if lang == default_lang:
+                            action.translations[lang].title = graph_data.at[idx, DATA_COLUMNS['ACTION']]
+                            action.translations[lang].html = \
+                                _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
+                        else:
+                            action.translations[lang].title = graph_data.at[idx, DATA_COLUMNS['ACTION']]
+                            action.translations[lang].html = \
+                                _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
                     model.db.session.add(action)
                     model.db.session.commit()
 
