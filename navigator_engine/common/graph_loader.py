@@ -198,15 +198,27 @@ def import_data(sheet_name, graphs):
                     model.db.session.commit()
 
                     # Parse action's resource urls and add them to database
-                    resources = _parse_resources(graph_data.at[idx, DATA_COLUMNS['ACTION_RESOURCES']])
-                    for resource_row in resources:
+                    resources = {}
+
+                    for lang in languages:
+                        if lang == default_lang:
+                            resources[lang] = _parse_resources(graph_data.at[idx, DATA_COLUMNS['ACTION_RESOURCES']])
+                        else:
+                            resources[lang] = _parse_resources(
+                                graph_data.loc[idx].get(DATA_COLUMNS['ACTION_RESOURCES'] + '::' + lang.upper()))
+
+                    resource_idx = 0
+                    for resource_row in resources[default_lang]:
                         resource = model.Resource()
-                        resource.translations[default_lang].title = resource_row['title']
                         resource.url = resource_row['url']
                         resource.action = action
-
+                        for lang in languages:
+                            if len(resources[lang]) > 0:
+                                resource.translations[lang].title = resources[lang][resource_idx].get('title')
                         model.db.session.add(resource)
                         model.db.session.commit()
+
+                        resource_idx = resource_idx + 1
 
                     # Add node to action
                     node_action = model.Node()
