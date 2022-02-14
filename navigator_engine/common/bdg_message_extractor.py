@@ -35,8 +35,7 @@ def extract_bdg(fileobj, keywords=None, comment_tags=None, options=None):
     :rtype: ``iterator``"""
 
     xl = pd.ExcelFile(fileobj)
-    #regex = re.compile(r'[\d]{2,2}-')
-    regex = re.compile(r'[0]{2,2}-')
+    regex = re.compile(r'[\d]{2,2}-')
     graph_sheets = list(filter(lambda x: regex.match(x), xl.sheet_names))
 
     dt = datetime.now(tz=timezone.utc)
@@ -92,4 +91,3 @@ def extract_bdg(fileobj, keywords=None, comment_tags=None, options=None):
 
 with open(app.config.get('DEFAULT_DECISION_GRAPH'), 'rb') as f:
     extract_bdg(f)
-
