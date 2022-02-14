@@ -7,7 +7,7 @@ from sqlalchemy_i18n import (
     translation_base,
     Translatable,
 )
-
+from sqlalchemy_i18n.manager import BaseTranslationMixin
 import networkx
 
 db = SQLAlchemy()
@@ -34,21 +34,12 @@ class Graph(Translatable, BaseModel):
         return network
 
 
-class GraphTranslation(translation_base(Graph)):
-    title = db.Column(db.UnicodeText)
-    description = db.Column(db.UnicodeText)
-
-
 class Conditional(Translatable, BaseModel):
     __translatable__ = {'locales': ['fr', 'en']}
     locale = 'en'
     id = db.Column(db.Integer, primary_key=True)
     function = db.Column(db.String)
     nodes = db.relationship("Node", back_populates="conditional")
-
-
-class ConditionalTranslation(translation_base(Conditional)):
-    title = db.Column(db.UnicodeText)
 
 
 class Action(Translatable, BaseModel):
@@ -71,11 +62,6 @@ class Action(Translatable, BaseModel):
         }
 
 
-class ActionTranslation(translation_base(Action)):
-    title = db.Column(db.UnicodeText)
-    html = db.Column(db.UnicodeText)
-
-
 class Milestone(Translatable, BaseModel):
     __translatable__ = {'locales': ['fr', 'en']}
     locale = 'en'
@@ -83,10 +69,6 @@ class Milestone(Translatable, BaseModel):
     graph_id = db.Column(db.Integer, db.ForeignKey('graph.id'))
     data_loader = db.Column(db.String)
     nodes = db.relationship("Node", back_populates="milestone")
-
-
-class MilestoneTranslation(translation_base(Milestone)):
-    title = db.Column(db.UnicodeText)
 
 
 class Node(BaseModel):
@@ -130,8 +112,33 @@ class Resource(Translatable, BaseModel):
         return {'label': self.title, 'url': self.url}
 
 
-class ResourceTranslation(translation_base(Resource)):
+GraphTranslationMixin: BaseTranslationMixin = translation_base(Graph)
+ResourceTranslationMixin: BaseTranslationMixin = translation_base(Resource)
+ActionTranslationMixin: BaseTranslationMixin = translation_base(Action)
+MilestoneTranslationMixin: BaseTranslationMixin = translation_base(Milestone)
+ConditionalTranslationMixin: BaseTranslationMixin = translation_base(Conditional)
+
+
+class GraphTranslation(GraphTranslationMixin):
+    title = db.Column(db.UnicodeText)
+    description = db.Column(db.UnicodeText)
+
+
+class ResourceTranslation(ResourceTranslationMixin):
     title = db.Column(db.UnicodeText, nullable=False)
+
+
+class ActionTranslation(ActionTranslationMixin):
+    title = db.Column(db.UnicodeText)
+    html = db.Column(db.UnicodeText)
+
+
+class ConditionalTranslation(ConditionalTranslationMixin):
+    title = db.Column(db.UnicodeText)
+
+
+class MilestoneTranslation(MilestoneTranslationMixin):
+    title = db.Column(db.UnicodeText)
 
 
 def load_all_graphs():
