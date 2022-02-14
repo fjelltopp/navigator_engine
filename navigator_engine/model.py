@@ -2,13 +2,11 @@ from flask_sqlalchemy import SQLAlchemy, orm
 from flask_sqlalchemy.model import DefaultMeta
 import sqlalchemy_utils
 from flask_babel import get_locale
-from flask import current_app
 from sqlalchemy_i18n import (
     make_translatable,
     translation_base,
     Translatable,
 )
-#from navigator_engine.app import app
 
 import networkx
 
