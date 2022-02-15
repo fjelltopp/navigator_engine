@@ -154,7 +154,7 @@ def import_data(sheet_name, graphs):
                 if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
 
                     if 'check_not_skipped' in conditional.function:
-                        graph_data.loc[[idx]] = _create_check_skips_action(conditional, graph_data.loc[[idx]])
+                        graph_data.loc[idx, :] = _create_check_skips_action(conditional, graph_data.loc[idx, :])
 
                     skippable = not _map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['UNSKIPPABLE']])
 
@@ -306,12 +306,16 @@ def _get_ref(ref, node_type):
     return f'EST-{ref}-{node_type[0].upper()}'
 
 
+def _is_null_or_false(value):
+    return pd.isnull(value) or not bool(value)
+
+
 def _create_check_skips_action(conditional, graph_data):
 
-    if graph_data[DATA_COLUMNS['ACTION']].isna().values.any():
+    if _is_null_or_false(graph_data[DATA_COLUMNS['ACTION']]):
         graph_data[DATA_COLUMNS['ACTION']] = "You have skipped some essential tasks"
 
-    if graph_data[DATA_COLUMNS['ACTION_CONTENT']].isna().values.any():
+    if _is_null_or_false(graph_data[DATA_COLUMNS['ACTION_CONTENT']]):
         function_name, function_args = common.get_pluggable_function_and_args(conditional.function)
 
         tasks = []
