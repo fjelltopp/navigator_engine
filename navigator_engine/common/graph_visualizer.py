@@ -3,6 +3,7 @@ from dash import dcc
 import dash_cytoscape as cyto
 from dash import html
 from dash.dependencies import Input, Output
+from flask_babel import _
 
 # Group selectors
 graph_stylesheet = [
@@ -73,7 +74,6 @@ graph_stylesheet = [
 
 
 def create_visualizer(flask_app, dash_app) -> None:
-
     dash_app.layout = html.Div(children=[
         html.Div(
             id='dropdown-container',
@@ -100,7 +100,7 @@ def create_visualizer(flask_app, dash_app) -> None:
         html.Hr(),
         html.P(
             id='tapNodeData-output',
-            children=['Click a node to see more information about it']
+            children=[_('Click a node to see more information about it')]
         ),
     ])
 
@@ -152,9 +152,9 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref} COMPLETE',
-                        'infobox': f'Action {node.ref} | '
-                                   f'Node {node.id} | '
-                                   f'{node.action.title}'
+                        'infobox': _('Action %(ref)s', ref=node.ref) + ' | ' +
+                        _('Node %(id)s', id=node.id) + ' | ' +
+                        f'{node.action.title}'
                     }
                 }
             elif node.action and not node.action.complete:
