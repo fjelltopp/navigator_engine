@@ -81,7 +81,7 @@ def create_visualizer(flask_app, dash_app) -> None:
                 dcc.Dropdown(
                     id='graph-dropdown',
                     options=[],
-                    placeholder='Select a graph'
+                    placeholder=_('Select a graph')
                 )
             ]
         ),
@@ -122,7 +122,7 @@ def create_visualizer(flask_app, dash_app) -> None:
         dropdown_options = []
         for graph in graphs:
             dropdown_options.append({
-                'label': f'Graph {graph.id} | {graph.title}',
+                'label': _('Graph') + f'{graph.id} | {graph.title}',
                 'value': graph.id
             })
 
@@ -151,10 +151,11 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'classes': 'red triangle',
                     'data': {
                         'id': str(node.id),
-                        'label': f'{node.ref} COMPLETE',
-                        'infobox': _('Action %(ref)s', ref=node.ref) + ' | ' +
-                        _('Node %(id)s', id=node.id) + ' | ' +
-                        f'{node.action.title}'
+                        'label': _('%(ref)s COMPLETE', ref=node.ref),
+                        'infobox':
+                            _('Action %(ref)s', ref=node.ref) + ' | ' +
+                            _('Node %(id)s', id=node.id) + ' | ' +
+                            f'{node.action.title}'
                     }
                 }
             elif node.action and not node.action.complete:
@@ -163,9 +164,10 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref}',
-                        'infobox': f'Action {node.ref} | '
-                                   f'Node {node.id} | '
-                                   f'{node.action.title}'
+                        'infobox':
+                            _('Action %(ref)s', ref=node.ref) + ' | ' +
+                            _('Node %(id)s', id=node.id) + ' | ' +
+                            f'{node.action.title}'
                     }
                 }
             elif node.milestone:
@@ -174,9 +176,10 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref}',
-                        'infobox': f'Milestone {node.ref} | '
-                                   f'Node {node.id}  | '
-                                   f'{node.milestone.title}'
+                        'infobox':
+                            _('Milestone %(ref)s', ref=node.ref) + ' | ' +
+                            _('Node %(id)s', id=node.id) + ' | ' +
+                            f'{node.action.title}'
                     }
                 }
             elif node.conditional:
@@ -185,10 +188,10 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref}',
-                        'infobox': f'Conditional '
-                                   f'{node.ref} | '
-                                   f'Node {node.id}  | '
-                                   f'{node.conditional.title}'
+                        'infobox':
+                            _('Conditional %(ref)s', ref=node.ref) + ' | ' +
+                            _('Node %(id)s', id=node.id) + ' | ' +
+                            f'{node.action.title}'
                     }
                 }
             else:
