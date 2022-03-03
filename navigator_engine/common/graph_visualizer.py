@@ -151,11 +151,8 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'classes': 'red triangle',
                     'data': {
                         'id': str(node.id),
-                        'label': _('%(ref)s COMPLETE', ref=node.ref),
-                        'infobox':
-                            _('Action %(ref)s', ref=node.ref) + ' | ' +
-                            _('Node %(id)s', id=node.id) + ' | ' +
-                            f'{node.action.title}'
+                        'label': f'{node.ref} COMPLETE',
+                        'infobox': f'Action {node.ref} | Node {node.id} | {node.action.title}'
                     }
                 }
             elif node.action and not node.action.complete:
@@ -164,10 +161,7 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref}',
-                        'infobox':
-                            _('Action %(ref)s', ref=node.ref) + ' | ' +
-                            _('Node %(id)s', id=node.id) + ' | ' +
-                            f'{node.action.title}'
+                        'infobox': f'Action {node.ref} | Node {node.id} | {node.action.title}'
                     }
                 }
             elif node.milestone:
@@ -176,10 +170,7 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref}',
-                        'infobox':
-                            _('Milestone %(ref)s', ref=node.ref) + ' | ' +
-                            _('Node %(id)s', id=node.id) + ' | ' +
-                            f'{node.action.title}'
+                        'infobox': f'Milestone {node.ref} | Node {node.id} | {node.action.title}'
                     }
                 }
             elif node.conditional:
@@ -188,10 +179,7 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref}',
-                        'infobox':
-                            _('Conditional %(ref)s', ref=node.ref) + ' | ' +
-                            _('Node %(id)s', id=node.id) + ' | ' +
-                            f'{node.action.title}'
+                        'infobox': f'Conditional {node.ref} | Node {node.id} | {node.action.title}'
                     }
                 }
             else:
