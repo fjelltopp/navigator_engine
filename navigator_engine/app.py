@@ -11,6 +11,7 @@ from navigator_engine.healthz import healthz_bp
 import importlib
 import json
 import json_logging
+from flask_babel import Babel
 
 
 def create_app(config_object=None):
@@ -36,6 +37,8 @@ def create_app(config_object=None):
             integrations=[FlaskIntegration()],
             traces_sample_rate=1.0
         )
+
+    babel = Babel(app)
 
     db.init_app(app)
     app.register_blueprint(api_blueprint)
