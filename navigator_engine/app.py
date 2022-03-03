@@ -11,7 +11,6 @@ from navigator_engine.healthz import healthz_bp
 import importlib
 import json
 import json_logging
-from flask_babel import Babel, _
 
 
 def create_app(config_object=None):
@@ -38,8 +37,6 @@ def create_app(config_object=None):
             traces_sample_rate=1.0
         )
 
-    babel = Babel(app)
-
     db.init_app(app)
     app.register_blueprint(api_blueprint)
     cli.register(app)
@@ -51,7 +48,7 @@ def create_app(config_object=None):
 
     @app.route('/')
     def index():
-        return jsonify({"status": _("Navigator Engine Running")})
+        return jsonify({"status": "Navigator Engine Running"})
 
     @app.errorhandler(HTTPException)
     def error_response(e):
