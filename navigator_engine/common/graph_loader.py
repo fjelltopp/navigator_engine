@@ -1,6 +1,5 @@
 import navigator_engine.model as model
 import navigator_engine.common as common
-from flask import current_app as app
 import logging
 import os
 import pandas as pd
