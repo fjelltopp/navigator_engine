@@ -6,6 +6,7 @@ import pandas as pd
 import re
 import markdown
 from urllib.parse import urlparse
+from flask import current_app as app
 
 MILESTONE_COLUMNS = {
     'TITLE': 'Milestone Title (Visible to User):',
@@ -52,8 +53,8 @@ def graph_loader(graph_config_file):
 
     assert file_extension == '.xlsx', 'File extension of Initial Graph Config must be XLSX'
 
-    default_lang = os.environ.get('NAVIGATOR_DEFAULT_LANGUAGE', 'en').lower()
-    languages = os.environ.get('NAVIGATOR_LANGUAGES', 'en,fr').split(',')
+    default_lang = app.config['DEFAULT_LANGUAGE']
+    languages = app.config['LANGUAGES']
 
     xl = pd.ExcelFile(graph_config_file)
     regex = re.compile(r'[\d]{2,2}-')
@@ -114,8 +115,8 @@ def graph_loader(graph_config_file):
 
 def import_data(sheet_name, graphs):
 
-    default_lang = os.environ.get('NAVIGATOR_DEFAULT_LANGUAGE', 'en').lower()
-    languages = os.environ.get('NAVIGATOR_LANGUAGES', 'en,fr').split(',')
+    default_lang = app.config['DEFAULT_LANGUAGE']
+    languages = app.config['LANGUAGES']
 
     graph_data = graphs[sheet_name]['graph_data']
     graph_header = graphs[sheet_name]['graph_header']
