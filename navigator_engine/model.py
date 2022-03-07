@@ -9,12 +9,16 @@ from sqlalchemy_i18n import (
 )
 from sqlalchemy_i18n.manager import BaseTranslationMixin
 import networkx
+from flask import current_app as app
 
 db = SQLAlchemy()
 
 BaseModel: DefaultMeta = db.Model
 
 sqlalchemy_utils.i18n.get_locale = get_locale
+
+with app.app_context():
+    languages = app.config['LANGUAGES']
 
 make_translatable(options={'locales': ['fr', 'en']})
 
