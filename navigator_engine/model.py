@@ -9,7 +9,7 @@ from sqlalchemy_i18n import (
 )
 from sqlalchemy_i18n.manager import BaseTranslationMixin
 import networkx
-from flask import current_app as app
+import os
 
 db = SQLAlchemy()
 
@@ -17,14 +17,13 @@ BaseModel: DefaultMeta = db.Model
 
 sqlalchemy_utils.i18n.get_locale = get_locale
 
-with app.app_context():
-    languages = app.config['LANGUAGES']
+languages = os.environ.get('NAVIGATOR_LANGUAGES', 'en').split(',')
 
-make_translatable(options={'locales': ['fr', 'en']})
+make_translatable(options={'locales': languages})
 
 
 class Graph(Translatable, BaseModel):
-    __translatable__ = {'locales': ['fr', 'en']}
+    __translatable__ = {'locales': languages}
     locale = 'en'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -39,7 +38,7 @@ class Graph(Translatable, BaseModel):
 
 
 class Conditional(Translatable, BaseModel):
-    __translatable__ = {'locales': ['fr', 'en']}
+    __translatable__ = {'locales': languages}
     locale = 'en'
     id = db.Column(db.Integer, primary_key=True)
     function = db.Column(db.String)
@@ -47,7 +46,7 @@ class Conditional(Translatable, BaseModel):
 
 
 class Action(Translatable, BaseModel):
-    __translatable__ = {'locales': ['fr', 'en']}
+    __translatable__ = {'locales': languages}
     locale = 'en'
     id = db.Column(db.Integer, primary_key=True)
     skippable = db.Column(db.Boolean, default=False)
@@ -67,7 +66,7 @@ class Action(Translatable, BaseModel):
 
 
 class Milestone(Translatable, BaseModel):
-    __translatable__ = {'locales': ['fr', 'en']}
+    __translatable__ = {'locales': languages}
     locale = 'en'
     id = db.Column(db.Integer, primary_key=True)
     graph_id = db.Column(db.Integer, db.ForeignKey('graph.id'))
@@ -105,7 +104,7 @@ class Edge(BaseModel):
 
 
 class Resource(Translatable, BaseModel):
-    __translatable__ = {'locales': ['fr', 'en']}
+    __translatable__ = {'locales': languages}
     locale = 'en'
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String, nullable=False)
