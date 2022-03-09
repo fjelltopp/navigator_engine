@@ -194,7 +194,7 @@ def import_data(sheet_name, graphs):
                             action.translations[lang].title = graph_data.loc[idx].get(
                                 DATA_COLUMNS['ACTION'] + '::' + lang.upper())
                             action.translations[lang].html = _markdown_to_html(graph_data.loc[idx].get(
-                                    DATA_COLUMNS['ACTION_CONTENT'] + '::' + lang.upper()))
+                                DATA_COLUMNS['ACTION_CONTENT'] + '::' + lang.upper()))
                     model.db.session.add(action)
                     model.db.session.commit()
 
