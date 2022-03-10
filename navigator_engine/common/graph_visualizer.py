@@ -169,7 +169,7 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref}',
-                        'infobox': f'Milestone {node.ref} | Node {node.id} | {node.action.title}'
+                        'infobox': f'Milestone {node.ref} | Node {node.id} | {node.milestone.title}'
                     }
                 }
             elif node.conditional:
@@ -178,7 +178,7 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref}',
-                        'infobox': f'Conditional {node.ref} | Node {node.id} | {node.action.title}'
+                        'infobox': f'Conditional {node.ref} | Node {node.id} | {node.conditional.title}'
                     }
                 }
             else:
