@@ -46,21 +46,15 @@ class TestGraphLoader:
         for graph in graphs:
             assert networkx.algorithms.isomorphism.is_isomorphic(graph.to_networkx(), graph_test_data[str(graph.id)])
 
-    @pytest.mark.parametrize('language,description', [
-        ('en', 'In this milestone, you will prepare and place the required input data in the templates needed to '
-               + 'generate HIV estimates. You should use the best, highest quality, and most complete input data you '
-               + 'have available to you for the estimates process.'),
-        ('fr', 'In this milestone, you will prepare and place the required input data in the templates needed to '
-               + 'generate HIV estimates. You should use the best, highest quality, and most complete input data you '
-               + 'have available to you for the estimates process.'),
-        ('pt', 'In this milestone, you will prepare and place the required input data in the templates needed to '
-               + 'generate HIV estimates. You should use the best, highest quality, and most complete input data you '
-               + 'have available to you for the estimates process.')
+    @pytest.mark.parametrize('language,title,description', [
+        ('en', 'Test Data Overview', 'Test Milestone'),
+        ('fr', 'FRENCH Test Data Overview', 'FRENCH Test Milestone'),
+        ('pt_PT', 'PORTUGUESE Test Data Overview', 'PORTUGUESE Test Milestone')
     ])
-    def test_graph_translation(self, mocker, language, description):
-        mocker.patch('navigator_engine.model.get_locale', return_value=language)
+    def test_graph_translation(self, language, title, description):
         graph = model.load_graph(graph_id=1)
-        assert graph.description.strip() == description.strip()
+        assert graph.translations[language].title == title
+        assert graph.translations[language].description == description
 
     def test_conditional_translation(self):
         conditionals = model.Node.query.all()
