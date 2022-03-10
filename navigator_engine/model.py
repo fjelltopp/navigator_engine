@@ -17,7 +17,7 @@ BaseModel: DefaultMeta = db.Model
 
 sqlalchemy_utils.i18n.get_locale = get_locale
 
-languages = os.environ.get('NAVIGATOR_LANGUAGES', 'en').split(',')
+languages = os.environ.get('NAVIGATOR_LANGUAGES', 'en,fr,pt').split(',')
 
 make_translatable(options={'locales': languages})
 

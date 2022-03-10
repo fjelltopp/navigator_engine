@@ -16,14 +16,14 @@ class Config(object):
     DASH_REROUTE_PREFIX = '/engine'
     DEFAULT_DECISION_GRAPH = f'{base_directory}/../Estimates 22 BDG [Final].xlsx'
     # LANGUAGES is hosted as an environment variable NAVIGATOR_LANGUAGES
-    LANGUAGES = os.getenv('NAVIGATOR_LANGUAGES', 'en').split(',')
+    LANGUAGES = os.getenv('NAVIGATOR_LANGUAGES', 'en,fr,pt').split(',')
     # DEFAULT_LANGUAGE is hosted as an environment variable NAVIGATOR_DEFAULT_LANGUAGE
     DEFAULT_LANGUAGE = os.getenv('NAVIGATOR_DEFAULT_LANGUAGE', 'en')
 
 
 class Testing(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:////{base_directory}/../testing.db'
+    SQLALCHEMY_DATABASE_URI = f'sqlite+pysqlite:/&//{base_directory}/../testing.db'
     DEFAULT_DECISION_GRAPH = f'{base_directory}/tests/test_data/Estimates Test Data.xlsx'
     DECISION_GRAPH_FOLDER = f'{base_directory}/tests/test_data/test_graphs/'
     DASH_REROUTE_PREFIX = ''
