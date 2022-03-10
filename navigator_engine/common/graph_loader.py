@@ -88,9 +88,9 @@ def graph_loader(graph_config_file):
                 graph.translations[lang].title = graph_header[MILESTONE_COLUMNS['TITLE']]
                 graph.translations[lang].description = graph_header[MILESTONE_COLUMNS['DESCRIPTION']]
             else:
-                graph.translations[lang].title = graph_header.get(MILESTONE_COLUMNS['TITLE'] + '::' + lang.upper())
+                graph.translations[lang].title = graph_header.get(MILESTONE_COLUMNS['TITLE'] + '::' + lang)
                 graph.translations[lang].description = \
-                    graph_header.get(MILESTONE_COLUMNS['DESCRIPTION'] + '::' + lang.upper())
+                    graph_header.get(MILESTONE_COLUMNS['DESCRIPTION'] + '::' + lang)
 
         model.db.session.add(graph)
         model.db.session.commit()
@@ -107,7 +107,7 @@ def graph_loader(graph_config_file):
             if lang == default_lang:
                 graphs[sheet_name]['title'][lang] = graph_header[MILESTONE_COLUMNS['TITLE']]
             else:
-                graphs[sheet_name]['title'][lang] = graph_header.get(MILESTONE_COLUMNS['TITLE'] + '::' + lang.upper())
+                graphs[sheet_name]['title'][lang] = graph_header.get(MILESTONE_COLUMNS['TITLE'] + '::' + lang)
 
     for sheet_name in graph_sheets:
         import_data(sheet_name, graphs)
@@ -163,7 +163,7 @@ def import_data(sheet_name, graphs):
                         conditional.translations[lang].title = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
                     else:
                         conditional.translations[lang].title = \
-                            graph_data.loc[idx].get(DATA_COLUMNS['TITLE'] + '::' + lang.upper())
+                            graph_data.loc[idx].get(DATA_COLUMNS['TITLE'] + '::' + lang)
 
                 node_conditional = model.Node()
                 node_conditional.ref = _get_ref(idx, 'conditional')
@@ -192,9 +192,9 @@ def import_data(sheet_name, graphs):
                                 _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
                         else:
                             action.translations[lang].title = graph_data.loc[idx].get(
-                                DATA_COLUMNS['ACTION'] + '::' + lang.upper())
+                                DATA_COLUMNS['ACTION'] + '::' + lang)
                             action.translations[lang].html = _markdown_to_html(graph_data.loc[idx].get(
-                                DATA_COLUMNS['ACTION_CONTENT'] + '::' + lang.upper()))
+                                DATA_COLUMNS['ACTION_CONTENT'] + '::' + lang))
                     model.db.session.add(action)
                     model.db.session.commit()
 
@@ -206,7 +206,7 @@ def import_data(sheet_name, graphs):
                             resources[lang] = _parse_resources(graph_data.at[idx, DATA_COLUMNS['ACTION_RESOURCES']])
                         else:
                             resources[lang] = _parse_resources(
-                                graph_data.loc[idx].get(DATA_COLUMNS['ACTION_RESOURCES'] + '::' + lang.upper()))
+                                graph_data.loc[idx].get(DATA_COLUMNS['ACTION_RESOURCES'] + '::' + lang))
 
                     resource_idx = 0
                     for resource_row in resources[default_lang]:
