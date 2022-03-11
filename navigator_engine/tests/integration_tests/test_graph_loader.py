@@ -1,6 +1,7 @@
 import pytest
 import networkx
 import pickle
+import re
 from navigator_engine import model
 from navigator_engine.common.graph_loader import graph_loader
 from navigator_engine.tests.util import app
@@ -56,14 +57,26 @@ class TestGraphLoader:
         assert graph.translations[language].title == title
         assert graph.translations[language].description == description
 
-    def test_conditional_translation(self):
-        conditionals = model.Node.query.all()
-        assert conditionals
-
-    def test_action_translation(self):
+    @pytest.mark.parametrize('language,title,html_start', [
+        ('en', 'Welcome to the Navigator', '<p>Welcome to the HIV Estimates Navigator.'),
+        ('fr', 'FRENCH Welcome to the Navigator', '<p>FRENCH Welcome to the HIV Estimates Navigator.'),
+        ('pt_PT', 'PORTUGUESE Welcome to the Navigator', '<p>PORTUGUESE Welcome to the HIV Estimates Navigator.')
+    ])
+    def test_action_translation(self, language, title, html_start):
         actions = model.Action.query.all()
-        assert actions
+        assert actions[0].translations[language].title == title
+        pattern = re.compile(f'^{html_start}.*')
+        assert pattern.match(actions[0].translations[language].html)
 
-    def test_milestone_translation(self):
-        milestones = model.Milestone.query.all()
-        assert milestones
+    @pytest.mark.parametrize('language,title', [
+        ('en', 'Test Resource 1, Test resource 2, Test link'),
+        ('fr', 'FRENCH Test Resource 1, Test resource 2, Test link'),
+        ('pt_PT', 'PORTUGUESE Test Resource 1, Test resource 2, Test link')
+    ])
+    def test_resource_translation(self, language, title):
+        resources = model.Resource.query.all()
+        assert resources[0].translations[language].title == title
+
+    def test_resource_url(self):
+        resources = model.Resource.query.all()
+        assert resources[0].url == 'https://test.org'
