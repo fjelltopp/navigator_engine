@@ -8,7 +8,7 @@ import os
     ('', 'Welcome to the UNAIDS HIV Estimates Navigator'),
     ('en', 'Welcome to the UNAIDS HIV Estimates Navigator'),
     ('fr', 'Bienvenue dans le navigateur des estimations du VIH de l\'ONUSIDA'),
-    ('pt', 'Bem-vindo ao Navegador da UNAIDS HIV')
+    ('pt_PT', 'Bem-vindo ao Navegador da UNAIDS HIV')
 ])
 def test_estimates_start(test_production_client, language, title):
     response = test_production_client.post(
