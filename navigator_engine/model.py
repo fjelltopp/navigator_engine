@@ -25,7 +25,7 @@ make_translatable(options={'locales': languages})
 
 class Graph(Translatable, BaseModel):
     __translatable__ = {'locales': languages}
-    locale = 'en'
+    locale = default_language
 
     id = db.Column(db.Integer, primary_key=True)
     version = db.Column(db.String, nullable=False)
@@ -40,7 +40,7 @@ class Graph(Translatable, BaseModel):
 
 class Conditional(Translatable, BaseModel):
     __translatable__ = {'locales': languages}
-    locale = 'en'
+    locale = default_language
     id = db.Column(db.Integer, primary_key=True)
     function = db.Column(db.String)
     nodes = db.relationship("Node", back_populates="conditional")
@@ -48,7 +48,7 @@ class Conditional(Translatable, BaseModel):
 
 class Action(Translatable, BaseModel):
     __translatable__ = {'locales': languages}
-    locale = 'en'
+    locale = default_language
     id = db.Column(db.Integer, primary_key=True)
     skippable = db.Column(db.Boolean, default=False)
     action_url = db.Column(db.String)
@@ -68,7 +68,7 @@ class Action(Translatable, BaseModel):
 
 class Milestone(Translatable, BaseModel):
     __translatable__ = {'locales': languages}
-    locale = 'en'
+    locale = default_language
     id = db.Column(db.Integer, primary_key=True)
     graph_id = db.Column(db.Integer, db.ForeignKey('graph.id'))
     data_loader = db.Column(db.String)
@@ -106,7 +106,7 @@ class Edge(BaseModel):
 
 class Resource(Translatable, BaseModel):
     __translatable__ = {'locales': languages}
-    locale = 'en'
+    locale = default_language
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String, nullable=False)
     action_id = db.Column(db.Integer, db.ForeignKey('action.id'), nullable=False)
