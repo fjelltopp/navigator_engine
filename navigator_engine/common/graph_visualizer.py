@@ -73,7 +73,6 @@ graph_stylesheet = [
 
 
 def create_visualizer(flask_app, dash_app) -> None:
-
     dash_app.layout = html.Div(children=[
         html.Div(
             id='dropdown-container',
@@ -118,8 +117,7 @@ def create_visualizer(flask_app, dash_app) -> None:
         Input(component_id='graph-dropdown', component_property='placeholder'))
     def load_dropdown_options(placeholder) -> list:
         with flask_app.app_context():
-            graphs = model.Graph.query.all()
-
+            graphs = model.load_all_graphs()
         dropdown_options = []
         for graph in graphs:
             dropdown_options.append({
@@ -153,9 +151,7 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref} COMPLETE',
-                        'infobox': f'Action {node.ref} | '
-                                   f'Node {node.id} | '
-                                   f'{node.action.title}'
+                        'infobox': f'Action {node.ref} | Node {node.id} | {node.action.title}'
                     }
                 }
             elif node.action and not node.action.complete:
@@ -164,9 +160,7 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref}',
-                        'infobox': f'Action {node.ref} | '
-                                   f'Node {node.id} | '
-                                   f'{node.action.title}'
+                        'infobox': f'Action {node.ref} | Node {node.id} | {node.action.title}'
                     }
                 }
             elif node.milestone:
@@ -175,9 +169,7 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref}',
-                        'infobox': f'Milestone {node.ref} | '
-                                   f'Node {node.id}  | '
-                                   f'{node.milestone.title}'
+                        'infobox': f'Milestone {node.ref} | Node {node.id} | {node.milestone.title}'
                     }
                 }
             elif node.conditional:
@@ -186,10 +178,7 @@ def create_visualizer(flask_app, dash_app) -> None:
                     'data': {
                         'id': str(node.id),
                         'label': f'{node.ref}',
-                        'infobox': f'Conditional '
-                                   f'{node.ref} | '
-                                   f'Node {node.id}  | '
-                                   f'{node.conditional.title}'
+                        'infobox': f'Conditional {node.ref} | Node {node.id} | {node.conditional.title}'
                     }
                 }
             else:

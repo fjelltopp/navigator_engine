@@ -1,6 +1,6 @@
 import os
 import sentry_sdk
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from sentry_sdk.integrations.flask import FlaskIntegration
 from werkzeug.exceptions import HTTPException
 from navigator_engine import cli
@@ -11,6 +11,7 @@ from navigator_engine.healthz import healthz_bp
 import importlib
 import json
 import json_logging
+from flask_babel import Babel
 
 
 def create_app(config_object=None):
@@ -37,6 +38,8 @@ def create_app(config_object=None):
             traces_sample_rate=1.0
         )
 
+    babel = Babel(app)
+
     db.init_app(app)
     app.register_blueprint(api_blueprint)
     cli.register(app)
@@ -60,6 +63,13 @@ def create_app(config_object=None):
         })
         response.content_type = "application/json"
         return response
+
+    @babel.localeselector
+    def get_locale():
+        if request:
+            return request.accept_languages.best_match(app.config['LANGUAGES'])
+        else:
+            return app.config['DEFAULT_LANGUAGE']
 
     return app
 

@@ -19,12 +19,14 @@ class ProgressTracker():
         self.report: dict = {}
 
     def report_progress(self) -> dict:
-        milestones = copy.deepcopy(self.milestones)
-        current_milestone = None
+        milestones = copy.copy(self.milestones)
+        current_milestone_id = None
         if milestones and not milestones[-1]['completed']:
             # Calculate percentage progress for current milestone
-            milestones[-1]['progress'] = milestones[-1]['progress'].percentage_progress()
-            current_milestone = milestones[-1]['id']
+            current_milestone = copy.copy(milestones.pop())
+            current_milestone['progress'] = current_milestone['progress'].percentage_progress()
+            current_milestone_id = current_milestone['id']
+            milestones.append(current_milestone)
         milestones_to_complete, milestone_list_resolved = self.milestones_to_complete()
         for node in milestones_to_complete:
             milestones.append({
@@ -35,7 +37,7 @@ class ProgressTracker():
             })
         self.report = {
             'progress': self.percentage_progress(),
-            'currentMilestoneID': current_milestone,
+            'currentMilestoneID': current_milestone_id,
             'milestoneListFullyResolved': milestone_list_resolved,
             'milestones': milestones
         }
