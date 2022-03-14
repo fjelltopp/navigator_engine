@@ -121,7 +121,7 @@ def create_visualizer(flask_app, dash_app) -> None:
         dropdown_options = []
         for graph in graphs:
             dropdown_options.append({
-                'label': 'Graph' + f'{graph.id} | {graph.title}',
+                'label': f'Graph {graph.id} | {graph.title}',
                 'value': graph.id
             })
 
