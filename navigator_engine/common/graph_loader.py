@@ -116,7 +116,6 @@ def graph_loader(graph_config_file):
 def import_data(sheet_name, graphs):
 
     default_lang = app.config['DEFAULT_LANGUAGE']
-    languages = app.config['LANGUAGES']
 
     graph_data = graphs[sheet_name]['graph_data']
     graph_header = graphs[sheet_name]['graph_header']
