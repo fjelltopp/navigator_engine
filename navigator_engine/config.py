@@ -15,9 +15,7 @@ class Config(object):
     SENTRY_DSN = os.getenv("SENTRY_DSN")
     DASH_REROUTE_PREFIX = '/engine'
     DEFAULT_DECISION_GRAPH = f'{base_directory}/../Estimates 22 BDG [Final].xlsx'
-    # LANGUAGES is hosted as an environment variable NAVIGATOR_LANGUAGES
     LANGUAGES = os.getenv('NAVIGATOR_LANGUAGES', 'en,fr,pt_PT').split(',')
-    # DEFAULT_LANGUAGE is hosted as an environment variable NAVIGATOR_DEFAULT_LANGUAGE
     DEFAULT_LANGUAGE = os.getenv('NAVIGATOR_DEFAULT_LANGUAGE', 'en')
 
 
