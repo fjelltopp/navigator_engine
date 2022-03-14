@@ -116,7 +116,6 @@ def graph_loader(graph_config_file):
 def import_data(sheet_name, graphs):
 
     default_lang = app.config['DEFAULT_LANGUAGE']
-    languages = app.config['LANGUAGES']
 
     graph_data = graphs[sheet_name]['graph_data']
     graph_header = graphs[sheet_name]['graph_header']
@@ -133,105 +132,10 @@ def import_data(sheet_name, graphs):
             p = re.compile(r'[\d]{2,2}-')
             is_milestone = p.match(graph_data.loc[idx, DATA_COLUMNS['TITLE']])
             if is_milestone:
-                milestone_sheet_name = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
-                data_loader = graphs[milestone_sheet_name]['graph_header'].get(
-                    MILESTONE_COLUMNS['DATA_LOADER']
-                )
-                milestone = model.Milestone()
-                milestone.graph_id = graphs[milestone_sheet_name]['graph_id']
-                milestone.data_loader = data_loader
-                for lang in languages:
-                    milestone.translations[lang].title = graphs[milestone_sheet_name]['title'][lang]
-                model.db.session.add(milestone)
-                model.db.session.commit()
-
-                node_milestone = model.Node()
-                node_milestone.ref = _get_ref(idx, 'milestone')
-                node_milestone.milestone_id = milestone.id
-
-                model.db.session.add(node_milestone)
-                model.db.session.commit()
-
-                graph_data.at[idx, 'DbNodeId'] = node_milestone.id
+                graph_data.at[idx, 'DbNodeId'] = _create_milestone(graph_data, graphs, idx)
             else:
-                conditional = model.Conditional()
-                conditional.function = graph_data.loc[idx, DATA_COLUMNS['FUNCTION']]
-                model.db.session.add(conditional)
-                model.db.session.commit()
-                for lang in languages:
-                    if lang == default_lang:
-                        conditional.translations[lang].title = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
-                    else:
-                        conditional.translations[lang].title = \
-                            graph_data.loc[idx].get(DATA_COLUMNS['TITLE'] + '::' + lang)
+                graph_data.at[idx, 'DbNodeId'] = _create_conditional(graph_data, graphs, idx)
 
-                node_conditional = model.Node()
-                node_conditional.ref = _get_ref(idx, 'conditional')
-                node_conditional.conditional_id = conditional.id
-                model.db.session.add(node_conditional)
-                model.db.session.commit()
-
-                graph_data.at[idx, 'DbNodeId'] = node_conditional.id
-
-                # If Conditional is False, add an action node if no skip destination is given
-                if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
-
-                    if 'check_not_skipped' in conditional.function:
-                        graph_data.loc[idx, :] = _create_check_skips_action(conditional, graph_data.loc[idx, :])
-
-                    skippable = not _map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['UNSKIPPABLE']])
-
-                    action = model.Action()
-                    action.skippable = skippable
-                    action.complete = False
-
-                    for lang in languages:
-                        if lang == default_lang:
-                            action.translations[lang].title = graph_data.at[idx, DATA_COLUMNS['ACTION']]
-                            action.translations[lang].html = \
-                                _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
-                        else:
-                            action.translations[lang].title = graph_data.loc[idx].get(
-                                DATA_COLUMNS['ACTION'] + '::' + lang)
-                            action.translations[lang].html = _markdown_to_html(graph_data.loc[idx].get(
-                                DATA_COLUMNS['ACTION_CONTENT'] + '::' + lang))
-                    model.db.session.add(action)
-                    model.db.session.commit()
-
-                    # Parse action's resource urls and add them to database
-                    resources = {}
-
-                    for lang in languages:
-                        if lang == default_lang:
-                            resources[lang] = _parse_resources(graph_data.at[idx, DATA_COLUMNS['ACTION_RESOURCES']])
-                        else:
-                            resources[lang] = _parse_resources(
-                                graph_data.loc[idx].get(DATA_COLUMNS['ACTION_RESOURCES'] + '::' + lang))
-
-                    resource_idx = 0
-                    for resource_row in resources[default_lang]:
-                        resource = model.Resource()
-                        resource.url = resource_row['url']
-                        resource.action = action
-                        for lang in languages:
-                            if len(resources[lang]) > 0:
-                                resource.translations[lang].title = resources[lang][resource_idx].get('title')
-                        model.db.session.add(resource)
-                        model.db.session.commit()
-
-                        resource_idx = resource_idx + 1
-
-                    # Add node to action
-                    node_action = model.Node()
-                    node_action.ref = _get_ref(idx, 'action')
-                    node_action.action_id = action.id
-
-                    model.db.session.add(node_action)
-                    model.db.session.commit()
-
-                    graph_data.at[idx, 'DbNodeActionId'] = node_action.id
-                    model.db.session.add(node_action)
-                    model.db.session.commit()
         except Exception as e:
             logger.error(f"Error reading row: {idx}")
             raise e
@@ -300,6 +204,126 @@ def import_data(sheet_name, graphs):
         except Exception as e:
             logger.error(f"Error creating edges for {idx}")
             raise e
+
+
+def _create_milestone(graph_data, graphs, idx):
+    languages = app.config['LANGUAGES']
+
+    milestone_sheet_name = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
+    data_loader = graphs[milestone_sheet_name]['graph_header'].get(
+        MILESTONE_COLUMNS['DATA_LOADER']
+    )
+    milestone = model.Milestone()
+    milestone.graph_id = graphs[milestone_sheet_name]['graph_id']
+    milestone.data_loader = data_loader
+    for lang in languages:
+        milestone.translations[lang].title = graphs[milestone_sheet_name]['title'][lang]
+    model.db.session.add(milestone)
+    model.db.session.commit()
+
+    node_milestone = model.Node()
+    node_milestone.ref = _get_ref(idx, 'milestone')
+    node_milestone.milestone_id = milestone.id
+
+    model.db.session.add(node_milestone)
+    model.db.session.commit()
+
+    return node_milestone.id
+
+
+def _create_conditional(graph_data, graphs, idx):
+    default_lang = app.config['DEFAULT_LANGUAGE']
+    languages = app.config['LANGUAGES']
+
+    conditional = model.Conditional()
+    conditional.function = graph_data.loc[idx, DATA_COLUMNS['FUNCTION']]
+    model.db.session.add(conditional)
+    model.db.session.commit()
+    for lang in languages:
+        if lang == default_lang:
+            conditional.translations[lang].title = graph_data.loc[idx, DATA_COLUMNS['TITLE']]
+        else:
+            conditional.translations[lang].title = \
+                graph_data.loc[idx].get(DATA_COLUMNS['TITLE'] + '::' + lang)
+
+    node_conditional = model.Node()
+    node_conditional.ref = _get_ref(idx, 'conditional')
+    node_conditional.conditional_id = conditional.id
+    model.db.session.add(node_conditional)
+    model.db.session.commit()
+
+    # If Conditional is False, add an action node if no skip destination is given
+    if graph_data.loc[:, DATA_COLUMNS['SKIP_TO']].isnull().loc[idx]:
+
+        if 'check_not_skipped' in conditional.function:
+            graph_data.loc[idx, :] = _create_check_skips_action(conditional, graph_data.loc[idx, :])
+
+        skippable = not _map_excel_boolean(graph_data.at[idx, DATA_COLUMNS['UNSKIPPABLE']])
+        _create_action(graph_data, skippable, idx)
+
+    return node_conditional.id
+
+
+def _create_action(graph_data, skippable, idx):
+    default_lang = app.config['DEFAULT_LANGUAGE']
+    languages = app.config['LANGUAGES']
+
+    action = model.Action()
+    action.skippable = skippable
+    action.complete = False
+
+    for lang in languages:
+        if lang == default_lang:
+            action.translations[lang].title = graph_data.at[idx, DATA_COLUMNS['ACTION']]
+            action.translations[lang].html = \
+                _markdown_to_html(graph_data.at[idx, DATA_COLUMNS['ACTION_CONTENT']])
+        else:
+            action.translations[lang].title = graph_data.loc[idx].get(
+                DATA_COLUMNS['ACTION'] + '::' + lang)
+            action.translations[lang].html = _markdown_to_html(graph_data.loc[idx].get(
+                DATA_COLUMNS['ACTION_CONTENT'] + '::' + lang))
+    model.db.session.add(action)
+    model.db.session.commit()
+
+    _create_resources(graph_data, action, idx)
+
+    # Add node to action
+    node_action = model.Node()
+    node_action.ref = _get_ref(idx, 'action')
+    node_action.action_id = action.id
+
+    model.db.session.add(node_action)
+    model.db.session.commit()
+
+    graph_data.at[idx, 'DbNodeActionId'] = node_action.id
+    model.db.session.add(node_action)
+    model.db.session.commit()
+
+
+def _create_resources(graph_data, action, idx):
+    default_lang = app.config['DEFAULT_LANGUAGE']
+    languages = app.config['LANGUAGES']
+    resources = {}
+
+    for lang in languages:
+        if lang == default_lang:
+            resources[lang] = _parse_resources(graph_data.at[idx, DATA_COLUMNS['ACTION_RESOURCES']])
+        else:
+            resources[lang] = _parse_resources(
+                graph_data.loc[idx].get(DATA_COLUMNS['ACTION_RESOURCES'] + '::' + lang))
+
+    resource_idx = 0
+    for resource_row in resources[default_lang]:
+        resource = model.Resource()
+        resource.url = resource_row['url']
+        resource.action = action
+        for lang in languages:
+            if len(resources[lang]) > 0:
+                resource.translations[lang].title = resources[lang][resource_idx].get('title')
+        model.db.session.add(resource)
+        model.db.session.commit()
+
+        resource_idx = resource_idx + 1
 
 
 def _map_excel_boolean(boolean):
