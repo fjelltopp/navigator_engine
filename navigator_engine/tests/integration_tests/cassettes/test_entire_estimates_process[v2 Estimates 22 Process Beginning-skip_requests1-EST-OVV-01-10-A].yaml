@@ -1,0 +1,207 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Authorization:
+      - DUMMY
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.27.1
+    method: GET
+    uri: https://dev.adr.fjelltopp.org/api/3/action/package_show?id=poland-country-estimates-2022&release=v2%20Estimates%2022%20Process%20Beginning
+  response:
+    body:
+      string: '{"help": "https://dev.adr.fjelltopp.org/api/3/action/help_show?name=package_show",
+        "success": true, "result": {"geo-location": "Poland", "license_title": null,
+        "maintainer": "admin", "relationships_as_object": [], "private": false, "maintainer_email":
+        "", "num_tags": 0, "year": "2022", "id": "055b8a0d-0ec8-412a-9356-90bca6e59d53",
+        "metadata_created": "2022-04-14T06:43:16.356265", "metadata_modified": "2022-04-14T06:43:17.448816",
+        "author": null, "author_email": null, "type_name": "Country Estimates", "state":
+        "active", "version": null, "creator_user_id": "02344e77-be8a-4e77-b07c-a54981b21779",
+        "type": "country-estimates-22", "resources": [{"cache_last_updated": null,
+        "package_id": "055b8a0d-0ec8-412a-9356-90bca6e59d53", "validation_status":
+        "success", "datastore_active": true, "id": "1fb4d4fc-0726-4133-9257-9953bd16b863",
+        "size": 3371963, "metadata_modified": "2022-04-14T06:43:17.455054", "validation_timestamp":
+        "2021-11-29T13:15:25.372787", "state": "active", "sha256": "4fdfbc4271f06f8a7abbd0727b8795da052ef75b527c65fce0601bb985c969dd",
+        "lfs_prefix": "fjelltopp/vanuatu-country-estimates-2022", "schema": "3_survey_inputs",
+        "hash": "", "format": "CSV", "mimetype_inner": null, "url_type": "upload",
+        "restricted_allowed_orgs": "unaids", "mimetype": "text/csv", "cache_url":
+        null, "name": "Survey Data", "created": "2021-11-29T13:06:08.395337", "url":
+        "https://dev.adr.fjelltopp.org/dataset/055b8a0d-0ec8-412a-9356-90bca6e59d53/resource/1fb4d4fc-0726-4133-9257-9953bd16b863/download/demo_survey_hiv_indicators-5.csv?activity_id=136445f2-bf0f-42c5-889a-d1beda462619",
+        "last_modified": "2021-11-29T13:06:08.314615", "position": 0, "resource_type":
+        "inputs-unaids-survey"}, {"cache_last_updated": null, "package_id": "055b8a0d-0ec8-412a-9356-90bca6e59d53",
+        "validation_status": "success", "datastore_active": true, "id": "dd516bf3-57b7-49de-874c-dc1962d665c7",
+        "size": 1573222, "metadata_modified": "2022-04-14T06:43:17.456804", "validation_timestamp":
+        "2021-11-29T13:14:08.948672", "state": "active", "sha256": "08077125cf7665222828b13156f6a375299181eaf415e1d6b5ade1f27b1ac847",
+        "lfs_prefix": "fjelltopp/vanuatu-country-estimates-2022", "schema": "3_population_inputs",
+        "hash": "", "format": "CSV", "mimetype_inner": null, "url_type": "upload",
+        "restricted_allowed_orgs": "unaids", "mimetype": "text/csv", "cache_url":
+        null, "name": "Population Data", "created": "2021-11-29T13:06:11.043561",
+        "url": "https://dev.adr.fjelltopp.org/dataset/055b8a0d-0ec8-412a-9356-90bca6e59d53/resource/dd516bf3-57b7-49de-874c-dc1962d665c7/download/demo_population_agesex-4.csv?activity_id=136445f2-bf0f-42c5-889a-d1beda462619",
+        "last_modified": "2021-11-29T13:06:10.924766", "position": 1, "resource_type":
+        "inputs-unaids-population"}, {"cache_last_updated": null, "package_id": "055b8a0d-0ec8-412a-9356-90bca6e59d53",
+        "datastore_active": false, "id": "32d78861-29f8-4584-96f4-b2f95ee29679", "size":
+        1028513, "metadata_modified": "2022-04-14T06:43:17.458478", "state": "active",
+        "sha256": "5ef32dd0f29a7edec33c41f04b288260a420a8149c7c9913d08c696602da7b47",
+        "lfs_prefix": "fjelltopp/vanuatu-country-estimates-2022", "hash": "", "format":
+        "PJNZ", "mimetype_inner": null, "url_type": "upload", "restricted_allowed_orgs":
+        "unaids", "mimetype": "application/pjnz", "cache_url": null, "name": "Spectrum
+        File", "created": "2021-11-29T13:06:14.693925", "url": "https://dev.adr.fjelltopp.org/dataset/055b8a0d-0ec8-412a-9356-90bca6e59d53/resource/32d78861-29f8-4584-96f4-b2f95ee29679/download/demo_mwi2019-5.pjn?activity_id=136445f2-bf0f-42c5-889a-d1beda462619",
+        "last_modified": "2021-11-29T13:06:14.433025", "position": 2, "resource_type":
+        "inputs-unaids-spectrum-file"}, {"cache_last_updated": null, "package_id":
+        "055b8a0d-0ec8-412a-9356-90bca6e59d53", "validation_status": "success", "datastore_active":
+        true, "id": "c8781918-4e2d-45b8-91e6-8f68f5344d0f", "size": 32402, "metadata_modified":
+        "2022-04-14T06:43:17.460182", "validation_timestamp": "2021-11-29T13:14:16.185661",
+        "state": "active", "sha256": "7eed24e79d6cc2e719e79762821fea2e342c550a82318ad15684d53345ff9837",
+        "lfs_prefix": "fjelltopp/vanuatu-country-estimates-2022", "schema": "4_art_estimates",
+        "hash": "", "format": "CSV", "mimetype_inner": null, "url_type": "upload",
+        "restricted_allowed_orgs": "unaids", "mimetype": "text/csv", "cache_url":
+        null, "name": "ART Data", "created": "2021-11-29T13:06:16.685613", "url":
+        "https://dev.adr.fjelltopp.org/dataset/055b8a0d-0ec8-412a-9356-90bca6e59d53/resource/c8781918-4e2d-45b8-91e6-8f68f5344d0f/download/demo_art_number-6.csv?activity_id=136445f2-bf0f-42c5-889a-d1beda462619",
+        "last_modified": "2021-11-29T13:06:16.435959", "position": 3, "resource_type":
+        "inputs-unaids-art"}, {"validate_package": "true", "cache_last_updated": null,
+        "package_id": "055b8a0d-0ec8-412a-9356-90bca6e59d53", "validation_status":
+        "success", "datastore_active": false, "id": "3eda6071-a117-42a2-8907-7985b62b118d",
+        "size": 1045993, "metadata_modified": "2022-04-14T06:43:17.462205", "validation_timestamp":
+        "2021-11-29T13:14:20.824583", "state": "active", "sha256": "fb9a189da2337c0b568998b3ab668ebf9e433e6ec26135cae95c20bf9bd5a953",
+        "lfs_prefix": "fjelltopp/vanuatu-country-estimates-2022", "schema": "3_geojson_inputs",
+        "hash": "", "format": "GeoJSON", "mimetype_inner": null, "url_type": "upload",
+        "restricted_allowed_orgs": "unaids", "mimetype": "application/geo+json", "cache_url":
+        null, "name": "Geographic Data", "created": "2021-11-29T13:06:21.520248",
+        "url": "https://dev.adr.fjelltopp.org/dataset/055b8a0d-0ec8-412a-9356-90bca6e59d53/resource/3eda6071-a117-42a2-8907-7985b62b118d/download/demo_areas-4.geo?activity_id=136445f2-bf0f-42c5-889a-d1beda462619",
+        "last_modified": "2021-11-29T13:06:20.953430", "position": 4, "resource_type":
+        "inputs-unaids-geographic"}, {"cache_last_updated": null, "package_id": "055b8a0d-0ec8-412a-9356-90bca6e59d53",
+        "validation_status": "success", "datastore_active": true, "id": "6965e865-de6e-40f3-a924-bc1348700804",
+        "size": 15323, "metadata_modified": "2022-04-14T06:43:17.463835", "validation_timestamp":
+        "2021-11-29T13:14:25.998992", "state": "active", "sha256": "09c5357c560ea1d25b0da67136d17340b2d44f4f56728a4dd47ede28f7c10c6d",
+        "lfs_prefix": "fjelltopp/vanuatu-country-estimates-2022", "schema": "3_anc_inputs",
+        "hash": "", "format": "CSV", "mimetype_inner": null, "url_type": "upload",
+        "restricted_allowed_orgs": "unaids", "mimetype": "text/csv", "cache_url":
+        null, "name": "ANC Data", "created": "2021-11-29T13:06:33.943252", "url":
+        "https://dev.adr.fjelltopp.org/dataset/055b8a0d-0ec8-412a-9356-90bca6e59d53/resource/6965e865-de6e-40f3-a924-bc1348700804/download/demo_anc_testing-3.csv?activity_id=136445f2-bf0f-42c5-889a-d1beda462619",
+        "last_modified": "2021-11-29T13:06:33.473192", "position": 5, "resource_type":
+        "inputs-unaids-anc"}, {"cache_last_updated": null, "package_id": "055b8a0d-0ec8-412a-9356-90bca6e59d53",
+        "datastore_active": false, "id": "1702cbf1-0fec-462a-9733-e67055b35ef8", "size":
+        22, "metadata_modified": "2022-04-14T06:43:17.463984", "filename": "navigator_workflow.json",
+        "state": "active", "sha256": "20ff0e8afba80608545aca1fef51341a41cb019a4ea07886a0d9396643dc3a85",
+        "lfs_prefix": "fjelltopp/vanuatu-country-estimates-2022-1", "hash": "", "format":
+        "JSON", "mimetype_inner": null, "url_type": "upload", "mimetype": null, "cache_url":
+        null, "name": "Navigator Workflow", "created": "2021-12-13T15:20:03.409262",
+        "url": "https://dev.adr.fjelltopp.org/dataset/055b8a0d-0ec8-412a-9356-90bca6e59d53/resource/1702cbf1-0fec-462a-9733-e67055b35ef8/download/adr.unaids.org?activity_id=136445f2-bf0f-42c5-889a-d1beda462619",
+        "last_modified": "2021-12-13T15:20:03.361198", "position": 6, "resource_type":
+        "navigator-workflow-state"}], "num_resources": 7, "tags": [], "groups": [],
+        "organization": {"description": "", "created": "2019-10-24T09:10:30.812415",
+        "title": "Fjelltopp", "name": "fjelltopp", "is_organization": true, "state":
+        "active", "image_url": "2019-10-24-091030.793071FjelltoppColour.png", "type":
+        "organization", "id": "38991331-e17b-4008-887e-294ee896c7db", "approval_status":
+        "approved"}, "relationships_as_subject": [], "name": "poland-country-estimates-2022",
+        "isopen": false, "url": null, "notes": "DEMO DATA.  This dataset is being
+        used to test the Navigator.", "owner_org": "38991331-e17b-4008-887e-294ee896c7db",
+        "title": "Poland HIV Estimates 2022"}}'
+    headers:
+      Cache-Control:
+      - public, must-revalidate, max-age=0
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '8323'
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Thu, 14 Apr 2022 07:06:51 GMT
+      Server:
+      - nginx/1.19.3
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Authorization:
+      - DUMMY
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.27.1
+    method: GET
+    uri: https://dev.adr.fjelltopp.org/dataset/055b8a0d-0ec8-412a-9356-90bca6e59d53/resource/1702cbf1-0fec-462a-9733-e67055b35ef8/download/adr.unaids.org?activity_id=136445f2-bf0f-42c5-889a-d1beda462619
+  response:
+    body:
+      string: '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+        <title>Redirecting...</title>
+
+        <h1>Redirecting...</h1>
+
+        <p>You should be redirected automatically to target URL: <a href="https://dev.adr.fjelltopp.org/giftless/fjelltopp/vanuatu-country-estimates-2022-1/objects/storage/20ff0e8afba80608545aca1fef51341a41cb019a4ea07886a0d9396643dc3a85?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2NDk5MjAzMTIsImlhdCI6MTY0OTkyMDAxMiwibmJmIjoxNjQ5OTIwMDEyLCJzdWIiOiJhZG1pbiIsIm5hbWUiOiJBRFIgQWRtaW4iLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL3ZhbnVhdHUtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLzIwZmYwZThhZmJhODA2MDg1NDVhY2ExZmVmNTEzNDFhNDFjYjAxOWE0ZWEwNzg4NmEwZDkzOTY2NDNkYzNhODU6cmVhZCJ9.hCnr6iGYTnu7pNncmlC6S7f1o8lK5cvqA9ECo9jdvWA&amp;filename=adr.unaids.org">https://dev.adr.fjelltopp.org/giftless/fjelltopp/vanuatu-country-estimates-2022-1/objects/storage/20ff0e8afba80608545aca1fef51341a41cb019a4ea07886a0d9396643dc3a85?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2NDk5MjAzMTIsImlhdCI6MTY0OTkyMDAxMiwibmJmIjoxNjQ5OTIwMDEyLCJzdWIiOiJhZG1pbiIsIm5hbWUiOiJBRFIgQWRtaW4iLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL3ZhbnVhdHUtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLzIwZmYwZThhZmJhODA2MDg1NDVhY2ExZmVmNTEzNDFhNDFjYjAxOWE0ZWEwNzg4NmEwZDkzOTY2NDNkYzNhODU6cmVhZCJ9.hCnr6iGYTnu7pNncmlC6S7f1o8lK5cvqA9ECo9jdvWA&amp;filename=adr.unaids.org</a>.  If
+        not click the link.'
+    headers:
+      Cache-Control:
+      - public, must-revalidate, max-age=0
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1419'
+      Content-Type:
+      - text/html; charset=utf-8
+      Date:
+      - Thu, 14 Apr 2022 07:06:52 GMT
+      Location:
+      - https://dev.adr.fjelltopp.org/giftless/fjelltopp/vanuatu-country-estimates-2022-1/objects/storage/20ff0e8afba80608545aca1fef51341a41cb019a4ea07886a0d9396643dc3a85?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2NDk5MjAzMTIsImlhdCI6MTY0OTkyMDAxMiwibmJmIjoxNjQ5OTIwMDEyLCJzdWIiOiJhZG1pbiIsIm5hbWUiOiJBRFIgQWRtaW4iLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL3ZhbnVhdHUtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLzIwZmYwZThhZmJhODA2MDg1NDVhY2ExZmVmNTEzNDFhNDFjYjAxOWE0ZWEwNzg4NmEwZDkzOTY2NDNkYzNhODU6cmVhZCJ9.hCnr6iGYTnu7pNncmlC6S7f1o8lK5cvqA9ECo9jdvWA&filename=adr.unaids.org
+      Server:
+      - nginx/1.19.3
+      Set-cookie:
+      - ckan=9a88e123baa23edc0f7dbd77b00884f1ab3f6dbbc50bb59d0382497b992447e089d17305;
+        expires=Fri, 15-Apr-2022 07:06:52 GMT; Path=/; SameSite=Lax
+    status:
+      code: 302
+      message: FOUND
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Authorization:
+      - DUMMY
+      Connection:
+      - keep-alive
+      Cookie:
+      - ckan=9a88e123baa23edc0f7dbd77b00884f1ab3f6dbbc50bb59d0382497b992447e089d17305
+      User-Agent:
+      - python-requests/2.27.1
+    method: GET
+    uri: https://dev.adr.fjelltopp.org/giftless/fjelltopp/vanuatu-country-estimates-2022-1/objects/storage/20ff0e8afba80608545aca1fef51341a41cb019a4ea07886a0d9396643dc3a85?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6ImdpZnRsZXNzLWludGVybmFsLWp3dC1rZXkifQ.eyJleHAiOjE2NDk5MjAzMTIsImlhdCI6MTY0OTkyMDAxMiwibmJmIjoxNjQ5OTIwMDEyLCJzdWIiOiJhZG1pbiIsIm5hbWUiOiJBRFIgQWRtaW4iLCJzY29wZXMiOiJvYmo6ZmplbGx0b3BwL3ZhbnVhdHUtY291bnRyeS1lc3RpbWF0ZXMtMjAyMi0xLzIwZmYwZThhZmJhODA2MDg1NDVhY2ExZmVmNTEzNDFhNDFjYjAxOWE0ZWEwNzg4NmEwZDkzOTY2NDNkYzNhODU6cmVhZCJ9.hCnr6iGYTnu7pNncmlC6S7f1o8lK5cvqA9ECo9jdvWA&filename=adr.unaids.org
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA6tWSs7PLchJLUlNCUkszi5WslKIjq0FAKA2IWMWAAAA
+    headers:
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - attachment; filename="adr.unaids.org"
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - text/html; charset=utf-8
+      Date:
+      - Thu, 14 Apr 2022 07:06:52 GMT
+      Server:
+      - nginx/1.19.3
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+version: 1
